@@ -1748,7 +1748,7 @@ def ask_gpt():
         # OpenAI API 호출을 asyncio에서 비동기로 실행
         # loop = asyncio.get_event_loop()
         # response = await loop.run_in_executor(None, lambda: openai.ChatCompletion.create(
-            _deployment_id=_deployment_id,  # Deploy Name
+            engine=_deployment_id,  # Deploy Name
             messages=[
                 {"role": "system", "content": "You are a professional Japanese text proofreading assistant."
                 "This includes not only Japanese text but also English abbreviations (英略語), "
@@ -4826,7 +4826,7 @@ def write_upload():
 
         # ChatCompletion Call
         response = openai.ChatCompletion.create(
-            _deployment_id=_deployment_id,  # Deploy Name
+            engine=_deployment_id,  # Deploy Name
             messages=[
                 {"role": "system", "content": "You are a professional Japanese text proofreading assistant."},
                 {"role": "user", "content": prompt_result}
@@ -5447,7 +5447,7 @@ def gpt_correct_text(prompt):
     
     # ChatCompletion Call
     response = openai.ChatCompletion.create(
-        _deployment_id=_deployment_id,  # Deploy Name
+        engine=_deployment_id,  # Deploy Name
         messages=[
             {"role": "system", "content": "You are a professional Japanese text proofreading assistant."},
             {"role": "user", "content": prompt_result}
@@ -5598,7 +5598,7 @@ def prompt_upload():
 
         # ChatCompletion Call
         response = openai.ChatCompletion.create(
-            _deployment_id=_deployment_id,  # Deploy Name
+            engine=_deployment_id,  # Deploy Name
             messages=[
                 {"role": "system", "content": "You are a professional Japanese text proofreading assistant."},
                 {"role": "user", "content": prompt_result}
@@ -5952,7 +5952,7 @@ async def get_original(input_data, org_text):
         {"role": "user", "content": input_data}
     ]
     response = await openai.ChatCompletion.acreate(
-        _deployment_id=_deployment_id,  # Deploy Name
+        engine=_deployment_id,  # Deploy Name
         messages=question,
         max_tokens=16384,
         temperature=0,
@@ -6240,7 +6240,7 @@ def integrate_enhance():
         ]
 
         response = openai.ChatCompletion.create(
-            _deployment_id=_deployment_id,  # Deploy Name
+            engine=_deployment_id,  # Deploy Name
             messages=question,
             max_tokens=16384,
             temperature=0,
@@ -6261,7 +6261,7 @@ def integrate_enhance():
                 {"role": "user", "content": summarize}
             ]
             _response = openai.ChatCompletion.create(
-                _deployment_id=_deployment_id,  # Deploy Name
+                engine=_deployment_id,  # Deploy Name
                 messages=_question,
                 max_tokens=16384,
                 temperature=0,
@@ -6413,7 +6413,7 @@ Return only HTML output. Do not explain or add comments.
         """  
         # ChatCompletion Call
         response = openai.ChatCompletion.create(
-            _deployment_id=_deployment_id,  # Deploy Name
+            engine=_deployment_id,  # Deploy Name
             messages=[
                 {"role": "system", "content": "You are a professional Japanese text proofreading assistant."
                 "This includes not only Japanese text but also English abbreviations (英略語), "
@@ -6575,7 +6575,7 @@ def get_num(num):
 def opt_common(input, prompt_result, pdf_base64, pageNumber, re_list, word_list, rule_list, rule1_list, rule3_list):  
     # ChatCompletion Call
     response = openai.ChatCompletion.create(
-        _deployment_id=_deployment_id,  # Deploy Name
+        engine=_deployment_id,  # Deploy Name
         messages=[
             {"role": "system", "content": "You are a Japanese text extraction tool capable of accurately extracting the required text."},
             {"role": "user", "content": prompt_result}
@@ -6686,7 +6686,7 @@ def opt_common(input, prompt_result, pdf_base64, pageNumber, re_list, word_list,
 async def opt_common_wording(file_name,fund_type,input,prompt_result,excel_base64,pdf_base64,resutlmap,upload_type,comment_type,icon,pageNumber):
     # ChatCompletion Call
     response = await openai.ChatCompletion.acreate(
-        _deployment_id=_deployment_id,  # Deploy Name
+        engine=_deployment_id,  # Deploy Name
         messages=[
             {"role": "system", "content": "あなたは曖昧な表現を定型語に変換する、厳格な金融校正AIです。出力形式・修正ルールはすべて厳守してください。"},
             {"role": "user", "content": prompt_result}
@@ -6829,7 +6829,7 @@ def opt_typo():
 
 async def handle_result(prompt_result):
     response = await openai.ChatCompletion.acreate(
-        _deployment_id=_deployment_id,  # Deploy Name
+        engine=_deployment_id,  # Deploy Name
         messages=[
             {"role": "system",
             "content": "You are a professional Japanese business document proofreader specialized in financial and public disclosure materials."},
@@ -8611,7 +8611,7 @@ def integrated_test():
             question.append({"role": "user", "content": input_data})
 
         response = openai.ChatCompletion.create(
-            _deployment_id=_deployment_id,  # Deploy Name
+            engine=_deployment_id,  # Deploy Name
             messages=question,
             max_tokens=16384,
             temperature=0,
