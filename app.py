@@ -166,8 +166,8 @@ token_cache = AzureTokenCache()
 openai.api_type = "azure_ad"
 openai.api_base = os.getenv("AZURE_OPENAI_ENDPOINT")  # Get Env
 openai.api_version = os.getenv("AZURE_OPENAI_API_VERSION")  # API Version
-deployment_id = os.getenv("AZURE_OPENAI_MODEL")  # Get Deploy Name(mini-ZZ)
-_deployment_id = os.getenv("AZURE_OPENAI_MODEL_4")  # Get Deploy Name(mini-ZZ)
+deployment_id = os.getenv("AZURE_OPENAI_MODEL")
+_deployment_id = os.getenv("AZURE_OPENAI_MODEL_4")
 
 # Cosmos DB 연결 설정
 COSMOS_DB_URI = os.getenv("COSMOS_DB_URI")
