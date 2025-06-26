@@ -166,8 +166,8 @@ token_cache = AzureTokenCache()
 openai.api_type = "azure_ad"
 openai.api_base = os.getenv("AZURE_OPENAI_ENDPOINT")  # Get Env
 openai.api_version = os.getenv("AZURE_OPENAI_API_VERSION")  # API Version
-deployment_id = os.getenv("AZURE_OPENAI_MODEL") 
-_deployment_id = os.getenv("AZURE_OPENAI_MODEL_4")
+deployment_id = os.getenv("AZURE_OPENAI_MODEL")  # Get Deploy Name(mini-ZZ)
+_deployment_id = os.getenv("AZURE_OPENAI_MODEL_4")  # Get Deploy Name(mini-ZZ)
 
 # Cosmos DB 연결 설정
 COSMOS_DB_URI = os.getenv("COSMOS_DB_URI")
@@ -1748,14 +1748,14 @@ def ask_gpt():
         # OpenAI API 호출을 asyncio에서 비동기로 실행
         # loop = asyncio.get_event_loop()
         # response = await loop.run_in_executor(None, lambda: openai.ChatCompletion.create(
-            engine=_deployment_id,  # Deploy Name
+            deployment_id=deployment_id,  # Deploy Name
             messages=[
                 {"role": "system", "content": "You are a professional Japanese text proofreading assistant."
                 "This includes not only Japanese text but also English abbreviations (英略語), "
                 "foreign terms (外来語),and specialized terminology (専門用語)."},
                 {"role": "user", "content": prompt_result}
             ],
-            max_tokens=16384,
+            max_tokens=32768,
             temperature=0,
             seed=42  # 재현 가능한 결과를 위해 seed 설정
         )
@@ -4826,12 +4826,12 @@ def write_upload():
 
         # ChatCompletion Call
         response = openai.ChatCompletion.create(
-            engine=_deployment_id,  # Deploy Name
+            deployment_id=deployment_id,  # Deploy Name
             messages=[
                 {"role": "system", "content": "You are a professional Japanese text proofreading assistant."},
                 {"role": "user", "content": prompt_result}
             ],
-            max_tokens=16384,
+            max_tokens=32768,
             temperature=0,
             seed=42  # 재현 가능한 결과를 위해 seed 설정
         )
@@ -5447,12 +5447,12 @@ def gpt_correct_text(prompt):
     
     # ChatCompletion Call
     response = openai.ChatCompletion.create(
-        engine=_deployment_id,  # Deploy Name
+        deployment_id=deployment_id,  # Deploy Name
         messages=[
             {"role": "system", "content": "You are a professional Japanese text proofreading assistant."},
             {"role": "user", "content": prompt_result}
         ],
-        max_tokens=16384,
+        max_tokens=32768,
         temperature=0,
         seed=42  # 재현 가능한 결과를 위해 seed 설정
     )
@@ -5598,12 +5598,12 @@ def prompt_upload():
 
         # ChatCompletion Call
         response = openai.ChatCompletion.create(
-            engine=_deployment_id,  # Deploy Name
+            deployment_id=deployment_id,  # Deploy Name
             messages=[
                 {"role": "system", "content": "You are a professional Japanese text proofreading assistant."},
                 {"role": "user", "content": prompt_result}
             ],
-            max_tokens=16384,
+            max_tokens=32768,
             temperature=0.1,
             seed=42  # 재현 가능한 결과를 위해 seed 설정
         )
@@ -5952,9 +5952,9 @@ async def get_original(input_data, org_text):
         {"role": "user", "content": input_data}
     ]
     response = await openai.ChatCompletion.acreate(
-        engine=_deployment_id,  # Deploy Name
+        deployment_id=deployment_id,  # Deploy Name
         messages=question,
-        max_tokens=16384,
+        max_tokens=32768,
         temperature=0,
         seed=42
     )
@@ -6240,7 +6240,7 @@ def integrate_enhance():
         ]
 
         response = openai.ChatCompletion.create(
-            engine=_deployment_id,  # Deploy Name
+            deployment_id=_deployment_id,  # Deploy Name
             messages=question,
             max_tokens=16384,
             temperature=0,
@@ -6261,7 +6261,7 @@ def integrate_enhance():
                 {"role": "user", "content": summarize}
             ]
             _response = openai.ChatCompletion.create(
-                engine=_deployment_id,  # Deploy Name
+                deployment_id=_deployment_id,  # Deploy Name
                 messages=_question,
                 max_tokens=16384,
                 temperature=0,
@@ -6413,14 +6413,14 @@ Return only HTML output. Do not explain or add comments.
         """  
         # ChatCompletion Call
         response = openai.ChatCompletion.create(
-            engine=_deployment_id,  # Deploy Name
+            deployment_id=deployment_id,  # Deploy Name
             messages=[
                 {"role": "system", "content": "You are a professional Japanese text proofreading assistant."
                 "This includes not only Japanese text but also English abbreviations (英略語), "
                 "foreign terms (外来語),and specialized terminology (専門用語)."},
                 {"role": "user", "content": prompt_result}
             ],
-            max_tokens=16384,
+            max_tokens=32768,
             temperature=0,
             seed=42  # 재현 가능한 결과를 위해 seed 설정
         )
@@ -6575,12 +6575,12 @@ def get_num(num):
 def opt_common(input, prompt_result, pdf_base64, pageNumber, re_list, word_list, rule_list, rule1_list, rule3_list):  
     # ChatCompletion Call
     response = openai.ChatCompletion.create(
-        engine=_deployment_id,  # Deploy Name
+        deployment_id=deployment_id,  # Deploy Name
         messages=[
             {"role": "system", "content": "You are a Japanese text extraction tool capable of accurately extracting the required text."},
             {"role": "user", "content": prompt_result}
         ],
-        max_tokens=16384,
+        max_tokens=32768,
         temperature=0,
         seed=42  # 재현 가능한 결과를 위해 seed 설정
     )
@@ -6588,32 +6588,33 @@ def opt_common(input, prompt_result, pdf_base64, pageNumber, re_list, word_list,
     parsed_data = ast.literal_eval(answer)
     combine_corrections = []
     for data in parsed_data:
-        _re_rule = ".{,2}"
-        _original_re = regcheck.search(f"{_re_rule}{re.escape(data["original"])}{_re_rule}", input)
-        if _original_re:
-            _original_text = _original_re.group()
-        else:
-            _original_text = data["original"]
-        combine_corrections.append({
-            "page": pageNumber,
-            "original_text": _original_text,  # 전체 입력
-            "comment": f'{_original_text} → {data["correct"]}', 
-            "reason_type": data["reason"],
-            "check_point": _original_text,
-            "locations": [],
-            "intgr": False,  # for debug 62
-        })
-    if rule_list:
-        for rule_result in rule_list:
+            _re_rule = ".{,2}"
+            _original_re = regcheck.search(f"{_re_rule}{re.escape(data["original"])}{_re_rule}", input)
+            if _original_re:
+                _original_text = _original_re.group()
+            else:
+                _original_text = data["original"]
             combine_corrections.append({
                 "page": pageNumber,
-                "original_text": str(rule_result),  # 전체 입력
-                "comment": f"{str(rule_result)} → 当月の投資配分",
-                "reason_type": "誤字脱字",
-                "check_point": str(rule_result),
+                "original_text": _original_text,  # 전체 입력
+                "comment": f'{_original_text} → {data["correct"]}',
+                "reason_type": data["reason"],
+                "check_point": _original_text,
                 "locations": [],
                 "intgr": False,  # for debug 62
             })
+
+    if rule_list:
+            for rule_result in rule_list:
+                combine_corrections.append({
+                    "page": pageNumber,
+                    "original_text": str(rule_result),  # 전체 입력
+                    "comment": f"{str(rule_result)} → 当月の投資配分",
+                    "reason_type": "誤字脱字",
+                    "check_point": str(rule_result),
+                    "locations": [],
+                    "intgr": False,  # for debug 62
+                })
 
     if re_list:
         for re_result in re_list:
@@ -6652,7 +6653,6 @@ def opt_common(input, prompt_result, pdf_base64, pageNumber, re_list, word_list,
                 "intgr": False,  # for debug 62
             })
 
-
     if word_list:
         for word_result in word_list:
             combine_corrections.append({
@@ -6664,7 +6664,6 @@ def opt_common(input, prompt_result, pdf_base64, pageNumber, re_list, word_list,
                 "locations": [],
                 "intgr": False,  # for debug 62
             })
-
 
     if pdf_base64:
         try:
@@ -6681,17 +6680,18 @@ def opt_common(input, prompt_result, pdf_base64, pageNumber, re_list, word_list,
     return jsonify({
         "success": True,
         "corrections": combine_corrections,  # 틀린 부분과 코멘트
+        "parsed_data": parsed_data
     })
 
 async def opt_common_wording(file_name,fund_type,input,prompt_result,excel_base64,pdf_base64,resutlmap,upload_type,comment_type,icon,pageNumber):
     # ChatCompletion Call
     response = await openai.ChatCompletion.acreate(
-        engine=_deployment_id,  # Deploy Name
+        deployment_id=deployment_id,  # Deploy Name
         messages=[
             {"role": "system", "content": "あなたは曖昧な表現を定型語に変換する、厳格な金融校正AIです。出力形式・修正ルールはすべて厳守してください。"},
             {"role": "user", "content": prompt_result}
         ],
-        max_tokens=16384,
+        max_tokens=32768,
         temperature=0,
         seed=42  # 재현 가능한 결과를 위해 seed 설정
     )
@@ -6829,13 +6829,13 @@ def opt_typo():
 
 async def handle_result(prompt_result):
     response = await openai.ChatCompletion.acreate(
-        engine=_deployment_id,  # Deploy Name
+        deployment_id=deployment_id,  # Deploy Name
         messages=[
             {"role": "system",
             "content": "You are a professional Japanese business document proofreader specialized in financial and public disclosure materials."},
             {"role": "user", "content": prompt_result}
         ],
-        max_tokens=16384,
+        max_tokens=32768,
         temperature=0,
         seed=42  # 재현 가능한 결과를 위해 seed 설정
     )
@@ -8611,9 +8611,9 @@ def integrated_test():
             question.append({"role": "user", "content": input_data})
 
         response = openai.ChatCompletion.create(
-            engine=_deployment_id,  # Deploy Name
+            deployment_id=deployment_id,  # Deploy Name
             messages=question,
-            max_tokens=16384,
+            max_tokens=32768,
             temperature=0,
             seed=42
         )
