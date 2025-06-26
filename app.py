@@ -167,7 +167,7 @@ openai.api_type = "azure_ad"
 openai.api_base = os.getenv("AZURE_OPENAI_ENDPOINT")  # Get Env
 openai.api_version = os.getenv("AZURE_OPENAI_API_VERSION")  # API Version
 deployment_id = os.getenv("AZURE_OPENAI_MODEL") 
-__deployment_id = os.getenv("AZURE_OPENAI_MODEL_4")
+_deployment_id = os.getenv("AZURE_OPENAI_MODEL_4")
 
 # Cosmos DB 연결 설정
 COSMOS_DB_URI = os.getenv("COSMOS_DB_URI")
@@ -1748,7 +1748,7 @@ def ask_gpt():
         # OpenAI API 호출을 asyncio에서 비동기로 실행
         # loop = asyncio.get_event_loop()
         # response = await loop.run_in_executor(None, lambda: openai.ChatCompletion.create(
-            _deployment_id=__deployment_id,  # Deploy Name
+            _deployment_id=_deployment_id,  # Deploy Name
             messages=[
                 {"role": "system", "content": "You are a professional Japanese text proofreading assistant."
                 "This includes not only Japanese text but also English abbreviations (英略語), "
@@ -6240,7 +6240,7 @@ def integrate_enhance():
         ]
 
         response = openai.ChatCompletion.create(
-            _deployment_id=__deployment_id,  # Deploy Name
+            _deployment_id=_deployment_id,  # Deploy Name
             messages=question,
             max_tokens=16384,
             temperature=0,
@@ -6261,7 +6261,7 @@ def integrate_enhance():
                 {"role": "user", "content": summarize}
             ]
             _response = openai.ChatCompletion.create(
-                _deployment_id=__deployment_id,  # Deploy Name
+                _deployment_id=_deployment_id,  # Deploy Name
                 messages=_question,
                 max_tokens=16384,
                 temperature=0,
