@@ -6942,7 +6942,6 @@ def get_prompt(corrected):
 
         {target_prompt}
 
-        **Please check each sentence **individually** for okurigana consistency.**
         """
         yield common_result
 
@@ -7018,38 +7017,30 @@ def loop_in_ruru(input):
             "requirements": [
                 {
                     "condition": "騰落率が 0.00％ / 0.0％ / 0％ の場合",
-                    "correction": "『騰落率は変わらず』の代わりに、以下のいずれかに修正する:\n- 『基準価額（分配金再投資）は前月末から変わらず』\n- 『前月末と同程度』"
+                    "correction": "騰落率は変わらずの代わりに、以下のいずれかに修正する:\n- 基準価額(分配金再投資)は前月末から変わらず\n- 前月末と同程度"
                 },
                 {
-                    "condition": "騰落率の数値が小数第3位まである（例：0.546％）",
-                    "correction": "小数第2位で四捨五入（round-half-up）し、『0.55%』のように修正する"
+                    "condition": "騰落率の数値が小数第3位まである(例：0.546％)",
+                    "correction": "小数第2位で四捨五入(round-half-up)し、0.55%のように修正する"
                 },
                 {
-                    "condition": "ファンドとベンチマーク（参考指数）の騰落率を比較する場合",
-                    "correction": "上記の四捨五入処理後の値で比較し、同じ場合は『騰落率は同程度となりました』と記述する"
+                    "condition": "ファンドとベンチマーク(参考指数)の騰落率を比較する場合",
+                    "correction": "上記の四捨五入処理後の値で比較し、同じ場合は騰落率は同程度となりましたと記述する"
                 }
             ],
             "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
             "Examples": [
                 {
                     "input": "ファンドの騰落率は0.546％",
-                    "output": "ファンドの騰落率は<span style=\"color:red;\">0.546％</span> (<span>修正理由: 四捨五入 <s style=\"background:yellow;color:red\">0.546％</s> →0.55%</span>)"
+                    "output": "'original': '0.546％', 'correct': '0.55%', 'reason': '四捨五入'",
                 },
                 {
-                    "input": "ベンチマークの騰落率は0.546％",
-                    "output": "ベンチマークの騰落率は<span style=\"color:red;\">0.546％</span> (<span>修正理由: 四捨五入 <s style=\"background:yellow;color:red\">0.546％</s> →0.55%</span>)"
-                },
-                {
-                    "input": "月間の基準価額（分配金再投資）の騰落率は+2.85％で、ベンチマークを0％を上回りました。",
-                    "output": "<span style=\"color:red;\">ベンチマークを0％を上回りました。</span> (<span>修正理由: 騰落率が同じ <s style=\"background:yellow;color:red\">ベンチマークを0％を上回りました。</s> →ベンチマークは同程度となりました。</span>)"
+                    "input": "月間の基準価額(分配金再投資)の騰落率は+2.85％で、ベンチマークを0％を上回りました。",
+                    "output": "'original': 'ベンチマークを0％を上回りました。', 'correct': 'ベンチマークは同程度となりました。', 'reason': '騰落率が同じ'",
                 },
                 {
                     "input": "0.00％となりました",
-                    "output": "<span style=\"color:red;\">0.00％となりました</span> (<span>修正理由: 表記の修正 <s style=\"background:yellow;color:red\">0.00％となりました</s> → 前月末から変わらず</span>)"
-                },
-                {
-                    "input": "0.0％でした。",
-                    "output": "<span style=\"color:red;\">0.0％でした。</span> (<span>修正理由: 表記の修正 <s style=\"background:yellow;color:red\">0.0％でした。</s> → 前月末から変わらず</span>)"
+                    "output": "'original': '0.00％となりました', 'correct': '前月末から変わらず', 'reason': '表記の修正'",
                 }
             ]
         },
@@ -7059,8 +7050,8 @@ def loop_in_ruru(input):
             "description": "収益率・騰落率などにおいて、正の数値には明示的に「+」を付与して統一性を保つ。既に「+」「−」が付いているものは変更しない。",
             "requirements": [
                 {
-                    "condition": "収益率、騰落率などで、正の数値に符号（+）が付いていない場合",
-                    "correction": "符号（+）を付与する（例：4.04％ → +4.04％）"
+                    "condition": "収益率、騰落率などで、正の数値に符号(+)が付いていない場合",
+                    "correction": "符号(+)を付与する(例：4.04％ → +4.04％)"
                 },
                 {
                     "condition": "すでに「+」や「−」が付いている数値",
@@ -7070,11 +7061,11 @@ def loop_in_ruru(input):
             "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': '「＋」「-」の明示的統一'",
             "Examples": [
                 {
-                    "input": "○月間の基準価額の騰落率は4.04％、ベンチマークの騰落率は4.53％、超過収益は-0.49％となりました。",
-                    "output": "○月間の基準価額の騰落率は<span style=\"color:red;\">4.04％</span> (<span>修正理由: 「＋」「-」の明示的統一 <s style=\"background:yellow;color:red\">4.04％</s> → +4.04％</span>)、ベンチマークの騰落率は<span style=\"color:red;\">4.53％</span> (<span>修正理由: 「＋」「-」の明示的統一 <s style=\"background:yellow;color:red\">4.53％</s> → +4.53％</span>)、超過収益は-0.49％となりました。"
+                    "input": "○月間の基準価額の騰落率は4.04％",
+                    "output": "'original': '4.04％', 'correct': '+4.04％', 'reason': '「＋」「-」の明示的統一'",
                 }
             ],
-            "notes": "対象数値は一般的に％が後ろに付く収益や成長値などに限定。整数・小数とも対象（例：5％、0.00％、1.234％ など）文章内に複数該当がある場合もすべて個別に対応する"
+            "notes": "対象数値は一般的に％が後ろに付く収益や成長値などに限定。整数・小数とも対象(例：5％、0.00％、1.234％ など)文章内に複数該当がある場合もすべて個別に対応する"
         },
         {
             "category": "Avoid Direct Mention of Specific Company Names(個別企業名の表記)",
@@ -7086,9 +7077,10 @@ def loop_in_ruru(input):
                     "correction": "Instead of using the company name, describe it by category, industry, or region. Make sure to place 'major' (大手) directly before the industry term, not the company name."
                 }
             ],
+            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': '個別企業名の直接記載は禁止。カテゴリや地域に一般化する必要あり。'",
             "Example": {
                 "Input": "スイス金融大手クレディ・スイスは～",
-                "Output": "<span style=\"color:red;\">クレディ・スイス</span> (<span>修正理由: 個別企業名の直接記載は禁止。カテゴリや地域に一般化する必要あり。 <s style=\"background:yellow;color:red\">スイス金融大手クレディ・スイス</s> → スイスの大手金融グループ</span>) は～"
+                "Output": "'original': 'スイス金融大手クレディ・スイス', 'correct': 'スイスの大手金融グループ', 'reason': '個別企業名の直接記載は禁止。カテゴリや地域に一般化する必要あり。'",
             }
         },
         {
@@ -7109,7 +7101,7 @@ def loop_in_ruru(input):
                     "correction": ""
                 },
                 {
-                    "condition": "利回りは「上昇（価格は下落）」または「低下（価格は上昇）」と表記。",
+                    "condition": "利回りは「上昇(価格は下落)」または「低下(価格は上昇)」と表記。",
                     "correction": ""
                 }
             ],
@@ -7117,27 +7109,23 @@ def loop_in_ruru(input):
             "Examples": [
                 {
                     "Input": "利回りの低下",
-                    "Output": "<span style=\"color:red;\">利回りの低下</span> (<span>修正理由:利回りと価格の逆相関関係を明記する必要あり <s style=\"background:yellow;color:red\">利回りの低下</s> → 利回りの低下（価格は上昇）</span>)"
-                },
-                {
-                    "Input": "その後次期トランプ政権にて財政赤字削減を唱えるベッセント氏が財務長官に指名され、財政政策に対して慎重な姿勢が取られると意識されたことなどにより債券利回りは低下に転じ、月間では債券利回りは低下しました。",
-                    "Output": "その後次期トランプ政権にて財政赤字削減を唱えるベッセント氏が財務長官に指名され、財政政策に対して慎重な姿勢が取られると意識されたことなどにより債券利回りは低下に転じ、月間では債券<span style=\"color:red;\">利回りは低下</span> (<span>修正理由:利回りと価格の逆相関関係を明記する必要あり <s style=\"background:yellow;color:red\">利回りは低下</s> → 利回りは低下（価格は上昇）</span>しました。)"
+                    "Output": "'original': '利回りの低下', 'correct': 'Corrected text', '利回りの低下(価格は上昇)','reason': '利回りと価格の逆相関関係を明記する必要あり'",
                 },
                 {
                     "Input": "日本10年国債利回りは、月間で上昇しました。",
-                    "Output": "日本10年国債利回りは、月間で<span style=\"color:red;\">上昇</span> (<span>修正理由:利回りと価格の逆相関関係を明記する必要あり <s style=\"background:yellow;color:red\">上昇</s> → 上昇（価格は低下）</span>しました。)"
+                    "Output": "'original': '上昇', 'correct': 'Corrected text', '上昇(価格は低下)','reason': '利回りと価格の逆相関関係を明記する必要あり'",
                 },
                 {
                     "Input": "利回りの上昇",
-                    "Output": "<span style=\"color:red;\">利回りの上昇</span> (<span>修正理由:利回りと価格の逆相関関係を明記する必要あり <s style=\"background:yellow;color:red\">利回りの上昇</s> → 利回りの上昇（価格は低下）</span>)"
+                    "Output": "'original': '利回りの上昇', 'correct': 'Corrected text', '利回りの上昇(価格は低下)','reason': '利回りと価格の逆相関関係を明記する必要あり'",
                 },
                 {
-                    "Input": "その後次期トランプ政権にて財政赤字削減を唱えるベッセント氏が財務長官に指名され、財政政策に対して慎重な姿勢が取られると意識されたことなどにより債券利回りは低下に転じ、月間では債券利回りは上昇しました。",
-                    "Output": "その後次期トランプ政権にて財政赤字削減を唱えるベッセント氏が財務長官に指名され、財政政策に対して慎重な姿勢が取られると意識されたことなどにより債券利回りは低下に転じ、月間では債券<span style=\"color:red;\">利回りは上昇</span> (<span>修正理由:利回りと価格の逆相関関係を明記する必要あり <s style=\"background:yellow;color:red\">利回りは上昇</s> → 利回りは上昇（価格は低下）</span>しました。)"
+                    "Input": "月間では債券利回りは上昇しました。",
+                    "Output": "'original': '利回りは上昇', 'correct': 'Corrected text', '利回りは上昇(価格は低下)','reason': '利回りと価格の逆相関関係を明記する必要あり'",
                 },
                 {
                     "Input": "日本10年国債利回りは、月間で下落しました。",
-                    "Output": "日本10年国債利回りは、月間で<span style=\"color:red;\">下落</span> (<span>修正理由:利回りと価格の逆相関関係を明記する必要あり <s style=\"background:yellow;color:red\">下落</s> → 下落（価格は上昇）</span>しました。)"
+                    "Output": "'original': '下落', 'correct': '下落(価格は上昇)', 'reason': '利回りと価格の逆相関関係を明記する必要あり'",
                 }
             ]
         },
@@ -7163,15 +7151,15 @@ def loop_in_ruru(input):
             "Examples": [
                 {
                     "Input": "米国債利回りが下落しました。",
-                    "Output": "<span style=\"color:red;\">米国債利回りが下落しました。</span> (<span>修正理由:利回りには「低下」を使用 <s style=\"background:yellow;color:red\">米国債利回りが下落しました。</s> → 米国債利回りが低下しました。</span>)"
+                    "Output": "'original': '米国債利回りが下落しました。', 'correct': '米国債利回りが低下しました。', 'reason': '利回りには「低下」を使用'",
                 },
                 {
                     "Input": "価額が低下しました。",
-                    "Output": "<span style=\"color:red;\">価額が低下しました。</span> (<span>修正理由:価格には「下落」を使用 <s style=\"background:yellow;color:red\">価額が低下しました。</s> → 価額が下落しました。</span>)"
+                    "Output": "'original': '価額が低下しました。', 'correct': '価額が下落しました', 'reason': '価格には「下落」を使用'",
                 },
                 {
                     "Input": "金利が下落しました。",
-                    "Output": "<span style=\"color:red;\">金利が下落しました。</span> (<span>修正理由:金利には「低下」を使用 <s style=\"background:yellow;color:red\">金利が下落しました。</s> → 金利が低下しました。</span>)"
+                    "Output": "'original': '金利が下落しました。。', 'correct': '金利が低下しました。', 'reason': '金利には「低下」を使用'",
                 }
             ]
         },
@@ -7188,7 +7176,7 @@ def loop_in_ruru(input):
             "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': '構成比0％の表記統一'",
             "Example": {
                 "Input": "当ファンドの構成比は0％です。",
-                "Output": "当ファンドの構成比は<span style=\"color:red;\">0％</span> (<span>修正理由:構成比0％の表記統一 <s style=\"background:yellow;color:red\">0％</s> → 0％程度</span>) です。"
+                "Output": "'original': '0％', 'correct': '0％程度', 'reason': '構成比0％の表記統一'",
             }
         },
         {
@@ -7209,42 +7197,38 @@ def loop_in_ruru(input):
             "Examples": [
                 {
                     "Input": "市場は徐々に鎮静していった。",
-                    "Output": "市場は徐々に <span style=\"color:red;\">沈静</span> (<span>修正理由: 意味の誤用 <s style=\"background:yellow;color:red\">鎮静</s> → 沈静</span>) していった。"
+                    "Output": "'original': '鎮静', 'correct': '沈静', 'reason': '意味の誤用'",
                 },
                 {
                     "Input": "医療チームは患者の暴動を沈静させた。",
-                    "Output": "医療チームは患者の暴動を <span style=\"color:red;\">鎮静</span> (<span>修正理由: 意味の誤用 <s style=\"background:yellow;color:red\">沈静</s> → 鎮静</span>) させた。"
+                    "Output": "'original': '沈静', 'correct': '鎮静', 'reason': '意味の誤用'",
                 }
             ]
         },
         {
             "category": "Prohibited_or_Cautioned_Expressions_Rise_and_Decline_Factors",
             "rule_id": "2.8",
-            "description": "When '上昇' or '下落' appears, check the paragraph-level context for an explicit causal explanation. If no cause is provided, highlight the word and prompt the user. Do not modify the sentence itself—annotate only. If both rise and fall occurred in different courses, prioritize the one with the larger change. Describing both is also acceptable. （上昇・下落要因の記載漏れに対する警告）",
+            "description": "When '上昇' or '下落' appears, check the paragraph-level context for an explicit causal explanation. If no cause is provided, highlight the word and prompt the user. Do not modify the sentence itself—annotate only. If both rise and fall occurred in different courses, prioritize the one with the larger change. Describing both is also acceptable. (上昇・下落要因の記載漏れに対する警告)",
             "requirements": [
                 {
                     "condition": "上昇",
-                    "correction": "上昇の要因（背景や理由）を明記してください。"
+                    "correction": "上昇の要因(背景や理由)を明記してください。"
                 },
                 {
                     "condition": "下落",
-                    "correction": "下落の要因（背景や理由）を明記してください。"
+                    "correction": "下落の要因(背景や理由)を明記してください。"
                 }
             ],
             "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': '上昇・下落要因の記載漏れ、メッセージ提示'",
             "Examples": [
                 {
                     "Input": "最近、米国経済において賃金上昇と物価高が続いており、景気過熱感が指摘されています。米国のインフレ懸念の高まりを背景に、株式市場は下落しました。金融当局は今後も利上げを続ける見通しです。",
-                    "Output": "（エラーなし:前文に要因記載あり）"
-                },
-                {
-                    "Input": "米国の景気動向が注目されています。株式市場は下落しました。今後の動向を見守る必要があります。",
-                    "Output": "<span style=\"color:red;\">下落</span> (<span>修正理由: 上昇・下落要因の記載漏れ、メッセージ提示 <s style=\"background:yellow;color:red\">下落</s> → 下落</span>)"
+                    "Output": "(エラーなし:前文に要因記載あり)"
                 }
             ]
         },
         {
-            "category": "Replacement Rules for Verb-Type Expressions（動詞・活用形を含む表現の置き換え）",
+            "category": "Replacement Rules for Verb-Type Expressions(動詞・活用形を含む表現の置き換え)",
             "rule_id": "2.9",
             "description":"Certain terms or expressions require more than simple string or regex-based replacement. These are called dynamically varying expressions, which include but are not limited to: Register-sensitive expressions (e.g., polite/humble language variations) Compound phrases or abbreviations that appear in flexible forms When the term to be replaced is a verb, the system must detect and process all conjugated or inflected forms. Do not use rigid pattern matching. Ensure grammatical accuracy after replacement. In general, all such replacements must be done in a context-sensitive manner, ensuring the result remains grammatically and semantically correct",
             "requirements": [
@@ -7261,33 +7245,23 @@ def loop_in_ruru(input):
             "Examples": [
                 {
                     "Input": "～に賭ける",
-                    "Output": "～を予想して"
+                    "Output": "'original': '～に賭ける', 'correct': '～を予想して', 'reason': 'Reason text'",
                 },
                 {
                     "Input": "当作成期を通してみると債券利回りは横ばいでした。",
-                    "Output": "<span style=\"color:red;\">横ばい</span> (<span>修正理由: 期間中に一定の変動幅が確認されており、「横ばい」という表現は実態と合わないため、「ほぼ変わらず」とするのが適切。 <s style=\"background:yellow;color:red\">横ばい</s> → ほぼ変わらず</span>)"
+                    "Output": "'original': '横ばい', 'correct': 'ほぼ変わらず', 'reason': '期間中に一定の変動幅が確認されており、「横ばい」という表現は実態と合わないため、「ほぼ変わらず」とするのが適切。'",
                 }
             ]
         },
         {
-            "category": "行って来い ⇒ 「上昇（下落）したのち下落（上昇）」等へ書き換える",
+            "category": "行って来い ⇒ 「上昇(下落)したのち下落(上昇)」等へ書き換える",
             "rule_id": "3.0",
             "description": "The expression “行って来い” is informal and vague. It must not be used in formal financial documents or reports intended for external audiences.Replace it with a precise description of the price movement, such as: “上昇したのち下落した” 下落したのち上昇した Always use fact-based, objective wording that clearly describes the market movement.",
-            # # "requirements": [
-            # #     {
-            # #         "condition": "",
-            # #         "correction": ""
-            # #     },
-            # #     {
-            # #         "condition": "",
-            # #         "correction": ""
-            # #     }
-            # ],
             "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': '「行って来い」は曖昧かつ口語的な表現であり、正式な金融文書では具体的な値動きを明記する必要があります。'",
             "Examples": [
                 {
                     "Input": "相場は行って来いの展開となりました。",
-                    "Output": "<span style=\"color:red;\">行って来い</span> (<span>修正理由: 「行って来い」は曖昧かつ口語的な表現であり、正式な金融文書では具体的な値動きを明記する必要があります。 <s style=\"background:yellow;color:red\">行って来い</s> → 一時上昇したものの、その後下落し、前日と同水準で終了しました。</span>)"
+                    "Output": "'original': '行って来い', 'correct': '一時上昇したものの、その後下落し、前日と同水準で終了しました。', 'reason': '「行って来い」は曖昧かつ口語的な表現であり、正式な金融文書では具体的な値動きを明記する必要があります。'",
                 }
             ]
         },
@@ -7295,21 +7269,11 @@ def loop_in_ruru(input):
             "category": "The phrase format “○○大手” (e.g., “通信大手”) is not preferred in formal writing.",
             "rule_id": "The phrase format “○○大手” (e.g., “通信大手”) ",
             "description": "Always rephrase using the structure “大手 + [industry/company type]”, such as: “大手通信会社” “大手不動産企業” “大手半導体メーカー” The “大手” modifier should appear before the industry or company type.If the noun is a company name, ensure “大手” precedes the type, not the sector.",
-            # "requirements": [
-            #     {
-            #         "condition": "",
-            #         "correction": ""
-            #     },
-            #     {
-            #         "condition": "",
-            #         "correction": ""
-            #     }
-            # ],
             "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
             "Examples": [
                 {
                     "Input": "通信大手が新サービスを発表しました。",
-                    "output": "<span style=\"color:red;\">通信大手</span> (<span>修正理由: 「通信大手」という表現は語順が不自然であり、正式なビジネス文書では「大手通信会社」のように「大手」を先に置く表現が適切です。 <s style=\"background:yellow;color:red\">通信大手</s> → 大手通信会社</span>)"
+                    "output": "'original': '通信大手', 'correct': '大手通信会社', 'reason': '「通信大手」という表現は語順が不自然であり、正式なビジネス文書では「大手通信会社」のように「大手」を先に置く表現が適切です。'",
                 }
             ]
         },
@@ -7317,23 +7281,7 @@ def loop_in_ruru(input):
             "category": "一般的な送り仮名など",
             "rule_id": "okurigana_usage",
             "description": "Verify that the correct and standardized okurigana is used consistently in the report.",
-            "requirements": [
-                {
-                    "condition": "",
-                    "correction": ""
-                },
-                {
-                    "condition": "",
-                    "correction": ""
-                }
-            ],
             "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
-            "Examples": [
-                {
-                    "input": "",
-                    "output": ""
-                }
-            ]
         },
     ]
 
