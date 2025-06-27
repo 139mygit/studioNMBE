@@ -994,7 +994,7 @@ def ask_gpt():
 
                 When comparing the performance of the fund with the benchmark (or reference index), the comparison must be made using rounded numbers.
 
-                修正理由: 比較は丸めた数字で行うこと。
+                修正理由: 比較は丸めた数字で行なうこと。
                 If the fund and benchmark (or reference index) have the same rate of return, use the phrase "騰落率は同程度となりました" instead of saying "騰落率は同じでした".
                 修正理由: 同じという表現は避け、代わりに「同程度」と記載すること。
 
@@ -3069,7 +3069,6 @@ replace_rules = {
     "ヶ月": "ヵ月",
     "入替え": "入れ替え",
     "入替": "入れ替",
-    "行われる": "行なわれる",
     "売付":"売り付け",
     "売付け":"売り付け",
     "格付": "格付け", 
@@ -3131,15 +3130,19 @@ replace_rules = {
     "買い付けました": "買い付けしました",
     '中銀': '中央銀行', #623
     '行われて': '行なわれて', #623
-    '行い': '行な', #623
+    '行い': '行ない', #623
+    "行った":"行なった",
     '行う': '行なう', #623
     '行って': '行なって', #623
+    "行われる": "行なわれる",
     '買い付け': '買い付けし', #64977
     'EDAツール': 'EDAツール（電子設計自動化ツール）', #623
     '前年比': '前年同期比', #623
     "買付":"買い付け",
     "買付け":"買い付けし", #63207
     "TOPIX":"TOPIX（東証株価指数）", #63207
+
+
 }
 
 def merge_brackets(content: str) -> str:
@@ -4069,7 +4072,7 @@ def write_upload():
 
                 When comparing the performance of the fund with the benchmark (or reference index), the comparison must be made using rounded numbers.
 
-                修正理由: 比較は丸めた数字で行うこと。
+                修正理由: 比較は丸めた数字で行なうこと。
                 If the fund and benchmark (or reference index) have the same rate of return, use the phrase "騰落率は同程度となりました" instead of saying "騰落率は同じでした".
                 修正理由: 同じという表現は避け、代わりに「同程度」と記載すること。
 
@@ -6859,7 +6862,7 @@ def get_prompt(corrected):
         -Detect any missing characters (脱字) or misused characters (誤字) that cause unnatural expressions or misinterpretation.
         **Proofreading Requirements**：
         - Detect and correct all genuine missing characters (脱字) or misused characters (誤字) that cause grammatical errors or change the intended meaning.
-        - Always detect and correct any incorrect conjugations, misused readings, or wrong kanji/verb usage, even if they superficially look natural.
+        - Always detect and correct any incorrect conjugations, misused readings, or verb usage, even if they superficially look natural.
         - Do not point out stylistic variations, natural auxiliary expressions, or acceptable conjugations unless they are grammatically incorrect.
         - Confirm that each kanji matches the intended meaning precisely.
         - Detect cases where non-verb terms are incorrectly used as if they were verbs.
@@ -6965,7 +6968,7 @@ def opt_kanji():
         print("✅ Token Update SUCCESS")
         
         data = request.json
-        input = data.get("input", "")
+        input = data.get("full_text", "") # kanji api need full text
 
         pdf_base64 = data.get("pdf_bytes", "")
         excel_base64 = data.get("excel_bytes", "")
@@ -7011,7 +7014,7 @@ def loop_in_ruru(input):
         {
             "category": "表記の統一 (Standardized Notation)",
             "rule_id": "1.1",
-            "description": "基準価額の騰落率に関する表現の統一および数値の四捨五入を行うこと。指定された表現に厳密に従う。",
+            "description": "基準価額の騰落率に関する表現の統一および数値の四捨五入を行なうこと。指定された表現に厳密に従う。",
             "requirements": [
                 {
                     "condition": "騰落率が 0.00％ / 0.0％ / 0％ の場合",
