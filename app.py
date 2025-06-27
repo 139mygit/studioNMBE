@@ -2822,10 +2822,6 @@ full_to_half_dict = {
     'Ｚ': 'Z','＋':'+','－':'-'
 }
 
-king_dict = {
-    '中銀': '中央銀行', 
-}
-
 
 def year_half_dict():
     # 전각 문자와 반각 문자의 매핑
@@ -7041,8 +7037,8 @@ def loop_in_ruru(input):
                     "output": "ベンチマークの騰落率は<span style=\"color:red;\">0.546％</span> (<span>修正理由: 四捨五入 <s style=\"background:yellow;color:red\">0.546％</s> →0.55%</span>)"
                 },
                 {
-                    "input": "騰落率は同じでした。",
-                    "output": "<span style=\"color:red;\">騰落率は同じでした。</span> (<span>修正理由: 騰落率が同じ <s style=\"background:yellow;color:red\">騰落率は同じでした。</s> →騰落率は同程度となりました。</span>)"
+                    "input": "月間の基準価額（分配金再投資）の騰落率は+2.85％で、ベンチマークを0％を上回りました。",
+                    "output": "<span style=\"color:red;\">ベンチマークを0％を上回りました。</span> (<span>修正理由: 騰落率が同じ <s style=\"background:yellow;color:red\">ベンチマークを0％を上回りました。</s> →ベンチマークは同程度となりました。</span>)"
                 },
                 {
                     "input": "0.00％となりました",
@@ -7055,77 +7051,8 @@ def loop_in_ruru(input):
             ]
         },
         {
-            "category": "表記の統一 (Standardized Notation)",
-            "rule_id": "1.3",
-            "description": "年の記載が省略された日付表記（例：1月31日）に対して、文中に存在する最新の『XXXX年度』を基準に対応する西暦年（XXXX年）を補完する。",
-            "requirements": [
-                {
-                "condition": "『XXXX年度』という記載が文中に存在し、かつ『○月○日』という形式で年が省略された日付がある場合",
-                "correction": "該当する『○月○日』の前に『XXXX年』を補完し、『XXXX年○月○日』の形式に統一する（XXXXは直前の年度から抽出）"
-                },
-                {
-                "condition": "既に『XXXX年○月○日』のように年が明記されている場合",
-                "correction": "変更は行わない（既に正しい形式）"
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
-            "Examples": [
-                {
-                "input": "2024年度の予想経常利益は前年度比4.4％増、1月31日時点の見通しです。",
-                "output": "2024年度の予想経常利益は前年度比4.4％増、<span style=\"color:red;\">1月31日</span> (<span>修正理由: 年が省略されていた日付に 2024年 を補完 <s style=\"background:yellow;color:red\">1月31日</s> → 2024年1月31日</span>)"
-                },
-                {
-                "input": "2025年度は同5.8％増（同上）となることが予想されます。2月1日に発表予定。",
-                "output": "2025年度は同5.8％増（同上）となることが予想されます。<span style=\"color:red;\">2月1日</span> (<span>修正理由: 年が省略されていた日付に 2025年 を補完 <s style=\"background:yellow;color:red\">2月1日</s> → 2025年2月1日</span>)"
-                },
-                {
-                "input": "2023年度の実績は2023年12月31日時点の情報です。",
-                "output": "2023年度の実績は2023年12月31日時点の情報です。"
-                }
-            ]
-        },
-        {
-            "category": "記号処理 (Symbol Handling)",
-            "rule_id": "2.1",
-            "description": "文中の「※」記号は、すべてHTMLの上付き形式<sup>※</sup>に変換する。視認性向上のため、注釈や脚注の目的で使用。",
-            "requirements": [
-                {
-                    "condition": "単語の末尾に「※」が付いている場合（例：重要事項※）",
-                    "correction": "上付き形式に変換：例）重要事項<sup>※</sup>"
-                },
-                {
-                    "condition": "文末に「※」がある場合",
-                    "correction": "上付き形式に変換：例）〜とされています<sup>※</sup>"
-                },
-                {
-                    "condition": "「※」が単独で文中に存在する場合",
-                    "correction": "<sup>※</sup> に変換"
-                },
-                {
-                    "condition": "「※」が複数回出現する場合",
-                    "correction": "すべて個別に変換する（例：リスク※や費用※ → リスク<sup>※</sup>や費用<sup>※</sup>）"
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
-            "Examples": [
-                {
-                    "input": "重要事項※",
-                    "output": "重要事項<sup>※</sup> (<span>修正理由: 単語の末尾にある「※」を上付きに変換 <s style=\"background:yellow;color:red\">重要事項※</s> → <sup>※</sup></span>)"
-                },
-                {
-                    "input": "リスク※や費用※",
-                    "output": "リスク<sup>※</sup>や費用<sup>※</sup> (<span>修正理由: 単語末尾の「※」を上付きに変換 <s style=\"background:yellow;color:red\">リスク※や費用※</s> → リスク<sup>※</sup>や費用<sup>※</sup></span>)"
-                },
-                {
-                    "input": "※",
-                    "output": "<span style=\"color:red;\">※</span> (<span>修正理由: 単独の「※」を上付きに変換 <s style=\"background:yellow;color:red\">※</s> → <sup>※</sup></span>)"
-                }
-            ],
-            "notes": "文脈の意味が変わらないように注意し、自然な文章になるように変換すること。一括置換ではなく、文全体を見て慎重に変換を行うこと。"
-        },
-        {
             "category": "数値記号の統一 (Numeric Sign Consistency)",
-            "rule_id": "3.1",
+            "rule_id": "1.2",
             "description": "収益率・騰落率などにおいて、正の数値には明示的に「+」を付与して統一性を保つ。既に「+」「−」が付いているものは変更しない。",
             "requirements": [
                 {
@@ -7142,341 +7069,28 @@ def loop_in_ruru(input):
                 {
                     "input": "○月間の基準価額の騰落率は4.04％、ベンチマークの騰落率は4.53％、超過収益は-0.49％となりました。",
                     "output": "○月間の基準価額の騰落率は<span style=\"color:red;\">4.04％</span> (<span>修正理由: 「＋」「-」の明示的統一 <s style=\"background:yellow;color:red\">4.04％</s> → +4.04％</span>)、ベンチマークの騰落率は<span style=\"color:red;\">4.53％</span> (<span>修正理由: 「＋」「-」の明示的統一 <s style=\"background:yellow;color:red\">4.53％</s> → +4.53％</span>)、超過収益は-0.49％となりました。"
-                },
-                {
-                    "input": "前月比は0.00％で、先月は-1.23％でした。",
-                    "output": "前月比は<span style=\"color:red;\">0.00％</span> (<span>修正理由: 「＋」「-」の明示的統一 <s style=\"background:yellow;color:red\">0.00％</s> → +0.00％</span>)で、先月は-1.23％でした。"
                 }
             ],
             "notes": "対象数値は一般的に％が後ろに付く収益や成長値などに限定。整数・小数とも対象（例：5％、0.00％、1.234％ など）文章内に複数該当がある場合もすべて個別に対応する"
         },
         {
-            "category": "カタカナ表記の統一",
-            "rule_id": "4.1",
-            "description": "外来語などカタカナ語の表記ゆれを文書内で統一する。",
-            "requirements": [
-                {
-                    "condition": "カタカナ語が複数表記で出現する場合",
-                    "correction": "最初に出現した表記を基準に統一。ただし、外部の正準リスト（辞書等）で誤りが明示されている場合はその正準形に従う。"
-                },
-                {
-                    "condition": "表記が文書内で混在している（例：サステナブル／サスティナブル）",
-                    "correction": "最初の出現語（あるいは標準リスト準拠）に合わせて他を統一する"
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': '「カタカナ表記の統一'",
-            "Examples": [
-                {
-                    "input": "このファンドはサステナブルな投資を目指します。なお、近年はサスティナブル経営が重視されています。",
-                    "output": "このファンドは<span style=\"color:red;\">サステナブル</span> (<span>修正理由: カタカナ表記の統一 <s style=\"background:yellow;color:red\">サステナブル</s> → サスティナブル</span>)な投資を目指します。なお、近年はサスティナブル経営が重視されています。"
-                },
-                {
-                    "input": "エンターテイメントの分野では、エンターテインメント企業の影響が大きい。",
-                    "output": "エンターテイメントの分野では、<span style=\"color:red;\">エンターテインメント</span> (<span>修正理由: カタカナ表記の統一 <s style=\"background:yellow;color:red\">エンターテインメント</s> → エンターテイメント</span>)企業の影響が大きい。"
-                }
-            ],
-            "notes": "最初に出現したカタカナ語を文書内基準とする。ただし、外部で定義された標準用語がある場合はそちらを優先。自動処理時は、同義語グループを辞書で管理し、最初の使用形にマッピングする処理が必要。"
-        },
-        {
-            "category": "経済指標の月明記",
-            "rule_id": "5.1",
-            "description": "経済指標が特定の時期に基づくものである場合、その月を明記する。",
-            "requirements": [
-                {
-                    "condition": "経済指標（例: PMI, CPI, 雇用統計など）が登場し、時期が文脈から特定可能だが、文中に月が記載されていない場合",
-                    "correction": "「○月の」などの形で時期を明記する。国名が必要な場合は併記する。"
-                }
-            ],
-            "output_format": "修正箇所は <span style=\"color:red;\">修正前</span> (<span>修正理由: 月が明記されていないため、明記が必要 <s style=\"background:yellow;color:red\">修正前</s> → 修正後</span>) の形式で表示",
-            "Examples": [
-                {
-                    "input": "製造業PMI（購買担当者景気指数）は上昇しました。",
-                    "output": "<span style=\"color:red;\">製造業PMI（購買担当者景気指数）は上昇しました。</span> (<span>修正理由: 月が明記されていないため、明記が必要 <s style=\"background:yellow;color:red\">製造業PMI（購買担当者景気指数）は上昇しました。</s> → 10月の製造業PMI（購買担当者景気指数）は上昇しました。</span>)"
-                }
-            ],
-            "notes": "月の明記は可能な限り前方に記載（例:『4月のCPI』）。日本国外の指標の場合、必要に応じて『米国の』なども追加する。"
-        },
-        {
-            "category": "加速表現の強調",
-            "rule_id": "5.2",
-            "description": "「加速」という語が登場する場合は常に強調して修正提案する（曖昧性排除目的）。",
-            "requirements": [
-                {
-                    "condition": "文中に「加速」が含まれる場合",
-                    "correction": "文意が明確でも、常に<span>修正理由: 「加速」を提示する</span>形式でマーキングして明示的に注意喚起を行う"
-                }
-            ],
-            "output_format": "修正箇所は <span style=\"color:red;\">修正前</span> (<span>修正理由: 「加速」を提示する <s style=\"background:yellow;color:red\">修正前</s> → 修正後</span>) の形式で表示",
-            "Examples": [
-                {
-                    "input": "景気は前月から加速しました。",
-                    "output": "<span style=\"color:red;\">景気は前月から加速しました。</span> (<span>修正理由: 「加速」を提示する <s style=\"background:yellow;color:red\">景気は前月から加速しました。</s> → 景気は前月から加速しました。</span>)"
-                }
-            ],
-            "notes": "「加速」は経済文脈で曖昧な場合が多いため、常に修正候補としてマーク。可能であれば、何がどのように加速したのか（例: 回復ペース、下落幅、景気回復の速度など）を明記するよう提案。"
-        },
-        {
-            "category": "会計期間の区切り記号統一",
-            "rule_id": "6.1",
-            "description": "会計期間表記において「～」は禁止し、必ず「ー」（全角ハイフン）に統一する。",
-            "requirements": [
-                {
-                    "condition": "表記中に「～」が含まれている場合",
-                    "correction": "「～」を「ー」に置換する"
-                }
-            ],
-            "output_format": "修正箇所は <span style=\"color:red;\">修正前</span> (<span>修正理由: 会計期間表記において「～」は禁止、「ー」に修正 <s style=\"background:yellow;color:red\">修正前</s> → 修正後</span>) の形式で表示",
-            "Examples": [
-                {
-                    "input": "6～8月期",
-                    "output": "<span style=\"color:red;\">6～8月期</span> (<span>修正理由: 会計期間表記において「～」は禁止、「ー」に修正 <s style=\"background:yellow;color:red\">6～8月期</s> → 6ー8月期</span>)"
-                }
-            ]
-        },
-        {
-            "category": "カレンダー年採用国の年度明記追加",
-            "rule_id": "6.2",
-            "description": "カレンダー年（1月～12月）採用国の年度表記には、具体的な期間を括弧で明記する。",
-            "requirements": [
-                {
-                    "condition": "「年度」のみ記載で月の範囲がない場合",
-                    "correction": "「（yyyy年1月-12月）」を追加"
-                },
-                {
-                    "condition": "「上期」や「下期」がある場合",
-                    "correction": "期間を対応した形で括弧内に追加（例: 上期→1月-6月、下期→6月-12月）"
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
-            "Examples": [
-                {
-                    "input": "ブラジルの2021年度予算",
-                    "output": "ブラジルの2021年度（2021年1月-12月）予算"
-                },
-                {
-                    "input": "ブラジルの2021年下期予算",
-                    "output": "ブラジルの2021年下期（2021年6月-12月）予算"
-                }
-            ]
-        },
-        {
-            "category": "年度または四半期表現の年明示義務",
-            "rule_id": "6.3",
-            "description": "1～3月発表の開示資料において、「今年度」「来年度」など曖昧な年度表現は使わず、西暦＋年度に統一する。",
-            "requirements": [
-                {
-                    "condition": "「今年度」「来年度」などの年度表現が使われている場合（1～3月発表文脈）",
-                    "correction": "実際の西暦を用いて「yyyy年度」に置換する"
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
-            "Examples": [
-                {
-                    "input": "今年度の第1四半期にあたる",
-                    "output": "<span style=\"color:red;\">今年度の第1四半期にあたる</span> (<span>修正理由: 1～3月発表は西暦＋年度に統一 <s style=\"background:yellow;color:red\">今年度の第1四半期にあたる</s> → 2024年度の第1四半期にあたる</span>)"
-                },
-                {
-                    "input": "来年度の予想",
-                    "output": "<span style=\"color:red;\">来年度の予想</span> (<span>修正理由: 1～3月発表は西暦＋年度に統一 <s style=\"background:yellow;color:red\">来年度の予想</s> → 2025年度の予想</span>)"
-                }
-            ]
-        },
-        {
-            "category": "四半期表現の月期統一",
-            "rule_id": "6.4",
-            "description": "会計期間が四半期であっても、「〇-〇月期」の形式で表現を統一する。",
-            "requirements": [
-                {
-                    "condition": "「第1四半期（5月21日～8月20日）」など不定期な期間表現がある場合",
-                    "correction": "「～」は「ー」に直し、可能な限り「〇-〇月期」形式に置換"
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': '会計期間表記は「ー」区切りに統一し、月期に直す'",
-            "Examples": [
-                {
-                    "input": "第1四半期（5月21日～8月20日）",
-                    "output": "<span style=\"color:red;\">第1四半期（5月21日～8月20日）</span> (<span>修正理由: 会計期間表記は「ー」区切りに統一し、月期に直す <s style=\"background:yellow;color:red\">第1四半期（5月21日～8月20日）</s> → 6-8月期</span>)"
-                }
-            ]
-        },
-        {
-            "category": "年表記の統一",
-            "rule_id": "YearNotation-1",
-            "description": "年表記は常に4桁（西暦）で統一し、省略表記は不可。",
-            "requirements": [
-                {
-                    "condition": "年を表現する場合",
-                    "correction": "必ず4桁の西暦（例：2022年）で表記。2桁（例：'22年'）は禁止。"
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
-            "Examples": [
-                {
-                    "input": "22年の経済成長率は",
-                    "output": "<span style=\"color:red;\">22年の経済成長率は</span> (<span>修正理由: 年表記は4桁（西暦）に統一 <s style=\"background:yellow;color:red\">22年の経済成長率は</s> → 2022年の経済成長率は</span>)"
-                }
-            ]
-        },
-        {
-            "category": "前年比較表現の統一",
-            "rule_id": "YearNotation-2",
-            "description": "前年比較の表現は「前年同月比」または「前年同期比」に統一。通年比較のみ「前年比」可。",
-            "requirements": [
-                {
-                    "condition": "前年との比較を表現する場合",
-                    "correction": "月次・期次データは「前年同月比」または「前年同期比」に統一。通年比較のみ「前年比」可。"
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': '月次データの比較は「前年同月比」に統一'",
-            "Examples": [
-                {
-                    "input": "1月のCPIは前年比で上昇しました。",
-                    "output": "1月のCPIは <span style=\"color:red;\">前年比</span> (<span>修正理由: 月次データの比較は「前年同月比」に統一 <s style=\"background:yellow;color:red\">前年比</s> → 前年同月比</span>) で上昇しました。"
-                },
-                {
-                    "input": "2023年のGDPは前年比+3.0％となりました。",
-                    "output": "修正不要。この場合通年比較なので「前年比」使用可。"
-                }
-            ]
-        },
-        {
-            "category": "年跨ぎ指標の年表記",
-            "rule_id": "YearNotation-3",
-            "description": "複数年にまたがる指標（CPI, PMI, GDP等）は、最初の出現時のみ年を明記し、以降は文脈が明確な場合は月のみで可。",
-            "requirements": [
-                {
-                    "condition": "異なる年にまたがる月を記載する場合",
-                    "correction": "最初の月にのみ年を明記し、以降は文脈が明確なら月のみで可。"
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
-            "Examples": [
-                { 
-                    "input":"",
-                    "output":""
-                }
-            ]
-        },
-        {
-            "category": "年推定ルール",
-            "rule_id": "YearNotation-4",
-            "description": "文脈から年を推定する場合のルール。",
-            "requirements": [
-                {
-                    "condition": "直前に4桁の年（例：2025年）が明記されている場合",
-                    "correction": "以降の月はその年を基準とする。"
-                },
-                {
-                    "condition": "年が明記されていない場合",
-                    "correction": "現在月を基準に推定。"
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': '年表記の初出が不明確なためメッセージ提示'",
-            "Examples": [
-                {
-                    "input": "12月のCPIは～",
-                    "output": "<span style=\"color:red;\">12月のCPIは～</span> (<span>修正理由: 年表記の初出が不明確なためメッセージ提示 <s style=\"background:yellow;color:red\">12月のCPIは～</s> → 2024年12月のCPIは～</span>)"
-                },
-                {
-                    "input": "1月のユーロ圏PMIは～",
-                    "output": "<span style=\"color:red;\">1月のユーロ圏PMIは～</span> (<span>修正理由: 年表記の初出が不明確なためメッセージ提示 <s style=\"background:yellow;color:red\">1月のユーロ圏PMIは～</s> → 2025年1月のユーロ圏PMIは～</span>)"
-                },
-                {
-                    "input": "10-12月期のGDPは～",
-                    "output": "<span style=\"color:red;\">10-12月期のGDPは～</span> (<span>修正理由: 年表記の初出が不明確なためメッセージ提示 <s style=\"background:yellow;color:red\">10-12月期のGDPは～</s> → 2024年10-12月期のGDPは～</span>)"
-                }
-            ],
-            "notes": "常に現在の年・月を動的に判定すること（システム時刻や手動設定の基準月を利用）。月範囲（例：3-5月期, 10-12月期）は最終月を抽出して年を推定。年が明記されている場合は推定しない（例：2024年12月のCPIはそのまま）。" 
-        },
-        {
-            "category": "レンジ表記の統一",
-            "rule_id": "RangeNotation-1",
-            "description": "数値レンジ（範囲）を表現する際は、パーセントの場合両端に必ず「％」を付ける。",
-            "requirements": [
-                {
-                    "condition": "パーセントのレンジ（範囲）を表現する場合",
-                    "correction": "両端に「％」を付けて表記（例: -1％～0.5％）"
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'レンジ表記においては両端に％を付ける必要あり'",
-            "Examples": [
-                {
-                    "input": "物価上昇率は-1～0.5の範囲で推移しました。",
-                    "output": "物価上昇率は<span style=\"color:red;\">-1～0.5</span> (<span>修正理由: レンジ表記においては両端に％を付ける必要あり <s style=\"background:yellow;color:red\">-1～0.5</s> → -1％～0.5％</span>) の範囲で推移しました。"
-                }
-            ],
-            "notes": "「-1～0.5％」のような表現は誤りであり、「-1％～0.5％」と記載すること。"
-        },
-        {
-            "category": "InvestmentEnvironmentMonthEndExpression",
-            "rule_id": "先月末",
-            "description": "When mentioning 'last month's investment environment' ('先月の投資環境') in the article, apply the following correction rule,When referring to '先月末' inside the '先月の投資環境' section, if it matches the month prior to the report creation standard month, it must be expressed as '前月末' or '●月末'. Simply saying '先月末' is not acceptable.",
-            "requirements": [
-                {
-                    "condition": "先月末",
-                    "correction": "前月末"
-                }
-            ],
-            "Example": [
-                {
-                    "Input": "先月末時点での株式市場は～",
-                    "Output": "<span style=\"color:red;\">先月末</span> (<span>修正理由: 投資環境記載時は「前月末」または「●月末」と記載するルール <s style=\"background:yellow;color:red\">先月末</s> → 前月末</span>) 時点での株式市場は～"
-                }
-            ]
-        },
-        {
-            "category": "AvoidDirectMentionOfSpecificCompanyNames(個別企業名の表記)",
-            "rule_id": "AvoidDirectMentionOfSpecificCompanyNames",
+            "category": "Avoid Direct Mention of Specific Company Names(個別企業名の表記)",
+            "rule_id": "Avoid Direct Mention of Specific Company Names",
             "description": "When describing the investment environment or economic conditions, avoid mentioning specific company names directly. ",
             "requirements": [
                 {
                     "condition": "Expressions must be generalized without citing the company's exact name.",
-                    "correction": ""
-                },
-                {
-                    "condition": "Instead of using the company name, describe it by category, industry, or region.",
-                    "correction": ""
+                    "correction": "Instead of using the company name, describe it by category, industry, or region. Make sure to place 'major' (大手) directly before the industry term, not the company name."
                 }
             ],
             "Example": {
                 "Input": "スイス金融大手クレディ・スイスは～",
-                "Output": "スイスの大手金融グループ<span style=\"color:red;\">クレディ・スイス</span> (<span>修正理由: 個別企業名の直接記載は禁止。カテゴリや地域に一般化する必要あり。 <s style=\"background:yellow;color:red\">クレディ・スイス</s> → スイスの大手金融グループ</span>) は～"
-            }
-        },
-        {
-            "category": "PositiveAndNegativeContributionExpressions",
-            "rule_id": "PositiveAndNegativeContributionExpressions",
-            "description": "When describing positive or negative contributions (寄与/影響), apply the following rules",
-            "requirements": [
-                {
-                    "condition": "For positive effects, either プラスに寄与 or プラスに影響 is acceptable.",
-                    "correction": ""
-                },
-                {
-                    "condition": "Alternatively, you may rephrase as ～プラス要因となる.",
-                    "correction": ""
-                },
-                {
-                    "condition": "For negative effects, 寄与 must not be used. Always use マイナスに影響 instead.",
-                    "correction": ""
-                },
-                {
-                    "condition": "Alternatively, rephrase as ～マイナス要因となる.",
-                    "correction": ""
-                },
-                {
-                    "condition": "Detect incorrect usage according to these standards and mark appropriately.",
-                    "correction": ""
-                }
-            ],
-            "Example": {
-                "Input": "政策の遅れが景気にマイナスに寄与した。",
-                "Output": "<span style=\"color:red;\">マイナスに寄与</span> (<span>修正理由:マイナス方向は「影響」表記に統一する <s style=\"background:yellow;color:red\">マイナスに寄与</s> → マイナスに影響</span>) "
+                "Output": "<span style=\"color:red;\">クレディ・スイス</span> (<span>修正理由: 個別企業名の直接記載は禁止。カテゴリや地域に一般化する必要あり。 <s style=\"background:yellow;color:red\">スイス金融大手クレディ・スイス</s> → スイスの大手金融グループ</span>) は～"
             }
         },
         {
             "category": "YieldMovementdescription",
-            "rule_id": "YieldMovementdescription",
+            "rule_id": "1.3",
             "description": "When describing the movement of yields (利回り), ensure that the inverse relationship with prices is properly reflected.",
             "requirements": [
                 {
@@ -7500,34 +7114,46 @@ def loop_in_ruru(input):
             "Examples": [
                 {
                     "Input": "利回りの低下",
-                    "Output": "<span style=\"color:red;\">利回りの低下</span> (<span>修正理由:利回りと価格の逆相関関係を明記する必要あり <s style=\"background:yellow;color:red\">利回りの低下</s> → 価格は上昇</span>)"
+                    "Output": "<span style=\"color:red;\">利回りの低下</span> (<span>修正理由:利回りと価格の逆相関関係を明記する必要あり <s style=\"background:yellow;color:red\">利回りの低下</s> → 利回りの低下（価格は上昇）</span>)"
+                },
+                {
+                    "Input": "その後次期トランプ政権にて財政赤字削減を唱えるベッセント氏が財務長官に指名され、財政政策に対して慎重な姿勢が取られると意識されたことなどにより債券利回りは低下に転じ、月間では債券利回りは低下しました。",
+                    "Output": "その後次期トランプ政権にて財政赤字削減を唱えるベッセント氏が財務長官に指名され、財政政策に対して慎重な姿勢が取られると意識されたことなどにより債券利回りは低下に転じ、月間では債券<span style=\"color:red;\">利回りは低下</span> (<span>修正理由:利回りと価格の逆相関関係を明記する必要あり <s style=\"background:yellow;color:red\">利回りは低下</s> → 利回りは低下（価格は上昇）</span>しました。)"
+                },
+                {
+                    "Input": "日本10年国債利回りは、月間で上昇しました。",
+                    "Output": "日本10年国債利回りは、月間で<span style=\"color:red;\">上昇</span> (<span>修正理由:利回りと価格の逆相関関係を明記する必要あり <s style=\"background:yellow;color:red\">上昇</s> → 上昇（価格は低下）</span>しました。)"
                 },
                 {
                     "Input": "利回りの上昇",
-                    "Output": "<span style=\"color:red;\">利回りの上昇</span> (<span>修正理由:利回りと価格の逆相関関係を明記する必要あり <s style=\"background:yellow;color:red\">利回りの上昇</s> → 価格は下落</span>)"
+                    "Output": "<span style=\"color:red;\">利回りの上昇</span> (<span>修正理由:利回りと価格の逆相関関係を明記する必要あり <s style=\"background:yellow;color:red\">利回りの上昇</s> → 利回りの上昇（価格は低下）</span>)"
+                },
+                {
+                    "Input": "その後次期トランプ政権にて財政赤字削減を唱えるベッセント氏が財務長官に指名され、財政政策に対して慎重な姿勢が取られると意識されたことなどにより債券利回りは低下に転じ、月間では債券利回りは上昇しました。",
+                    "Output": "その後次期トランプ政権にて財政赤字削減を唱えるベッセント氏が財務長官に指名され、財政政策に対して慎重な姿勢が取られると意識されたことなどにより債券利回りは低下に転じ、月間では債券<span style=\"color:red;\">利回りは上昇</span> (<span>修正理由:利回りと価格の逆相関関係を明記する必要あり <s style=\"background:yellow;color:red\">利回りは上昇</s> → 利回りは上昇（価格は低下）</span>しました。)"
+                },
+                {
+                    "Input": "日本10年国債利回りは、月間で下落しました。",
+                    "Output": "日本10年国債利回りは、月間で<span style=\"color:red;\">下落</span> (<span>修正理由:利回りと価格の逆相関関係を明記する必要あり <s style=\"background:yellow;color:red\">下落</s> → 下落（価格は上昇）</span>しました。)"
                 }
             ]
         },
         {
-            "category": "CorrectUsageOfTeikaAndGeraku",
-            "rule_id": "CorrectUsageOfTeikaAndGeraku",
+            "category": "Correct Usage Of Teika And Geraku",
+            "rule_id": "1.4",
             "description": "When describing changes in yields, prices, or interest rates, apply the following word choice rules strictly",
             "requirements": [
                 {
-                    "condition": "利回り（Yield）",
+                    "condition": "利回りについての数値変換の場合",
                     "correction": "use 低下 for decline, not 下落."
                 },
                 {
-                    "condition": "価格（Price）",
+                    "condition": "価格についての数値変換の場合",
                     "correction": "use 下落 for decline, not 低下."
                 },
                 {
-                    "condition": "金利（Interest Rate）",
+                    "condition": "金利についての数値変換の場合",
                     "correction": "use 低下 for decline, not 下落."
-                },
-                {
-                    "condition": "利回りは「上昇（価格は下落）」または「低下（価格は上昇）」と表記。",
-                    "correction": ""
                 }
             ],
             "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
@@ -7537,8 +7163,8 @@ def loop_in_ruru(input):
                     "Output": "<span style=\"color:red;\">米国債利回りが下落しました。</span> (<span>修正理由:利回りには「低下」を使用 <s style=\"background:yellow;color:red\">米国債利回りが下落しました。</s> → 米国債利回りが低下しました。</span>)"
                 },
                 {
-                    "Input": "株価が低下しました。",
-                    "Output": "<span style=\"color:red;\">株価が低下しました。</span> (<span>修正理由:価格には「下落」を使用 <s style=\"background:yellow;color:red\">株価が低下しました。</s> → 株価が下落しました。</span>)"
+                    "Input": "価額が低下しました。",
+                    "Output": "<span style=\"color:red;\">価額が低下しました。</span> (<span>修正理由:価格には「下落」を使用 <s style=\"background:yellow;color:red\">価額が低下しました。</s> → 価額が下落しました。</span>)"
                 },
                 {
                     "Input": "金利が下落しました。",
@@ -7547,93 +7173,13 @@ def loop_in_ruru(input):
             ]
         },
         {
-            "category": "FundInflowsAndOutflowsExpression",
-            "rule_id": "CorrectUsageOfTeikaAndGeraku",
-            "description": "When describing fund flows related to investors (especially foreign investors), apply the following standardized expression",
-            "requirements": [
-                {
-                    "condition": "外国人投資家の資金流出",
-                    "correction": "外国人投資家からの資金流入"
-                },
-                {
-                    "condition": "Ensure consistency in the wording.",
-                    "correction": ""
-                },
-                {
-                    "condition": "If incorrect or incomplete expressions are found, highlight and annotate accordingly.",
-                    "correction": ""
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': '資金流出入表現の統一'",
-            "Example": {
-                "Input": "外国人投資家の資金流入が続きました。",
-                "Output": "外国人投資家<span style=\"color:red;\">の資金流入</span> (<span>修正理由:資金流出入表現の統一 <s style=\"background:yellow;color:red\">の資金流入</s> → からの資金流入</span>) が続きました。"
-            }
-        },
-        {
-            "category": "PortfoliodescriptionStandardization",
-            "rule_id": "PortfoliodescriptionStandardization",
-            "description": "When describing portfolio composition, apply the following rule",
-            "requirements": [
-                {
-                    "condition": "Expressions like \"●●への組み入れ\" are prohibited.",
-                    "correction": "外国人投資家からの資金流入"
-                },
-                {
-                    "condition": "Always use \"●●の組み入れ\" instead.",
-                    "correction": ""
-                },
-                {
-                    "condition": "However, expressions like \"●●への投資比率\" are acceptable and do not need correction.",
-                    "correction": ""
-                },
-                {
-                    "condition": "If incorrect expressions are found, highlight and annotate accordingly.",
-                    "correction": ""
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'ポートフォリオ表現の統一'",
-            "Example": {
-                "Input": "株式への組み入れを拡大しました。",
-                "Output": "株式<span style=\"color:red;\">への組み入れ</span> (<span>修正理由:ポートフォリオ表現の統一 <s style=\"background:yellow;color:red\">への組み入れ</s> → の組み入れ</span>) を拡大しました。"
-            }
-        },
-        {
-            "category": "CurrencyNotationStandardization",
-            "rule_id": "CurrencyNotationStandardization",
-            "description": "Throughout the article, unify the notation of currency names consistently.",
-            "requirements": [
-                {
-                    "condition": "If different expressions referring to the same currency are found, choose the first appearing form as the standard.",
-                    "correction": "外国人投資家からの資金流入"
-                },
-                {
-                    "condition": "Other variants must be corrected to match the first occurrence.",
-                    "correction": ""
-                },
-                {
-                    "condition": "However, expressions like \"●●への投資比率\" are acceptable and do not need correction.",
-                    "correction": ""
-                },
-                {
-                    "condition": "If incorrect expressions are found, highlight and annotate accordingly.",
-                    "correction": ""
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': '通貨表記の統一'",
-            "Example": {
-                "Input": "米ドル建て資産とUSD建て資産に投資しました。",
-                "Output": "米ドル建て資産と<span style=\"color:red;\">USD建て資産</span> (<span>修正理由:通貨表記の統一 <s style=\"background:yellow;color:red\">USD建て資産</s> → 米ドル建て資産</span>) に投資しました。"
-            }
-        },
-        {
             "category": "ZeroPercentCompositionNotation",
-            "rule_id": "ZeroPercentCompositionNotation",
+            "rule_id": "1.8",
             "description": "When describing a composition ratio of 0%, use either 「0％程度」 or 「ゼロ％程度」",
             "requirements": [
                 {
-                    "condition": "Both expressions are acceptable, but direct expressions like just \"0%\" without 「程度」 should be corrected.",
-                    "correction": ""
+                    "condition": "When describing a composition ratio of 0%",
+                    "correction": "use either 「0％程度」 or 「ゼロ％程度」 direct expressions like just \"0%\" without 「程度」 should be corrected."
                 }
             ],
             "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': '構成比0％の表記統一'",
@@ -7642,36 +7188,9 @@ def loop_in_ruru(input):
                 "Output": "当ファンドの構成比は<span style=\"color:red;\">0％</span> (<span>修正理由:構成比0％の表記統一 <s style=\"background:yellow;color:red\">0％</s> → 0％程度</span>) です。"
             }
         },
-
-        {
-            "category": "TerminologyConsistency_Sentiment",
-            "rule_id": "TerminologyConsistency_Sentiment",
-            "description": "Both 「先高感」 and 「先高観」 are acceptable expressions.",
-            "requirements": [
-                {
-                    "condition": "TerminologyConsistency_Sentiment",
-                    "correction": "先高感"
-                },
-                {
-                    "condition": "TerminologyConsistency_Sentiment",
-                    "correction": "先高"
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
-            "Example": [
-                {
-                    "Input": "金利の先高感が高まりました。",
-                    "Output": "No correction needed."
-                },
-                {
-                    "Input": "金利の先高観が意識されました。",
-                    "Output": "No correction needed."
-                }
-            ]
-        },
         {
             "category": "TerminologyConsistency_Calm",
-            "rule_id": "TerminologyConsistency_Calm",
+            "rule_id": "2.0",
             "description": "If the usage does not match the context, correct it according to the appropriate meaning.修正理由: 意味の誤用",
             "requirements": [
                 {
@@ -7696,227 +7215,17 @@ def loop_in_ruru(input):
             ]
         },
         {
-            "category": "TerminologyConsistency_BenchmarkIndex",
-            "rule_id": "TerminologyConsistency_BenchmarkIndex",
-            "description": "The notation of each index must be consistent throughout the document. 修正理由:メッセージ提示（指数名称の表記統一）",
-            "requirements": [
-                {
-                    "condition": "If multiple variations of the same index name appear (e.g., abbreviated and full names), this inconsistency must be detected.",
-                    "correction": ""
-                },
-                {
-                    "condition": "Correction should not be automatically performed",
-                    "correction": ""
-                },
-                {
-                    "condition": "Instead, highlight and prompt the user with a correction suggestion as a message.",
-                    "correction": ""
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
-            "Example": {
-                "Input": "本ファンドのベンチマークはMSCIインド指数です。",
-                "Output": "<span style=\"color:red;\">MSCIインド指数</span> (<span>修正理由: 表記統一の確認が必要 <s style=\"background:yellow;color:red\">MSCIインド指数</s> → MSCIインド・インデックス</span>)"
-            }
-        },
-        {
-            "category": "TerminologyConsistency_DowJones",
-            "rule_id": "TerminologyConsistency_DowJones",
-            "description": "Always use the full official name 「ダウ平均株価」）",
-            "requirements": [
-                {
-                    "condition": "If multiple variations of the same index name appear (e.g., abbreviated and full names), this inconsistency must be detected.",
-                    "correction": ""
-                },
-                {
-                    "condition": "Abbreviations like 「ダウ平均」 or 「NYダウ」 are not allowed when mentioning it as a benchmark or reference index.",
-                    "correction": ""
-                },
-                {
-                    "condition": "Instead, highlight and prompt the user with a correction suggestion as a message.",
-                    "correction": ""
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
-            "Examples": [
-                {
-                    "Input": "米国市場ではダウ平均が上昇しました。",
-                    "Output": "米国市場では <span style=\"color:red;\">ダウ平均</span> (<span>修正理由:正式名称「ダウ平均株価」に統一 <s style=\"background:yellow;color:red\">ダウ平均</s> → ダウ平均株価</span>) が上昇しました。"
-                },
-                {
-                    "Input": "NYダウも同様にプラスとなりました。",
-                    "Output": "<span style=\"color:red;\">NYダウ</span> (<span>修正理由:正式名称「ダウ平均株価」に統一 <s style=\"background:yellow;color:red\">NYダウ</s> → ダウ平均株価</span>) も同様にプラスとなりました。"
-                }
-            ]
-        },
-        {
-            "category": "TerminologyConsistency_Others",
-            "rule_id": "TerminologyConsistency_Others",
-            "description": "Ensure the following specialized terms are consistent",
-            "requirements": [
-                {
-                    "condition": "- \"平均乖離率\" should be used instead of \"平均かい離率\" or other variants.",
-                    "correction": "平均かい離率"
-                },
-                {
-                    "condition": "- \"運用報告書\" should not be abbreviated or altered.",
-                    "correction": ""
-                },
-                    {
-                    "condition": "- \"営業日\" must be spelled correctly without deviations.",
-                    "correction": ""
-                },
-                    {
-                    "condition": "- \"日経平均株価\" must always be used fully; \"日経平均\" alone is not acceptable when used as a benchmark.",
-                    "correction": ""
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
-            "Examples": [
-                {
-                    "Input": "平均かい離率は10％でした。",
-                    "Output": "<span style=\"color:red;\">平均かい離率</span> (<span>修正理由:用語統一 <s style=\"background:yellow;color:red\">平均かい離率</s> → 平均乖離率</span>) は10％でした。"
-                },
-                {
-                    "Input": "営業日数は多かった。",
-                    "Output": "変更不要（正しい表記）"
-                }
-            ]
-        },
-        {
-            "category": "Attractive_Terms_Check",
-            "rule_id": "Attractive_Terms_Check",
-            "description": "If the above expressions are found, highlight them and provide a message prompt to the user.Do not automatically delete or correct the expression. These expressions require careful usage: They can be used if a sufficient basis is provided. However, when referring directly to funds (ファンド), their use is prohibited even with justification.",
-            "requirements": [
-                {
-                    "condition": "魅力的な",
-                    "correction": "魅力的な"
-                },
-                {
-                    "condition": "投資妙味",
-                    "correction": "投資妙味"
-                },
-                {
-                    "condition": "割高.",
-                    "correction": "割高"
-                },
-                {
-                    "condition": "割高感.",
-                    "correction": "割高感"
-                },
-                {
-                    "condition": "割安.",
-                    "correction": "割安"
-                },
-                {
-                    "condition": "割安感.",
-                    "correction": "割安感"
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
-            "Examples": [
-                {
-                    "Input": "魅力的な",
-                    "Output": "<span style=\"color:red;\">魅力的な</span> (<span>修正理由: メッセージ提示 <s style=\"background:yellow;color:red\">魅力的な</s> → 魅力的な</span>)"
-                },
-                {
-                    "Input": "また、現在の価格は割安感があると判断できます。",
-                    "Output": "<span style=\"color:red;\">割安感</span> (<span>修正理由: メッセージ提示 <s style=\"background:yellow;color:red\">割安感</s> → 割安感</span>)"
-                }
-            ]
-        },
-        {
-            "category": "Prohibited_Expression_Must",
-            "rule_id": "Prohibited_Expression_Must",
-            "description": "Avoid any expression implying a definitive judgment (such as \"必ず～\") about future investment performance, economic indicators, corporate earnings, etc. unless explicit supporting evidence is provided.If detected, mark the problematic phrase and issue a message prompt.",
-            "requirements": [
-                {
-                    "condition": "「必ず～」のように、将来の運用成績や経済指標・企業業績等に対する断定的な判断を示す表現は、根拠が明示されていない限り使用不可。",
-                    "correction": ""
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': '断定的な判断表現、根拠明示なし'",
-            "Example": {
-                "Input": "このファンドは必ず利益を生み出します。",
-                "Output": "このファンドは <span style=\"color:red;\">必ず</span> (<span>修正理由:断定的な判断表現、根拠明示なし</span>) 利益を生み出します。"
-            }
-        },
-        {
-            "category": "Prohibited_or_Cautioned_Expressions_Selling_and_Limited",
-            "rule_id": "Prohibited_or_Cautioned_Expressions_Selling_and_Limited",
-            "description": "Detect the above expressions and highlight them. Issue a message prompt to the user. No forced rewriting, only alert.",
-            "requirements": [
-                {
-                    "condition": "断定表現のためメッセージ提示",
-                    "correction": ""
-                },
-                {
-                    "condition": "利益確定の売り",
-                    "correction": ""
-                },
-                {
-                    "condition": "利食い売り",
-                    "correction": ""
-                },
-                {
-                    "condition": "限定的",
-                    "correction": ""
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': '断定表現のためメッセージ提示'",
-            "Examples": [
-                {
-                    "Input": "株価の下落により利益確定の売りが出ました。",
-                    "Output": "<span style=\"color:red;\">利益確定の売り</span> (<span>修正理由: 断定表現のためメッセージ提示 <s style=\"background:yellow;color:red\">利益確定の売り</s> → 利益確定の売り</span>)"
-                },
-                {
-                    "Input": "投資家心理が弱まり、利食い売りが続きました。",
-                    "Output": "<span style=\"color:red;\">利食い売り</span> (<span>修正理由: 断定表現のためメッセージ提示 <s style=\"background:yellow;color:red\">利食い売り</s> → 利食い売り</span>)"
-                },
-                {
-                    "Input": "政策効果は限定的でした。",
-                    "Output": "<span style=\"color:red;\">限定的</span> (<span>修正理由: 曖昧表現のためメッセージ提示 <s style=\"background:yellow;color:red\">限定的</s> → 限定的</span>)"
-                }
-            ]
-        },
-        {
-            "category": "Prohibited_or_Cautioned_Expressions_Prediction_and_Psychology",
-            "rule_id": "Prohibited_or_Cautioned_Expressions_Prediction_and_Psychology",
-            "description": "Detect these expressions and highlight them to issue a message prompt. No forced rewriting, only alert the user. Exception: Do NOT trigger warning if part of fixed financial terms such as 「市場予想」 or 「市場心理」.",
-            "requirements": [
-                {
-                    "condition": "予想",
-                    "correction": ""
-                },
-                {
-                    "condition": "心理",
-                    "correction": ""
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': '主体不明確'",
-            "Examples": [
-                {
-                    "Input": "景気回復への予想が高まった。",
-                    "Output": "<span style=\"color:red;\">予想</span> (<span>修正理由: 主体不明確 <s style=\"background:yellow;color:red\">予想</s> → 予想</span>)"
-                },
-                {
-                    "Input": "利上げ観測を受けて心理が改善した。",
-                    "Output": "<span style=\"color:red;\">心理</span> (<span>修正理由: 主体不明確 <s style=\"background:yellow;color:red\">心理</s> → 心理</span>)"
-                }
-            ]
-        },
-        {
             "category": "Prohibited_or_Cautioned_Expressions_Rise_and_Decline_Factors",
-            "rule_id": "Prohibited_or_Cautioned_Expressions_Rise_and_Decline_Factors",
-            "description": "When \"上昇\" or \"下落\" appears, check the entire paragraph context. Verify if a causal explanation (background or reason) is clearly described within the paragraph. If missing, highlight the term and issue a user prompt. Do not modify the original sentence; only annotate and prompt. 上昇・下落要因の記載漏れ、メッセージ提示",
+            "rule_id": "2.8",
+            "description": "When '上昇' or '下落' appears, check the paragraph-level context for an explicit causal explanation. If no cause is provided, highlight the word and prompt the user. Do not modify the sentence itself—annotate only. If both rise and fall occurred in different courses, prioritize the one with the larger change. Describing both is also acceptable. （上昇・下落要因の記載漏れに対する警告）",
             "requirements": [
                 {
                     "condition": "上昇",
-                    "correction": ""
+                    "correction": "上昇の要因（背景や理由）を明記してください。"
                 },
                 {
                     "condition": "下落",
-                    "correction": ""
+                    "correction": "下落の要因（背景や理由）を明記してください。"
                 }
             ],
             "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': '上昇・下落要因の記載漏れ、メッセージ提示'",
@@ -7933,40 +7242,12 @@ def loop_in_ruru(input):
         },
         {
             "category": "Replacement Rules for Verb-Type Expressions（動詞・活用形を含む表現の置き換え）",
-            "rule_id": "Replacement Rules for Verb-Type Expressions（動詞・活用形を含む表現の置き換え）",
+            "rule_id": "2.9",
             "description":"Certain terms or expressions require more than simple string or regex-based replacement. These are called dynamically varying expressions, which include but are not limited to: Register-sensitive expressions (e.g., polite/humble language variations) Compound phrases or abbreviations that appear in flexible forms When the term to be replaced is a verb, the system must detect and process all conjugated or inflected forms. Do not use rigid pattern matching. Ensure grammatical accuracy after replacement. In general, all such replacements must be done in a context-sensitive manner, ensuring the result remains grammatically and semantically correct",
             "requirements": [
                 {
-                    "condition": "先月/前月, 1ヵ月前について言及する場合は、「前月」を使用。",
-                    "correction": "前月"
-                },
-                {
-                    "condition": "前期比○％ ,replacement 前期比年率○％ , 基本、期間比較の伸率は、「年率」記載にして下さい。",
-                    "correction": ""
-                },
-                {
-                    "condition": "「第◯四半期」という表現を使用する際には、各四半期に対応する月（1〜3月、4〜6月、7〜9月、10〜12月）を明記する必要がある。特に「18年第4四半期」などのように年号や対象月が不明確な場合は、「2018年10〜12月期」などの具体的な年月期間に必ず言い換えること。",
-                    "correction": ""
-                },
-                {
                     "condition": "～に賭ける to ～を予想して ,日本語の使い型変換を注意すべき",
                     "correction": "～を予想して"
-                },
-                {
-                    "condition": "「出遅れ感」「割高感」などの“〜感”を含む表現は、読み手に主観的・感情的印象を与える恐れがあるため注意が必要です。とくに「出遅れ感」は相場観を含む表現であり、客観的事実の報告が求められる金融レポートには不適切な場合があります。",
-                    "correction": ""
-                },
-                {
-                    "condition": "そのため、以下のいずれかの対応を行うこと:\n- 相場観を表に出す意図がない場合 → 削除\n- 相場観を意図的に述べる場合 → 「〜と考えます」「〜との見方があります」などに修正",
-                    "correction": ""
-                },
-                {
-                    "condition": "約、程度、前後は同時に使わない。",
-                    "correction": ""
-                },
-                {
-                    "condition": "「（割安に）放置」などの表現は、主観的な割安感に基づいているにもかかわらず、省略形によって根拠や判断主体が曖昧になるため、読者に正確な意味が伝わりにくい。このような場合には、「割安感のある銘柄」や「割安と評価される」など、より明確で客観的な表現へと言い換えること。",
-                    "correction": ""
                 },
                 {
                     "condition": "「横ばい」という表現は、期間中の価格・利回り等の値動きが非常に小さい場合に限定して使用すること。一方で、期間中に一定の変動があったものの、最終的に開始時点と同程度の水準に戻った場合には、「ほぼ変わらず」「同程度となる」などの表現を使用する。誤って「横ばい」と記述すると、値動きがなかったような誤認を与える可能性があるため、事実に基づいた正確な表現選択が求められる。",
@@ -7976,24 +7257,8 @@ def loop_in_ruru(input):
             "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
             "Examples": [
                 {
-                    "Input": "18年第4四半期の売上は前年同期比で増加しました。",
-                    "Output": "<span style=\"color:red;\">18年第4四半期</span> (<span>修正理由: 「18年第4四半期」では西暦か和暦か不明確であり、また期間（月）が具体的に示されていないため、「2018年10〜12月期」と明確な年月表記に修正する必要があります。 <s style=\"background:yellow;color:red\">18年第4四半期</s> → 2018年10〜12月期</span>)"
-                },
-                {
                     "Input": "～に賭ける",
                     "Output": "～を予想して"
-                },
-                {
-                    "Input": "資源関連株は出遅れ感から買われました。",
-                    "Output": "<span style=\"color:red;\">出遅れ感</span> (<span>修正理由: 「出遅れ感」は主観的な相場観を含む表現であり、事実報告を重視する文書では「〜との見方」などの客観的表現に言い換える必要があります。 <s style=\"background:yellow;color:red\">出遅れ感</s> → 相対的に割安との見方</span>)"
-                },
-                {
-                    "Input": "約○％程度",
-                    "Output": "約○％"
-                },
-                {
-                    "Input": "一部の小型株は（割安に）放置されています。",
-                    "Output": "<span style=\"color:red;\">（割安に）放置</span> (<span>修正理由: 「（割安に）放置」という省略的な表現は、主観的評価である割安感を文中に明確に示す必要があるため、より客観的な言い換えが必要です。 <s style=\"background:yellow;color:red\">（割安に）放置</s> → 割安感のある水準にあると見られています。</span>)"
                 },
                 {
                     "Input": "当作成期を通してみると債券利回りは横ばいでした。",
@@ -8003,18 +7268,18 @@ def loop_in_ruru(input):
         },
         {
             "category": "行って来い ⇒ 「上昇（下落）したのち下落（上昇）」等へ書き換える",
-            "rule_id": "行って来い ⇒ 「上昇（下落）したのち下落（上昇）」等へ書き換える",
+            "rule_id": "3.0",
             "description": "The expression “行って来い” is informal and vague. It must not be used in formal financial documents or reports intended for external audiences.Replace it with a precise description of the price movement, such as: “上昇したのち下落した” 下落したのち上昇した Always use fact-based, objective wording that clearly describes the market movement.",
-            "requirements": [
-                {
-                    "condition": "",
-                    "correction": ""
-                },
-                {
-                    "condition": "",
-                    "correction": ""
-                }
-            ],
+            # # "requirements": [
+            # #     {
+            # #         "condition": "",
+            # #         "correction": ""
+            # #     },
+            # #     {
+            # #         "condition": "",
+            # #         "correction": ""
+            # #     }
+            # ],
             "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': '「行って来い」は曖昧かつ口語的な表現であり、正式な金融文書では具体的な値動きを明記する必要があります。'",
             "Examples": [
                 {
@@ -8027,227 +7292,21 @@ def loop_in_ruru(input):
             "category": "The phrase format “○○大手” (e.g., “通信大手”) is not preferred in formal writing.",
             "rule_id": "The phrase format “○○大手” (e.g., “通信大手”) ",
             "description": "Always rephrase using the structure “大手 + [industry/company type]”, such as: “大手通信会社” “大手不動産企業” “大手半導体メーカー” The “大手” modifier should appear before the industry or company type.If the noun is a company name, ensure “大手” precedes the type, not the sector.",
-            "requirements": [
-                {
-                    "condition": "",
-                    "correction": ""
-                },
-                {
-                    "condition": "",
-                    "correction": ""
-                }
-            ],
+            # "requirements": [
+            #     {
+            #         "condition": "",
+            #         "correction": ""
+            #     },
+            #     {
+            #         "condition": "",
+            #         "correction": ""
+            #     }
+            # ],
             "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
             "Examples": [
                 {
                     "Input": "通信大手が新サービスを発表しました。",
                     "output": "<span style=\"color:red;\">通信大手</span> (<span>修正理由: 「通信大手」という表現は語順が不自然であり、正式なビジネス文書では「大手通信会社」のように「大手」を先に置く表現が適切です。 <s style=\"background:yellow;color:red\">通信大手</s> → 大手通信会社</span>)"
-                }
-            ]
-        },
-        {
-            "category": "The term “ローン” (katakana loanword) ",
-            "rule_id": "rule_12",
-            "description": "Replace “ローン” with “貸し付け” or “融資” in general.Do not flag when part of fixed financial terms such as “住宅ローン”, “教育ローン”, “マイカーローン” This maintains formal tone and correct financial terminology.",
-            "requirements": [
-                {
-                    "condition": "",
-                    "correction": ""
-                },
-                {
-                    "condition": "",
-                    "correction": ""
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
-            "Examples": [
-                {
-                    "input": "企業向けのローンが増加しています。",
-                    "output": "<span style=\"color:red;\">ローン</span> (<span>修正理由: 「ローン」は口語的で曖昧な表現であり、金融用語としては「融資」と明確に表記するのが適切です。ただし、「住宅ローン」などの固定用語はこの限りではありません。 <s style=\"background:yellow;color:red\">ローン</s> → 融資</span>)"
-                },
-                {
-                    "input": "住宅ローンの金利が今月から引き下げられました。",
-                    "output": "<span style=\"color:red;\">住宅ローン</span> (<span>修正理由: 「住宅ローン」は一般的かつ正式な金融商品名であり、修正の必要はありません。</span>)"
-                }
-            ]
-        },
-        {
-            "category": "Use “格付け” (with okurigana) when the word stands alone or is used as a verb/noun phrase, and “格付” (without okurigana) in compounds or technical terms.",
-            "rule_id": "rule_13",
-            "description": "Use “格付け” for standalone usage.""Use “格付” for compound words such as “格付機関”, “格付別”.""Do not mix both styles within the same document. Ensures consistency with financial industry standards.",
-            "requirements": [
-                {
-                    "condition": "",
-                    "correction": ""
-                },
-                {
-                    "condition": "",
-                    "correction": ""
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
-            "Examples": [
-                {
-                    "input": "格付",
-                    "output": "<span style=\"color:red;\">格付</span> (<span>修正理由: 単独使用の場合は送り仮名「け」を付けて「格付け」とするのが適切です。 <s style=\"background:yellow;color:red\">格付</s> → 格付け</span>)"
-                },
-                {
-                    "input": "格付機関",
-                    "output": "<span style=\"color:red;\">格付機関</span> (<span>修正理由: 「格付機関」は専門用語として定着しており、複合語では送り仮名を付けないのが適切です。</span>)"
-                }
-            ]
-        },
-        {
-            "category": "買い入れの書き方",
-            "rule_id": "rule_14",
-            "description": "Use “国債買い入れ” (with okurigana) when the word stands alone or is used as a verb/noun phrase. Use “国債買入” (without okurigana) when part of a compound word or technical term (e.g., 国債買入オペ). Do not mix both styles within the same document.Ensures consistency with financial industry standards and clarity",
-            "requirements": [
-                {
-                    "condition": "",
-                    "correction": ""
-                },
-                {
-                    "condition": "",
-                    "correction": ""
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
-            "Examples": [
-                {
-                    "input": "",
-                    "output": ""
-                }
-            ]
-        },
-        {
-            "category": "引締の書き方",
-            "rule_id": "rule_15",
-            "description": "Use “引き締め” (with okurigana) when the word stands alone or is used as a verb/noun phrase. Use “引締” (without okurigana) when part of a compound word or technical term (e.g., 引締策). Do not mix both styles within the same document. Ensures consistency with financial industry standards and clarity.",
-            "requirements": [
-                {
-                    "condition": "",
-                    "correction": ""
-                },
-                {
-                    "condition": "",
-                    "correction": ""
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
-            "Examples": [
-                {
-                    "input": "",
-                    "output": ""
-                }
-            ]
-        },
-        {
-            "category": "積極姿勢/消極姿勢の表現修正",
-            "rule_id": "rule_16",
-            "description": "Expressions such as “積極姿勢” or “消極姿勢” are too abstract and vague for formal financial writing. Always replace with more specific, descriptive investment actions, e.g.: “長めとした” (increased allocation/duration) “組入を増やした” (added to portfolio) “保有を減らした” (reduced exposure) Ensure the expression clearly conveys actual investment action or policy",
-            "requirements": [
-                {
-                    "condition": "",
-                    "correction": ""
-                },
-                {
-                    "condition": "",
-                    "correction": ""
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': '「積極姿勢」は抽象的で読み手に具体的な投資行動が伝わらないため、「長めとした」などの明確な表現に置き換える必要があります。'",
-            "Examples": [
-                {
-                    "input": "積極姿勢",
-                    "output": "<span style=\"color:red;\">積極姿勢</span> (<span>修正理由: 「積極姿勢」は抽象的で読み手に具体的な投資行動が伝わらないため、「長めとした」などの明確な表現に置き換える必要があります。 <s style=\"background:yellow;color:red\">積極姿勢</s> → 長め</span>)"
-                }
-            ]
-        },
-        {
-            "category": "ハト派／タカ派（金融政策に関する表現",
-            "rule_id": "rule_17",
-            "description": "Expressions “ハト派” (dovish) and “タカ派” (hawkish) are metaphorical and colloquial. Replace with objective descriptions of monetary policy stance, such as:“金融緩和を重視する姿勢” (emphasis on monetary easing) “金融引き締めに積極的” (proactive on tightening) If the replacement conveys the same intent (stance on easing/tightening), it is acceptable.",
-            "requirements": [
-                {
-                    "condition": "",
-                    "correction": ""
-                },
-                {
-                    "condition": "",
-                    "correction": ""
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': '「ハト派」は比喩的かつ俗語的表現のため、金融政策スタンスを客観的に表す文に修正する必要があります。'",
-            "Examples": [
-                {
-                    "input": "ハト派",
-                    "output": "<span style=\"color:red;\">ハト派</span> (<span>修正理由: 「ハト派」は比喩的かつ俗語的表現のため、金融政策スタンスを客観的に表す文に修正する必要があります。 <s style=\"background:yellow;color:red\">ハト派</s> → 金融緩和を重視する姿勢</span>)"
-                }
-            ]
-        },
-        {
-            "category": "表記の統一",
-            "rule_id": "consistent_terminology",
-            "description": "Ensure that the writing format of financial terms is consistent throughout the report.",
-            "requirements": [
-                {
-                    "condition": "",
-                    "correction": ""
-                },
-                {
-                    "condition": "",
-                    "correction": ""
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
-            "Examples": [
-                {
-                    "input": "",
-                    "output": ""
-                }
-            ]
-        },
-        {
-            "category": "ひらがなを表記するもの",
-            "rule_id": "hiragana_usage",
-            "description": "Ensure the report follows the rules for hiragana notation. Replace kanji that are not commonly used with their appropriate hiragana form.",
-            "requirements": [
-                {
-                    "condition": "",
-                    "correction": ""
-                },
-                {
-                    "condition": "",
-                    "correction": ""
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
-            "Examples": [
-                {
-                    "input": "",
-                    "output": ""
-                }
-            ]
-        },
-        {
-            "category": "一部かな書き等で表記するもの",
-            "rule_id": "kana_notation_nonstandard_kanji",
-            "description":"Ensure non-standard or difficult kanji are replaced with kana in accordance with the standard writing format.",
-            "requirements": [
-                {
-                    "condition": "",
-                    "correction": ""
-                },
-                {
-                    "condition": "",
-                    "correction": ""
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
-            "Examples": [
-                {
-                    "input": "",
-                    "output": ""
                 }
             ]
         },
@@ -8273,145 +7332,8 @@ def loop_in_ruru(input):
                 }
             ]
         },
-        {
-            "category": "Foreign Exchange Market Trend Analysis",
-            "rule_id": "rule_forex_trend_analysis",
-            "description": "Revise to either '円高' or '円安' based on context.",
-            "requirements": [
-                {
-                    "condition": "Occurs when the value of the yen increases relative to other currencies.",
-                    "correction": "多くの通貨が対円で下落した"
-                },
-                {
-                    "condition": "Occurs when the value of the yen increases relative to other currencies.",
-                    "correction": "ドル円が下落した"
-                },
-                {
-                    "condition": "Occurs when the value of the yen increases relative to other currencies.",
-                    "correction": "対米ドルで円の価値が上昇した"
-                },
-                {
-                    "condition": "Occurs when the value of the yen declines relative to other currencies.",
-                    "correction": "多くの通貨が対円で上昇した"
-                },
-                {
-                    "condition": "Occurs when the value of the yen declines relative to other currencies.",
-                    "correction": "ドル円が上昇した"
-                },
-                {
-                    "condition": "Occurs when the value of the yen declines relative to other currencies.",
-                    "correction": "対米ドルで円の価値が下落した"
-                },
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
-            "Examples": [
-                {
-                    "input": "",
-                    "output": ""
-                },
-                {
-                    "input": "",
-                    "output": ""
-                }
-            ],
-            "Notes": "The replacement depends on the surrounding context, so parsing of nearby sentences is required."
-        },
-        {
-            "category": "レポートのデータ部との整合性確認",
-            "rule_id": "レポートのデータ部との整合性確認",
-            "description": "Ensure the textual descriptions in the main body are logically and factually consistent with the data section. No content-related discrepancies should exist.",
-            "requirements": [
-                {
-                    "condition": "",
-                    "correction": ""
-                },
-                {
-                    "condition": "",
-                    "correction": ""
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
-            "Examples": [
-                {
-                    "input": "",
-                    "output": ""
-                }
-            ]
-        },
-        {
-            "category": "文頭の「〇」印と一文字目の間隔を統一",
-            "rule_id": "文頭の「〇」印と一文字目の間隔を統一",
-            "description": "- When a sentence or paragraph includes multiple “○” bullet-style markers, the spacing between each “○” and the following text must be **uniform**. - Do not impose a fixed rule like “no space” or “one half-width space”; instead, **adopt the spacing style used in the first occurrence** and apply it consistently throughout the sentence or document.- If spacing after “○” varies (e.g., mixed usage of no space, half-width, and full-width), flag it as a formatting inconsistency and suggest unifying.",
-            "requirements": [
-                {
-                    "condition": "Adopt spacing from the **first occurrence** and apply it consistently.",
-                    "correction": "全ての〇の後に、最初の〇に準拠したスペース（例：なし or 半角）を統一する。"
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': '「〇」の後に半角空白を入れる形式が最初に使用されているため、すべての「〇」後の間隔を統一する必要があります。'",
-            "Examples": [
-                {
-                    "input": "〇　　利益率は横ばいとなった。",
-                    "output": "〇利益率は横ばいとなった"
-                }
-            ]
-        },
-        {
-            "category": "年度表記",
-            "rule_id": "年度表記",
-            "description": "Japanese financial documents must standardize how symbols, punctuation, and numbers are written. Two-digit year expressions (e.g., 22年)",
-            "requirements": [
-                {
-                    "condition": "Convert to four-digit year format (e.g., 2022年).",
-                    "correction": "22年 → 2022年"
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
-            "Examples": [
-                {
-                    "input": "22年",
-                    "output": "2022年"
-                }
-            ],
-            "Notes": "Avoid direct modification in proper nouns or quoted references unless clearly incorrect."
-        },
-        {
-            "category": "Special Formatting Rules",
-            "rule_id": "Special Formatting Rules",
-            "description": "Japanese financial documents must standardize how symbols, punctuation, and numbers are written. Do not modify names of people, places, or organizations unless clearly incorrect. Delete unnecessary characters without replacing them with others. Maintain intra-text spaces unless at start or end of the sentence.",
-            "requirements": [
-                {
-                    "condition": "Proper Nouns",
-                    "correction": "ベッセント氏 → ✅ (No correction)"
-                },
-                {
-                    "condition": "Redundant Characters",
-                    "correction": "ユーロ圏域内の景気委 → ユーロ圏域内の景気"
-                },
-                {
-                    "condition": "Preserving Spaces",
-                    "correction": "月の 前半は米国の 債券利回りの上昇 につれて → ✅ (No correction)"
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
-            "Examples": [
-                {
-                    "input": "ベッセント氏",
-                    "output": "No correction"
-                },
-                {
-                    "input": "ユーロ圏域内の景気委",
-                    "output": "ユーロ圏域内の景気"
-                },
-                {
-                    "input": "月の 前半は米国の 債券利回りの上昇 につれて",
-                    "output": "No correction"
-                }
-            ],
-            "Notes": "Avoid direct modification in proper nouns or quoted references unless clearly incorrect."
-        }
     ]
-    
+
     for ruru_split in ruru_all:
         result = f"""
         You are a professional Japanese text proofreading assistant specialized in high-precision document validation.
