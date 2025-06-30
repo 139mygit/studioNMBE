@@ -3174,54 +3174,54 @@ def opt_check_eng(content, rules):
     seen_full = set()
     results = []
 
-    # for line in lines:
-    result = []
+    for line in lines:
+        result = []
 
-    for k, v in rules.items():
-        raw_key = k.replace("(", "（").replace(")", "）")
-        full_key = v.replace("(", "（").replace(")", "）")
+        for k, v in rules.items():
+            raw_key = k.replace("(", "（").replace(")", "）")
+            full_key = v.replace("(", "（").replace(")", "）")
 
-        escaped_k = regcheck.escape(raw_key)
-        escaped_v = regcheck.escape(full_key)
+            escaped_k = regcheck.escape(raw_key)
+            escaped_v = regcheck.escape(full_key)
 
-        new_k = escaped_k
-        if raw_key.isalpha() or raw_key in ["S&L", "M&A"]:
-            if raw_key == "OPEC":
-                new_k = f"(?<![a-zA-Z]){escaped_k}(?!プラス|[a-zA-Z])"
-            elif raw_key == "スティープ化":
-                new_k = f"(?<!イールドカーブの){escaped_k}"
-            elif raw_key == "イールドカーブ":
-                new_k = f"{escaped_k}(?!・コントロール|のスティープ化|のフラット化)"
-            elif raw_key == "キャッシュフロー":
-                new_k = f"(?<!フリー){escaped_k}"
-            elif raw_key == "キャリートレード":
-                new_k = f"(?<!円){escaped_k}"
-            elif raw_key == "スプレッド":
-                new_k = f"(?<!クレジット){escaped_k}"
-            elif raw_key == "バリュー":
-                new_k = f"(?<!レラティブ・|フェア){escaped_k}"
-            elif raw_key == "モーゲージ":
-                new_k = f"{escaped_k}(?!債)"
-            elif raw_key == "商い":
-                new_k = f"(?<!薄){escaped_k}"
-            else:
-                new_k = f"(?<![a-zA-Z]){escaped_k}(?![a-zA-Z])"
+            new_k = escaped_k
+            if raw_key.isalpha() or raw_key in ["S&L", "M&A"]:
+                if raw_key == "OPEC":
+                    new_k = f"(?<![a-zA-Z]){escaped_k}(?!プラス|[a-zA-Z])"
+                elif raw_key == "スティープ化":
+                    new_k = f"(?<!イールドカーブの){escaped_k}"
+                elif raw_key == "イールドカーブ":
+                    new_k = f"{escaped_k}(?!・コントロール|のスティープ化|のフラット化)"
+                elif raw_key == "キャッシュフロー":
+                    new_k = f"(?<!フリー){escaped_k}"
+                elif raw_key == "キャリートレード":
+                    new_k = f"(?<!円){escaped_k}"
+                elif raw_key == "スプレッド":
+                    new_k = f"(?<!クレジット){escaped_k}"
+                elif raw_key == "バリュー":
+                    new_k = f"(?<!レラティブ・|フェア){escaped_k}"
+                elif raw_key == "モーゲージ":
+                    new_k = f"{escaped_k}(?!債)"
+                elif raw_key == "商い":
+                    new_k = f"(?<!薄){escaped_k}"
+                else:
+                    new_k = f"(?<![a-zA-Z]){escaped_k}(?![a-zA-Z])"
 
-        line_matched_full = regcheck.search(escaped_v, content)
-        line_matched_raw = regcheck.search(new_k, content)
+            line_matched_full = regcheck.search(escaped_v, line)
+            line_matched_raw = regcheck.search(new_k, line)
 
-        if line_matched_full and full_key not in seen_full:
-            result.append({raw_key: full_key})
-            seen_raw.add(raw_key)
-            seen_full.add(full_key)
-        elif line_matched_full and full_key in seen_full:
-            result.append({full_key: "删除"})
-        elif line_matched_raw and raw_key not in seen_raw:
-            result.append({raw_key: full_key})
-            seen_raw.add(raw_key)
-            seen_full.add(full_key)
+            if line_matched_full and full_key not in seen_full:
+                result.append({raw_key: full_key})
+                seen_raw.add(raw_key)
+                seen_full.add(full_key)
+            elif line_matched_full and full_key in seen_full:
+                result.append({full_key: "删除"})
+            elif line_matched_raw and raw_key not in seen_raw:
+                result.append({raw_key: full_key})
+                seen_raw.add(raw_key)
+                seen_full.add(full_key)
 
-    results.append(result)
+        results.append(result)
 
     return results
 
@@ -3404,23 +3404,28 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
     # 英略词
     if fund_type == 'public':
         results = opt_check_eng(input_text, replace_rules)
-        for item in results:
-            for k, v in item.items():
-                original_text = k  # 키 값을 original_text에 저장 AI
-                corrected_text_re = v  # 값(v)을 corrected_text_re에 저장 AI（人工知能）
-                reason_type = "用語の統一"  # 수정 이유
+        for line_result in results:  # line 단위로 반복
+            for item in line_result:  # 각 줄 안의 사전들
+                for k, v in item.items():
+                    original_text = k
+                    corrected_text_re = v
+                    reason_type = "用語の統一"
 
-                comment = f"{reason_type} {original_text} → {corrected_text_re}"
+                    if corrected_text_re == "删除":
+                        comment = f"{reason_type} {original_text} は不要"
+                    else:
+                        comment = f"{reason_type} {original_text} → {corrected_text_re}"
 
-            corrections.append({
-                "page": pageNumber,
-                "original_text": extract_text(input_text, original_text),# original_text,
-                "comment": comment,
-                "reason_type": reason_type,
-                "check_point": input_text.strip(),  # 필요에 따라 입력
-                "locations": [],  # 필요에 따라 입력
-                "intgr": False,  # for debug 62
-            })
+                    corrections.append({
+                        "page": pageNumber,
+                        "original_text": extract_text(input_text, original_text),
+                        "comment": comment,
+                        "reason_type": reason_type,
+                        "check_point": input_text.strip(),
+                        "locations": [],
+                        "intgr": False,
+                    })
+
 # -----------------
     if fund_type == 'public':
         word_re = regcheck.findall(r"外国人投資家からの資金流入|外国人投資家の資金流出|魅力|投資妙味|割高|割高感|割安|割安感|加速|心理|"
