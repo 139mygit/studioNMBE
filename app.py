@@ -3166,95 +3166,62 @@ def year_half_dict(text: str) -> str:
 def opt_check_eng(content, rules):
     content = merge_brackets(content)
     content = content.replace("(", "（").replace(")", "）")
-    # lines = content.strip().splitlines()
+    lines = content.strip().splitlines()
 
-    result = []
+    seen_raw = set()
+    seen_full = set()
+    results = []
 
-    # seen_raw = set()
-    # seen_full = set()
+    for line in lines:
+        result = []
 
-    # for line in lines:
-    #     # result = []
-    for k, v in rules.items():
-        raw_key = k.replace("(", "（").replace(")", "）")
-        full_key = v.replace("(", "（").replace(")", "）")
+        for k, v in rules.items():
+            raw_key = k.replace("(", "（").replace(")", "）")
+            full_key = v.replace("(", "（").replace(")", "）")
 
-        escaped_k = regcheck.escape(raw_key)
-        escaped_v = regcheck.escape(full_key)
-        
-        new_k = escaped_k
-        if raw_key.isalpha() or raw_key in ["S&L", "M&A"]:
-            if raw_key == "OPEC":
-                new_k = f"(?<![a-zA-Z]){escaped_k}(?!プラス|[a-zA-Z])"
-            elif raw_key == "スティープ化":
-                new_k = f"(?<!イールドカーブの){escaped_k}"
-            elif raw_key == "イールドカーブ":
-                new_k = f"{escaped_k}(?!・コントロール|のスティープ化|のフラット化)"
-            elif raw_key == "キャッシュフロー":
-                new_k = f"(?<!フリー){escaped_k}"
-            elif raw_key == "キャリートレード":
-                new_k = f"(?<!円){escaped_k}"
-            elif raw_key == "スプレッド":
-                new_k = f"(?<!クレジット){escaped_k}"
-            elif raw_key == "バリュー":
-                new_k = f"(?<!レラティブ・|フェア){escaped_k}"
-            elif raw_key == "モーゲージ":
-                new_k = f"{escaped_k}(?!債)"
-            elif raw_key == "商い":
-                new_k = f"(?<!薄){escaped_k}"
-            elif k == "格付":
-                new_k = f"{escaped_k}(?!機関|別)"
-            elif k == "ローン":
-                new_k = f"(?<!住宅){escaped_k}"
-            else:
-                new_k = f"(?<![a-zA-Z]){escaped_k}(?![a-zA-Z])"
+            escaped_k = regcheck.escape(raw_key)
+            escaped_v = regcheck.escape(full_key)
 
-        # 中銀 예외 처리
-        if raw_key == "中銀":
-            matches = list(regcheck.finditer(escaped_v, content))
-            exclude = False
-            for m in matches:
-                prefix = content[max(0, m.start() - 2): m.start()]
-                if prefix and not regcheck.match(r"[ \t\n\r]", prefix):
-                    exclude = True
-                    break
-            if exclude:
-                new_k = escaped_k
-                full_match = None
-            else:
-                full_match = regcheck.search(escaped_v, content)
-        else:
-            full_match = regcheck.search(escaped_v, content)
+            new_k = escaped_k
+            if raw_key.isalpha() or raw_key in ["S&L", "M&A"]:
+                if raw_key == "OPEC":
+                    new_k = f"(?<![a-zA-Z]){escaped_k}(?!プラス|[a-zA-Z])"
+                elif raw_key == "スティープ化":
+                    new_k = f"(?<!イールドカーブの){escaped_k}"
+                elif raw_key == "イールドカーブ":
+                    new_k = f"{escaped_k}(?!・コントロール|のスティープ化|のフラット化)"
+                elif raw_key == "キャッシュフロー":
+                    new_k = f"(?<!フリー){escaped_k}"
+                elif raw_key == "キャリートレード":
+                    new_k = f"(?<!円){escaped_k}"
+                elif raw_key == "スプレッド":
+                    new_k = f"(?<!クレジット){escaped_k}"
+                elif raw_key == "バリュー":
+                    new_k = f"(?<!レラティブ・|フェア){escaped_k}"
+                elif raw_key == "モーゲージ":
+                    new_k = f"{escaped_k}(?!債)"
+                elif raw_key == "商い":
+                    new_k = f"(?<!薄){escaped_k}"
+                else:
+                    new_k = f"(?<![a-zA-Z]){escaped_k}(?![a-zA-Z])"
 
-            # has_full = full_key in line
-            # has_raw = raw_key in line
+            line_matched_full = regcheck.search(escaped_v, line)
+            line_matched_raw = regcheck.search(new_k, line)
 
-            # # full_key가 줄에 있고 이전에 나온 적 없다면 등록
-            # if has_full and full_key not in seen_full:
-            #     result.append({raw_key: full_key})
-            #     seen_raw.add(raw_key)
-            #     seen_full.add(full_key)
-            # # full_key가 줄에 있고 이전에 나온 적 있다면 삭제 대상
-            # elif has_full and full_key in seen_full:
-            #     result.append({full_key: '删除'})
-            # # full_key는 없지만 raw_key가 있고, 아직 등록되지 않았다면 변환 대상
-            # elif has_raw and raw_key not in seen_raw:
-            #     result.append({raw_key: full_key})
-            #     seen_raw.add(raw_key)
-            #     seen_full.add(full_key)
-            # 이미 등장한 raw_key는 무시
+            if line_matched_full and full_key not in seen_full:
+                result.append({raw_key: full_key})
+                seen_raw.add(raw_key)
+                seen_full.add(full_key)
+            elif line_matched_full and full_key in seen_full:
+                result.append({full_key: "删除"})
+            elif line_matched_raw and raw_key not in seen_raw:
+                result.append({raw_key: full_key})
+                seen_raw.add(raw_key)
+                seen_full.add(full_key)
 
+        results.append(result)
 
-            raw_matches = list(regcheck.finditer(new_k, content))
-            if not raw_matches:
-                continue
-            first_raw = raw_matches[0]  # 가장 앞에 나오는 매칭
-            if full_match and full_match.start() <= first_raw.start():
-                continue
-
-            result.append({raw_key: full_key})
-
-    return result
+    return results
 
 # 0501 debug
 def find_corrections(corrected_text,input_text,pageNumber):
