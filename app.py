@@ -3210,8 +3210,13 @@ def opt_check_eng(content, rules):
                     new_k = f"(?<![a-zA-Z]){escaped_k}(?![a-zA-Z])"
 
 
+            # has_full = escaped_v in line
+            # has_raw = escaped_k in line
+
+            # new_k를 사용하여 매칭 확인
+            raw_matches = list(regcheck.finditer(new_k, line))
             has_full = escaped_v in line
-            has_raw = escaped_k in line
+            has_raw = bool(raw_matches)
 
             # full_key가 줄에 있고 이전에 나온 적 없다면 등록
             if has_full and full_key not in seen_full:
@@ -4850,6 +4855,8 @@ def save_local_link():
         meigaramaster = data.get("meigaramaster", "")
         reportData = data.get("reportData", "")
         simu = data.get("simu", "")
+        resultngPath = data.get("resultngPath", "")
+        resultokPath = data.get("resultokPath", "")
         fund_type = data.get("fund_type", "")
         container = get_db_connection(LOCAL_LINK)
         link_data = list(container.query_items(
@@ -4865,7 +4872,10 @@ def save_local_link():
                 individualPdfPath=individualPdfPath,
                 meigaramaster=meigaramaster,
                 reportData=reportData,
-                simu=simu
+                simu=simu,
+                resultngPath=resultngPath,
+                resultokPath=resultokPath
+
         )
 
         if not link_data:
