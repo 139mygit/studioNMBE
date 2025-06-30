@@ -3163,6 +3163,9 @@ def year_half_dict(text: str) -> str:
 
 
 def opt_check_eng(content, rules):
+    if not isinstance(rules, dict):
+        raise TypeError(f"`rules` must be a dict, got {type(rules)}")
+    
     content = merge_brackets(content)
     content = content.replace("(", "（").replace(")", "）")
     lines = content.strip().splitlines()
