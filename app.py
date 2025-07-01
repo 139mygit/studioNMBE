@@ -3405,27 +3405,23 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
     if fund_type == 'public':
         results = opt_check_eng(input_text, replace_rules)
         for line_result in results:  # 각 줄 (list of dicts)
-            for item in line_result:  # 각 줄의 dict
-                if not isinstance(item, dict) or not item:
-                    continue  # dict가 아니거나 빈 dict면 무시
+            for original_text, corrected_text_re in line_result.items():
+                reason_type = "用語の統一"
 
-                for original_text, corrected_text_re in item.items():
-                    reason_type = "用語の統一"
+                if corrected_text_re == "删除":
+                    comment = f"{reason_type} {original_text} は不要"
+                else:
+                    comment = f"{reason_type} {original_text} → {corrected_text_re}"
 
-                    if corrected_text_re == "删除":
-                        comment = f"{reason_type} {original_text} は不要"
-                    else:
-                        comment = f"{reason_type} {original_text} → {corrected_text_re}"
-
-                    corrections.append({
-                        "page": pageNumber,
-                        "original_text": extract_text(input_text, original_text),
-                        "comment": comment,
-                        "reason_type": reason_type,
-                        "check_point": input_text.strip(),
-                        "locations": [],
-                        "intgr": False,
-                    })
+                corrections.append({
+                    "page": pageNumber,
+                    "original_text": extract_text(input_text, original_text),
+                    "comment": comment,
+                    "reason_type": reason_type,
+                    "check_point": input_text.strip(),
+                    "locations": [],
+                    "intgr": False,
+                })
 
 # -----------------
     if fund_type == 'public':
