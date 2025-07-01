@@ -3424,21 +3424,26 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
         #         })
 
         # 데이터 순환
-        for entry in results:
-            if entry:  # entry가 비어있지 않은 경우
-                for item in entry:
+        for line_result in results:
+            if line_result:  # entry가 비어있지 않은 경우
+                for item in line_result:
                     if isinstance(item, dict):  # item이 딕셔너리인지 확인
-                        for key, value in item.items():
+                        for original_text, corrected_text_re in item.items():
                             # comment와 reason_type은 예시로 설정 (필요에 따라 수정)
-                            comment = f"{key}에 대한 수정 사항입니다."
-                            reason_type = "수정"
+                            # comment = f"{corrected_text_re}에 대한 수정 사항입니다."
+                            reason_type = "用語の統一"
+
+                        if corrected_text_re == "删除":
+                            comment = f"{reason_type} {original_text} は不要"
+                        else:
+                            comment = f"{reason_type} {original_text} → {corrected_text_re}"
 
                             corrections.append({
                                 "page": pageNumber,
-                                "original_text": key,
+                                "original_text": extract_text(input_text, original_text),
                                 "comment": comment,
                                 "reason_type": reason_type,
-                                "check_point": key.strip(),
+                                "check_point": input_text.strip(),
                                 "locations": [],
                                 "intgr": False,
                             })
