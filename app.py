@@ -3416,7 +3416,7 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
                             reason_type = "用語の統一"
 
                         if corrected_text_re == "删除":
-                            comment = f"トルは不要"
+                            comment = f"{original_text} → トルは不要"
                         else:
                             comment = f"{original_text} → {corrected_text_re}"
 
