@@ -3404,25 +3404,7 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
     # 英略词
     if fund_type == 'public':
         results = opt_check_eng(input_text, replace_rules)
-        # for line_result in results:  # 각 줄 (list of dicts)
-        #     for original_text, corrected_text_re in line_result.items():
-        #         reason_type = "用語の統一"
-
-        #         if corrected_text_re == "删除":
-        #             comment = f"{reason_type} {original_text} は不要"
-        #         else:
-        #             comment = f"{reason_type} {original_text} → {corrected_text_re}"
-
-        #         corrections.append({
-        #             "page": pageNumber,
-        #             "original_text": extract_text(input_text, original_text),
-        #             "comment": comment,
-        #             "reason_type": reason_type,
-        #             "check_point": input_text.strip(),
-        #             "locations": [],
-        #             "intgr": False,
-        #         })
-
+    
         # 데이터 순환
         for line_result in results:
             if line_result:  # entry가 비어있지 않은 경우
@@ -3438,15 +3420,15 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
                         else:
                             comment = f"{reason_type} {original_text} → {corrected_text_re}"
 
-                            corrections.append({
-                                "page": pageNumber,
-                                "original_text": original_text,
-                                "comment": comment,
-                                "reason_type": corrected_text_re,# reason_type,
-                                "check_point": input_text.strip(),
-                                "locations": [],
-                                "intgr": False,
-                            })
+                        corrections.append({
+                            "page": pageNumber,
+                            "original_text": original_text,
+                            "comment": comment,
+                            "reason_type": reason_type,
+                            "check_point": input_text.strip(),
+                            "locations": [],
+                            "intgr": False,
+                        })
 
 # -----------------
     if fund_type == 'public':
