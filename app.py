@@ -3406,6 +3406,9 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
         results = opt_check_eng(input_text, replace_rules)
         for line_result in results:  # line 단위로 반복
             for item in line_result:  # 각 줄 안의 사전들
+                if not item:  # 빈 딕셔너리는 무시
+                    continue
+                
                 for k, v in item.items():
                     original_text = k
                     corrected_text_re = v
