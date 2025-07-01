@@ -5745,13 +5745,13 @@ def get_prompt(corrected):
         f"""
         **Typographical Errors (脱字・誤字) Detection**
         -Detect any missing characters (脱字) or misused characters (誤字) that cause unnatural expressions or misinterpretation.
-        **Proofreading Requirements**：
-        - Detect and correct all genuine missing characters (脱字) or misused characters (誤字) that cause grammatical errors or change the intended meaning.
-        - Always detect and correct any incorrect conjugations, misused readings, or verb usage, even if they superficially look natural.
-        - Do not point out stylistic variations, natural auxiliary expressions, or acceptable conjugations unless they are grammatically incorrect.
-        - Confirm that each kanji matches the intended meaning precisely.
-        - Detect cases where non-verb terms are incorrectly used as if they were verbs.
-        - Do **not** treat orthographic variants involving okurigana omission or abbreviation（e.g., 書き換え vs 書換え, 読み取る vs 読取る, 取り込む vs 取込）as typographical errors
+        **Proofreading Requirements:**
+        -Detect and correct all genuine missing characters (脱字) or misused characters (誤字) that cause grammatical errors or change the intended meaning.
+        -Always detect and correct any incorrect conjugations, misused readings, or verb usage, even if they superficially look natural.
+        -Do not point out stylistic variations, natural auxiliary expressions, or acceptable conjugations unless they are grammatically incorrect.
+        -Confirm that each kanji matches the intended meaning precisely.
+        -Detect cases where non-verb terms are incorrectly used as if they were verbs.
+
 
         **missing Example*：
         {example_0}  ”と”を脱字しました
@@ -5766,11 +5766,12 @@ def get_prompt(corrected):
         """,
         f"""
         **Punctuation (句読点) Usage Check**
-        -Detect missing, excessive, or incorrect use of punctuation marks (、。).
-        **Proofreading Requirements**：
-        -Ensure sentences correctly end with「。」where appropriate.
-        -Avoid redundant commas「、」in unnatural positions.
-        -Maintain standard business writing style.
+        -Check the sentence-ending punctuation and comma usage only within complete sentences.
+        **Proofreading Requirements:**
+        -Ensure that every complete sentence ends with exactly one「。」.
+        -Do not flag missing or extra「。」in sentence fragments, headings, bullet points, or intentionally incomplete expressions.
+        -Check for excessive or missing「、」only within grammatically complete sentences.
+        -Do not flag cases where comma omission is stylistically natural and grammatically acceptable in Japanese (e.g.,「好感され月間では下落し」).
         **Example**：
         {example_2}
         """,
@@ -5795,6 +5796,7 @@ def get_prompt(corrected):
         **Monetary Unit(金額表記) Check**
         -Proofreading Requirements：
         -Ensure currency units (円、兆円、億円) are correctly used.
+        {corrected}
         """
     ]
 
