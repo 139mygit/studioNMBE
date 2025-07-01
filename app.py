@@ -3404,14 +3404,12 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
     # 英略词
     if fund_type == 'public':
         results = opt_check_eng(input_text, replace_rules)
-        for line_result in results:  # line 단위로 반복
-            for item in line_result:  # 각 줄 안의 사전들
-                if not item:  # 빈 딕셔너리는 무시
-                    continue
-                
-                for k, v in item.items():
-                    original_text = k
-                    corrected_text_re = v
+        for line_result in results:  # 각 줄 (list of dicts)
+            for item in line_result:  # 각 줄의 dict
+                if not isinstance(item, dict) or not item:
+                    continue  # dict가 아니거나 빈 dict면 무시
+
+                for original_text, corrected_text_re in item.items():
                     reason_type = "用語の統一"
 
                     if corrected_text_re == "删除":
