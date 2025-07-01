@@ -3130,7 +3130,7 @@ replace_rules = {
     'グローバルで事業': 'グローバルに事業', #630
     '伸び': '伸び率', #630
     '積み増す': '積み増しする', #630 
-    '多く': '多くの',#630
+    # '多く': '多くの',#630
     '取組み': '取り組み'
 }
 
@@ -3416,9 +3416,9 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
                             reason_type = "用語の統一"
 
                         if corrected_text_re == "删除":
-                            comment = f"{reason_type} {original_text} は不要"
+                            comment = f"トルは不要"
                         else:
-                            comment = f"{reason_type} {original_text} → {corrected_text_re}"
+                            comment = f"{original_text} → {corrected_text_re}"
 
                         corrections.append({
                             "page": pageNumber,
