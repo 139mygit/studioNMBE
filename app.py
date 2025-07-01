@@ -3419,20 +3419,20 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
                             # comment = f"{key}에 대한 수정 사항입니다."
                             reason_type = "用語の統一"
                         
-                        if corrected_text_re == "删除":
-                            comment = f"{original_text} → トルは不要"
-                        else:
-                            comment = f"{original_text} → {corrected_text_re}"
+                            if corrected_text_re == "删除":
+                                comment = f"{original_text} → トルは不要"
+                            else:
+                                comment = f"{original_text} → {corrected_text_re}"
 
-                        corrections.append({
-                            "page": pageNumber,
-                            "original_text": original_text,
-                            "comment": comment,
-                            "reason_type": reason_type,
-                            "check_point": input_text.strip(),
-                            "locations": [],
-                            "intgr": False,
-                        })
+                            corrections.append({
+                                "page": pageNumber,
+                                "original_text": original_text,
+                                "comment": comment,
+                                "reason_type": reason_type,
+                                "check_point": input_text.strip(),
+                                "locations": [],
+                                "intgr": False,
+                            })
 
 # -----------------
     if fund_type == 'public':
