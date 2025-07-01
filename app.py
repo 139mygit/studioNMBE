@@ -3440,7 +3440,7 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
 
                             corrections.append({
                                 "page": pageNumber,
-                                "original_text": extract_text(input_text, original_text),
+                                "original_text": original_text,
                                 "comment": comment,
                                 "reason_type": reason_type,
                                 "check_point": input_text.strip(),
