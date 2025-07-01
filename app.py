@@ -2512,7 +2512,7 @@ def allowed_file(filename):
     :param filename: 파일명
     :return: bool
     """
-    ALLOWED_EXTENSIONS = {'pdf', 'xlsx','txt','xls','xlsx','xlm','xlmx'}  # PDF와 Excel 파일 허용 
+    ALLOWED_EXTENSIONS = {'pdf', 'xlsx','txt','xls','XLSX','xlm','xlmx'}  # PDF와 Excel 파일 허용 
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/api/test_token', methods=['GET'])
@@ -2675,7 +2675,7 @@ def check_upload():
                         "prompt_text": text  # Excel에서 읽어온 원본 텍스트
                     })
 
-                elif regcheck.search(r'\.(xls|xlsx|xlm|xlmx)$',file.filename):
+                elif regcheck.search(r'\.(xls|xlsx|xlm|XLSX|xlmx)$',file.filename):
                     """
                     엑셀 파일을 처리하여 GPT로 교정 후, 수정된 엑셀을 반환하는 함수
                     :param file_bytes: 업로드된 엑셀 파일 바이너리
@@ -3131,8 +3131,10 @@ replace_rules = {
     '伸び': '伸び率', #630
     '積み増す': '積み増しする', #630 
     # '多く': '多くの',#630
-    '取組み': '取り組み'
+    '取組み': '取り組み',
+    '魅力度': '<sup>※</sup>魅力度'
 }
+
 
 def merge_brackets(content: str) -> str:
     """
@@ -3312,14 +3314,15 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
             })
 
         # （全角→半角） -() → ()
-        pattern_half_width_kuohao = r"[()]+"
+        pattern_half_width_kuohao = r"\(([^)]+)\)"
         half_width_kuohao_matches = regcheck.findall(pattern_half_width_kuohao, input_text)
 
         for match in half_width_kuohao_matches:
             corrected_text_re = half_and_full_process(match,half_to_full_dict)  # 반각 카타카나를 전각으로 변환
             reason_type = "半角括弧を全角括弧に統一"  # 수정 이유
             original_text = match  # 원본 텍스트
-            target_text = corrected_text_re  # 전각으로 변환된 텍스트
+            converted = corrected_text_re  # 전각으로 변환된 텍스트
+            target_text = re.sub(r'\(([^)]+)\)', r'（\1）', converted)
             # 「％」表記の統一（半角→全角） -0.09% → -0.09％
             comment = f"{reason_type} {original_text} → {target_text}"
 
@@ -6141,32 +6144,6 @@ def loop_in_ruru(input):
             ]
         },
         {
-            "category": "Replacement Rules for Verb-Type Expressions(動詞・活用形を含む表現の置き換え)",
-            "rule_id": "2.9",
-            "description":"Certain terms or expressions require more than simple string or regex-based replacement. These are called dynamically varying expressions, which include but are not limited to: Register-sensitive expressions (e.g., polite/humble language variations) Compound phrases or abbreviations that appear in flexible forms When the term to be replaced is a verb, the system must detect and process all conjugated or inflected forms. Do not use rigid pattern matching. Ensure grammatical accuracy after replacement. In general, all such replacements must be done in a context-sensitive manner, ensuring the result remains grammatically and semantically correct",
-            "requirements": [
-                {
-                    "condition": "～に賭ける to ～を予想して ,日本語の使い型変換を注意すべき",
-                    "correction": "～を予想して"
-                },
-                {
-                    "condition": "「横ばい」という表現は、期間中の価格・利回り等の値動きが非常に小さい場合に限定して使用すること。一方で、期間中に一定の変動があったものの、最終的に開始時点と同程度の水準に戻った場合には、「ほぼ変わらず」「同程度となる」などの表現を使用する。誤って「横ばい」と記述すると、値動きがなかったような誤認を与える可能性があるため、事実に基づいた正確な表現選択が求められる。",
-                    "correction": "ほぼ変わらず"
-                }
-            ],
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
-            "Examples": [
-                {
-                    "Input": "～に賭ける",
-                    "Output": "'original': '～に賭ける', 'correct': '～を予想して', 'reason': 'Reason text'",
-                },
-                {
-                    "Input": "当作成期を通してみると債券利回りは横ばいでした。",
-                    "Output": "'original': '横ばい', 'correct': 'ほぼ変わらず', 'reason': '期間中に一定の変動幅が確認されており、「横ばい」という表現は実態と合わないため、「ほぼ変わらず」とするのが適切。'",
-                }
-            ]
-        },
-        {
             "category": "行って来い ⇒ 「上昇(下落)したのち下落(上昇)」等へ書き換える",
             "rule_id": "3.0",
             "description": "The expression “行って来い” is informal and vague. It must not be used in formal financial documents or reports intended for external audiences.Replace it with a precise description of the price movement, such as: “上昇したのち下落した” 下落したのち上昇した Always use fact-based, objective wording that clearly describes the market movement.",
@@ -6183,7 +6160,7 @@ def loop_in_ruru(input):
             "rule_id": "okurigana_usage",
             "description": "Verify that the correct and standardized okurigana is used consistently in the report.",
             "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
-        },
+        }
     ]
 
     for ruru_split in ruru_all:
