@@ -3430,7 +3430,7 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
                     if isinstance(item, dict):  # item이 딕셔너리인지 확인
                         for original_text, corrected_text_re in item.items():
                             # comment와 reason_type은 예시로 설정 (필요에 따라 수정)
-                            # comment = f"{corrected_text_re}에 대한 수정 사항입니다."
+                            # comment = f"{key}에 대한 수정 사항입니다."
                             reason_type = "用語の統一"
 
                         if corrected_text_re == "删除":
@@ -3442,7 +3442,7 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
                                 "page": pageNumber,
                                 "original_text": original_text,
                                 "comment": comment,
-                                "reason_type": reason_type,
+                                "reason_type": corrected_text_re,# reason_type,
                                 "check_point": input_text.strip(),
                                 "locations": [],
                                 "intgr": False,
