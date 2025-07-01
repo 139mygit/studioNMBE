@@ -3181,6 +3181,10 @@ def opt_check_eng(content, rules):
             raw_key = k.replace("(", "（").replace(")", "）")
             full_key = v.replace("(", "（").replace(")", "）")
 
+            # full_key에 괄호가 없는 경우 출력하지 않도록 조건 추가
+            if '(' not in full_key and '（' not in full_key:
+                continue
+            
             escaped_k = regcheck.escape(raw_key)
             escaped_v = regcheck.escape(full_key)
 
@@ -3414,7 +3418,7 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
                             # comment와 reason_type은 예시로 설정 (필요에 따라 수정)
                             # comment = f"{key}에 대한 수정 사항입니다."
                             reason_type = "用語の統一"
-
+                        
                         if corrected_text_re == "删除":
                             comment = f"{original_text} → トルは不要"
                         else:
