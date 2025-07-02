@@ -3636,23 +3636,23 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
 
         results_ruru1 = opt_check_ruru1(input_text, replace_rules1)
     
-        for line_result in results_ruru1:
-            if line_result:  # entry가 비어있지 않은 경우
-                for item in line_result:
-                    if isinstance(item, dict):  # item이 딕셔너리인지 확인
-                        for original_text, corrected_text_re in item.items():
-                            reason_type = "用語の統一"
-                            comment = f"{original_text} → {corrected_text_re}"
+        for item in results_ruru1:
+            for k, v in item.items():
+                original_text = k  # 키 값을 original_text에 저장 AI
+                corrected_text_re = v  # 값(v)을 corrected_text_re에 저장 AI（人工知能）
+                reason_type = "用語の統一"  # 수정 이유
 
-                            corrections.append({
-                                "page": pageNumber,
-                                "original_text": original_text,
-                                "comment": comment,
-                                "reason_type": reason_type,
-                                "check_point": input_text.strip(),
-                                "locations": [],
-                                "intgr": False,
-                            })
+                comment = f"{reason_type} {original_text} → {corrected_text_re}"
+
+            corrections.append({
+                "page": pageNumber,
+                "original_text": extract_text(input_text, original_text),# original_text,
+                "comment": comment,
+                "reason_type": reason_type,
+                "check_point": input_text.strip(),  # 필요에 따라 입력
+                "locations": [],  # 필요에 따라 입력
+                "intgr": False,  # for debug 62
+            })
 
 # -----------------
     if fund_type == 'public':
