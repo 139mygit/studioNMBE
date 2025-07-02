@@ -3135,6 +3135,130 @@ replace_rules = {
     '魅力度': '<sup>※</sup>魅力度'
 }
 
+replace_rules1 ={
+    'シャリア': 'シャリーア',
+    'TTM': '仲値',
+    '殆ど': 'ほとんど',
+    '真似': 'まね',
+    '亘る': 'わたる',
+    '但し': 'ただし',
+    '牽制': 'けん制',
+    '牽引': 'けん引',
+    '終焉': '終えん',
+    '収斂': '収れん',
+    '逼迫': 'ひっ迫',
+    '横這い': '横ばい',
+    'ヶ月': 'ヵ月',
+    '入替え': '入れ替え',
+    '入替': '入れ替',
+    '売付':'売り付け',
+    '売付け':'売り付け',
+    '格付': '格付け', 
+    '買建て': '買い建て',
+    '売建て': '売り建て',
+    '切上げ': '切り上げ',
+    '切捨て': '切り捨て',
+    '組入れ': '組み入れ', 
+    '繰上げ償還': '繰上償還',
+    '先き行き': '先行き',
+    '下支える': '下支えする',
+    '取り引き': '取引',
+    '引上げ': '引き上げ',
+    '引下げ': '引き下げ',
+    '引続き': '引き続き',
+    '引締め': '引き締め',
+    '薄商い': '取引量が少なく',
+    'コア銘柄': '中核銘柄、コア（中核）銘柄',
+    'トリガー': 'きっかけ',
+    'ブルーチップ企業': '優良企業',
+    'まちまち': '異なる動き',
+    'ハト派': '金融緩和に前向き',
+    'タカ派': '金融引き締め重視',
+    '相場': '市場',
+    '連れ高': '影響を受けて上昇',
+    '伝播': '広がる',
+    'でんぱ': '広がる',
+    'トレンド': '傾向',
+    'レンジ': '範囲',
+    '回金': '円転',
+    'ローン': '貸し付け',
+    '所謂': 'いわゆる',
+    '暫く': 'しばらく',
+    '留まる': 'とどまる',
+    '止まる': 'とどまる',
+    '尚': 'なお',
+    '筈': 'はず',
+    '蓋然性': '可能性',
+    '商い': '出来高',
+    '後倒し': '延期',
+    '経済正常化': '経済活動正常化',
+    '金融正常化': '金融政策正常化',
+    '日本銀行': '日銀',
+    '政治的リスク': '政治リスク',
+    '地政学リスク': '地政学的リスク',
+    'への組み入れ': 'の組み入れ',
+    'マイナスに寄与': 'マイナスに影響',
+    '米国国債': '米国債',
+    '新型コロナ': '新型コロナウイルス',
+    'コロナウイルス': '新型コロナウイルス',
+    '立ち後れ': '立ち遅れ',
+    '伸張': '伸長',
+    'ダウ平均': 'ダウ平均株価',
+    'NYダウ': 'ダウ平均株価',
+    '中銀': '中央銀行', #623
+
+    '行われ': '行なわれ', #623
+    '行い': '行ない', #623
+    '行った':'行なった',
+    '行う': '行なう', #623
+    '行って': '行なって', #623
+    '行われる': '行なわれる',
+    'なりしました': 'なしました', #180015,628
+
+    '買い付けました': '買い付けしました',
+    '買い付け': '買い付けし', #64977
+    '買付':'買い付け',
+    '買付け':'買い付けし', #63207
+
+    '売り付けました':'売り付けしました', #628
+    '売り立てました':'売り立てしました', #628
+    
+
+    '積極姿勢': '高め',
+    '消極姿勢': '低め',
+    '割安に': '割安感のある',
+    'MSCIインド指数': 'MSCIインド・インデックス',
+    'サステナブル': 'エンターテイメント',
+    '積み増し': '積み増しし',
+
+    '亘': 'わた',
+    'REIT': 'リート', #629
+    '燻': 'くすぶ',
+    'トランプ政権': 'トランプ米政権',
+    'トランプ大統領': 'トランプ米大統領',
+    '米トランプ大統領': '米トランプ大統領',
+
+    '好感され、下落し': '好感され下落し',
+    '嫌気され、下落し': '嫌気され下落し',
+    '好感され、上昇し': '好感され上昇し',
+    '嫌気され、上昇し': '嫌気され上昇し',
+    '値上がり': '値上がりし',
+
+    '留': 'とど', #629
+    '当社': '同社', #629
+    '牽': 'けん', #629
+
+    '回ったこと': '回ったことや', #630
+    '組み入れ': '組み入れし', #630
+    'こと目指している': 'ことを目指している', #630
+    'グローバルで事業': 'グローバルに事業', #630
+    '伸び': '伸び率', #630
+    '積み増す': '積み増しする', #630 
+    # '多く': '多くの',#630
+    '取組み': '取り組み',
+    '魅力度': '<sup>※</sup>魅力度'
+}
+
 
 def merge_brackets(content: str) -> str:
     """
@@ -3230,6 +3354,75 @@ def opt_check_eng(content, rules):
         results.append(result)
 
     return results
+
+
+def opt_check_ruru1(content, rules):
+    content = merge_brackets(content)  # 1️⃣ 괄호 내 줄바꿈 제거
+
+    result = []
+    for k, v in rules.items():
+        raw_key = k.replace("(", "（").replace(")", "）")
+        full_key = v.replace("(", "（").replace(")", "）")
+
+        escaped_k = regcheck.escape(raw_key)
+        escaped_v = regcheck.escape(full_key)
+
+        new_k = escaped_k
+        if raw_key.isalpha() or raw_key in ["S&L", "M&A"]:
+            if raw_key == "OPEC":
+                new_k = f"(?<![a-zA-Z]){escaped_k}(?!プラス|[a-zA-Z])"
+            elif raw_key == "スティープ化":
+                new_k = f"(?<!イールドカーブの){escaped_k}"
+            elif raw_key == "イールドカーブ":
+                new_k = f"{escaped_k}(?!・コントロール|のスティープ化|のフラット化)"
+            elif raw_key == "キャッシュフロー":
+                new_k = f"(?<!フリー){escaped_k}"
+            elif raw_key == "キャリートレード":
+                new_k = f"(?<!円){escaped_k}"
+            elif raw_key == "スプレッド":
+                new_k = f"(?<!クレジット){escaped_k}"
+            elif raw_key == "バリュー":
+                new_k = f"(?<!レラティブ・|フェア){escaped_k}"
+            elif raw_key == "モーゲージ":
+                new_k = f"{escaped_k}(?!債)"
+            elif raw_key == "商い":
+                new_k = f"(?<!薄){escaped_k}"
+            else:
+                new_k = f"(?<![a-zA-Z]){escaped_k}(?![a-zA-Z])"
+        # 예외 처리: 中銀
+        elif raw_key == "中銀":
+            # '中央銀行' 앞에 수식어 포함 여부 확인
+            matches = regcheck.finditer(escaped_v, content)
+            exclude = False
+            for m in matches:
+                # 예: '欧州中央銀行' => m.start() - 2 >= 0, 앞 2글자 포함 확인
+                prefix = content[max(0, m.start() - 2): m.start()]
+                if prefix and not regcheck.match(r"[ \t\n\r]", prefix):
+                    exclude = True
+                    break
+            if exclude:
+                new_k = escaped_k  # full_key는 건너뛰고, raw_key만 검사
+                full_match = None
+            else:
+                full_match = regcheck.search(escaped_v, content)
+
+            
+        raw_match = regcheck.search(new_k, content)
+        full_match = regcheck.search(escaped_v, content)
+
+        # 일반 조건: full_key가 먼저 등장하면 제외
+        if raw_key != "中銀":  # 중銀 예외 상황 제외
+            # full_key가 먼저 등장한 경우, 이 키는 제외하고 다음 키로
+            if full_match and raw_match:
+                if full_match.start() <= raw_match.start():
+                    continue
+            elif full_match and not raw_match:
+                continue
+
+        if raw_match:
+            result.append({raw_key: full_key})
+        
+    return result
 
 # 0501 debug
 def find_corrections(corrected_text,input_text,pageNumber):
@@ -3410,32 +3603,51 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
 #-------------------
     # 英略词
     if fund_type == 'public':
-        results = opt_check_eng(input_text, replace_rules)
+        # results = opt_check_eng(input_text, replace_rules)
     
-        # 데이터 순환
-        for line_result in results:
-            if line_result:  # entry가 비어있지 않은 경우
-                for item in line_result:
-                    if isinstance(item, dict):  # item이 딕셔너리인지 확인
-                        for original_text, corrected_text_re in item.items():
-                            # comment와 reason_type은 예시로 설정 (필요에 따라 수정)
-                            # comment = f"{key}에 대한 수정 사항입니다."
-                            reason_type = "用語の統一"
+        # # 데이터 순환
+        # for line_result in results:
+        #     if line_result:  # entry가 비어있지 않은 경우
+        #         for item in line_result:
+        #             if isinstance(item, dict):  # item이 딕셔너리인지 확인
+        #                 for original_text, corrected_text_re in item.items():
+        #                     # comment와 reason_type은 예시로 설정 (필요에 따라 수정)
+        #                     # comment = f"{key}에 대한 수정 사항입니다."
+        #                     reason_type = "用語の統一"
                         
-                            if corrected_text_re == "删除":
-                                comment = f"{original_text} → トルは不要"
-                            else:
-                                comment = f"{original_text} → {corrected_text_re}"
+        #                     if corrected_text_re == "删除":
+        #                         comment = f"{original_text} → トルは不要"
+        #                     else:
+        #                         comment = f"{original_text} → {corrected_text_re}"
 
-                            corrections.append({
-                                "page": pageNumber,
-                                "original_text": original_text,
-                                "comment": comment,
-                                "reason_type": reason_type,
-                                "check_point": input_text.strip(),
-                                "locations": [],
-                                "intgr": False,
-                            })
+        #                     corrections.append({
+        #                         "page": pageNumber,
+        #                         "original_text": original_text,
+        #                         "comment": comment,
+        #                         "reason_type": reason_type,
+        #                         "check_point": input_text.strip(),
+        #                         "locations": [],
+        #                         "intgr": False,
+        #                     })
+
+
+        results_ruru1 = opt_check_ruru1(input_text, replace_rules1)
+    
+        for line_result in results_ruru1:
+            for item in line_result:
+                for original_text, corrected_text_re in item.items():
+                    reason_type = "用語の統一"
+                    comment = f"{original_text} → {corrected_text_re}"
+
+                    corrections.append({
+                        "page": pageNumber,
+                        "original_text": original_text,
+                        "comment": comment,
+                        "reason_type": reason_type,
+                        "check_point": input_text.strip(),
+                        "locations": [],
+                        "intgr": False,
+                    })
 
 # -----------------
     if fund_type == 'public':
