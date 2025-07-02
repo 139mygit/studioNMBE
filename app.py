@@ -4885,7 +4885,8 @@ def save_local_link():
             update_data.update(id=str(uuid.uuid4()))
             container.upsert_item(update_data)
         else:
-            link_data[0].update(update_data)
+            effective_data = dict(filter(lambda x: x[1], update_data.items()))
+            link_data[0].update(effective_data)
             container.upsert_item(link_data[0])
         return jsonify({"success": True}), 200
     except Exception as e:
@@ -6140,6 +6141,32 @@ def loop_in_ruru(input):
                 {
                     "Input": "最近、米国経済において賃金上昇と物価高が続いており、景気過熱感が指摘されています。米国のインフレ懸念の高まりを背景に、株式市場は下落しました。金融当局は今後も利上げを続ける見通しです。",
                     "Output": "(エラーなし:前文に要因記載あり)"
+                }
+            ]
+        },
+        {
+            "category": "Replacement Rules for Verb-Type Expressions(動詞・活用形を含む表現の置き換え)",
+            "rule_id": "2.9",
+            "description":"Certain terms or expressions require more than simple string or regex-based replacement. These are called dynamically varying expressions, which include but are not limited to: Register-sensitive expressions (e.g., polite/humble language variations) Compound phrases or abbreviations that appear in flexible forms When the term to be replaced is a verb, the system must detect and process all conjugated or inflected forms. Do not use rigid pattern matching. Ensure grammatical accuracy after replacement. In general, all such replacements must be done in a context-sensitive manner, ensuring the result remains grammatically and semantically correct",
+            "requirements": [
+                {
+                    "condition": "～に賭ける to ～を予想して ,日本語の使い型変換を注意すべき",
+                    "correction": "～を予想して"
+                },
+                {
+                    "condition": "「横ばい」という表現は、期間中の価格・利回り等の値動きが非常に小さい場合に限定して使用すること。一方で、期間中に一定の変動があったものの、最終的に開始時点と同程度の水準に戻った場合には、「ほぼ変わらず」「同程度となる」などの表現を使用する。誤って「横ばい」と記述すると、値動きがなかったような誤認を与える可能性があるため、事実に基づいた正確な表現選択が求められる。",
+                    "correction": "ほぼ変わらず"
+                }
+            ],
+            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
+            "Examples": [
+                {
+                    "Input": "～に賭ける",
+                    "Output": "'original': '～に賭ける', 'correct': '～を予想して', 'reason': 'Reason text'",
+                },
+                {
+                    "Input": "当作成期を通してみると債券利回りは横ばいでした。",
+                    "Output": "'original': '横ばい', 'correct': 'ほぼ変わらず', 'reason': '期間中に一定の変動幅が確認されており、「横ばい」という表現は実態と合わないため、「ほぼ変わらず」とするのが適切。'",
                 }
             ]
         },
