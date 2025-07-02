@@ -3634,20 +3634,22 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
         results_ruru1 = opt_check_ruru1(input_text, replace_rules1)
     
         for line_result in results_ruru1:
-            for item in line_result:
-                for original_text, corrected_text_re in item.items():
-                    reason_type = "用語の統一"
-                    comment = f"{original_text} → {corrected_text_re}"
+            if line_result:  # entry가 비어있지 않은 경우
+                for item in line_result:
+                    if isinstance(item, dict):  # item이 딕셔너리인지 확인
+                        for original_text, corrected_text_re in item.items():
+                            reason_type = "用語の統一"
+                            comment = f"{original_text} → {corrected_text_re}"
 
-                    corrections.append({
-                        "page": pageNumber,
-                        "original_text": original_text,
-                        "comment": comment,
-                        "reason_type": reason_type,
-                        "check_point": input_text.strip(),
-                        "locations": [],
-                        "intgr": False,
-                    })
+                            corrections.append({
+                                "page": pageNumber,
+                                "original_text": original_text,
+                                "comment": comment,
+                                "reason_type": reason_type,
+                                "check_point": input_text.strip(),
+                                "locations": [],
+                                "intgr": False,
+                            })
 
 # -----------------
     if fund_type == 'public':
