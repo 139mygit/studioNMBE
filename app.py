@@ -4850,17 +4850,17 @@ def get_local_link():
 def save_local_link():
     try:
         data = request.json
-        commonComment = data.get("commonComment", "")
-        individualCheckPath = data.get("individualCheckPath", "")
-        individualComment = data.get("individualComment", "")
-        individualExcelPath = data.get("individualExcelPath", "")
-        individualPdfPath = data.get("individualPdfPath", "")
-        meigaramaster = data.get("meigaramaster", "")
-        reportData = data.get("reportData", "")
-        simu = data.get("simu", "")
-        resultngPath = data.get("resultngPath", "")
-        resultokPath = data.get("resultokPath", "")
-        fund_type = data.get("fund_type", "")
+        commonComment = data.get("commonComment")
+        individualCheckPath = data.get("individualCheckPath")
+        individualComment = data.get("individualComment")
+        individualExcelPath = data.get("individualExcelPath")
+        individualPdfPath = data.get("individualPdfPath")
+        meigaramaster = data.get("meigaramaster")
+        reportData = data.get("reportData")
+        simu = data.get("simu")
+        resultngPath = data.get("resultngPath")
+        resultokPath = data.get("resultokPath")
+        fund_type = data.get("fund_type")
         container = get_db_connection(LOCAL_LINK)
         link_data = list(container.query_items(
            query=f"SELECT * FROM c WHERE c.fund_type='{fund_type}'",
@@ -4885,7 +4885,7 @@ def save_local_link():
             update_data.update(id=str(uuid.uuid4()))
             container.upsert_item(update_data)
         else:
-            effective_data = dict(filter(lambda x: x[1], update_data.items()))
+            effective_data = dict(filter(lambda x: x[1] is not None, update_data.items()))
             link_data[0].update(effective_data)
             container.upsert_item(link_data[0])
         return jsonify({"success": True}), 200
@@ -5747,14 +5747,20 @@ def get_prompt(corrected):
     example_70 = "'original': '○月間の基準価額（分配金再投資）の騰落率は、毎月分配型が0.37％、年2回決算型は0.36％の上昇となり、参考指数の騰落率（0.58％の上昇）を下回りました。', 'correct': '○月間の基準価額（分配金再投資）の騰落率は、毎月分配型が0.37％の上昇、年2回決算型は0.36％の上昇となり、参考指数の騰落率（0.58％の上昇）を下回りました。', 'reason': 'Aが◯%、Bは△%の上昇の場合、「の上昇」がBだけにかかっていて、Aにもつけた方がわかりやすいため。'"
     prompt_list = [
         f"""
-        **Typographical Errors (脱字・誤字) Detection**
-        -Detect any missing characters (脱字) or misused characters (誤字) that cause unnatural expressions or misinterpretation.
+         **Missing or Misused Function Words（機能語・助詞などの脱字・誤用）**
+        -Detect and correct missing or misused function words that compromise grammatical structure, clarity, or completeness. This includes particles, auxiliary expressions, conjunctions, numerical elements, and word-level usage that are essential in formal Japanese writing.
         **Proofreading Requirements:**
-        -Detect and correct all genuine missing characters (脱字) or misused characters (誤字) that cause grammatical errors or change the intended meaning.
-        -Always detect and correct any incorrect conjugations, misused readings, or verb usage, even if they superficially look natural.
-        -Do not point out stylistic variations, natural auxiliary expressions, or acceptable conjugations unless they are grammatically incorrect.
-        -Confirm that each kanji matches the intended meaning precisely.
-        -Detect cases where non-verb terms are incorrectly used as if they were verbs.
+        -Detect omissions or misuses of:
+        -Particles（助詞 such as「を」「に」「は」）
+        -Auxiliary expressions（補助動詞・接続表現 such as「ことを」「ように」「ために」）
+        -Conjunctions and connectors（e.g., duplicated「がが」or missing「こと」）
+        -Decimal formatting and numeric components（e.g., missing "0" in「.7％」→「0.7％」）
+        -Incorrect or misused words（単語の誤用・表記ミス） that result in unintended meaning or break natural usage.
+        -Even if an expression appears natural or understandable in spoken Japanese, any omission, misuse, or lexical error that violates formal written grammar must be corrected.
+        -Do not flag stylistically acceptable orthographic variants involving okurigana (送り仮名) usage. The following are examples of such variants that should not be treated as errors:
+        「取り込む」vs「取込む」
+        「行う」vs「行なう」
+        「書き換え」vs「書換え」
 
 
         **missing Example*：
@@ -5800,7 +5806,6 @@ def get_prompt(corrected):
         **Monetary Unit(金額表記) Check**
         -Proofreading Requirements：
         -Ensure currency units (円、兆円、億円) are correctly used.
-        {corrected}
         """
     ]
 
