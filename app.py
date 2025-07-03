@@ -3731,7 +3731,7 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
             "no": 2,
             "sheetname": "過去分整理3列",
             "stocks": "古河電気工業",
-            "元組入銘柄解説": "日本を代表する電線メーカー。光ファイバおよび光ケーブルを米国内で一貫生産できる体制をもつグローバルで数少ない企業。今後は米国で高速インターネットの整備に向けた需要の拡大による業績拡大に期待。加えて、機能製品のAI関連需要の拡大にも注目。",
+            "元組入銘柄解説": "加速",
             "分類": "新規銘柄",
             "新組入銘柄解説": "日本を代表する電線メーカー。光ファイバおよび光ケーブルを米国内で一貫生産できる体制をもつグローバルで数少ない企業。今後は米国で高速インターネットの整備に向けた需要の拡大による業績拡大に期待。加えて、機能製品のAI関連需要の拡大にも注目。"
         },
@@ -3757,7 +3757,7 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
             "comment": f"{old_text} → {new_text}",
             "intgr": False,
             "locations": [],
-            "original_text": new_text,
+            "original_text": old_text,
             "page": pageNumber,
             "reason_type": item.get("分類", "")
         })
