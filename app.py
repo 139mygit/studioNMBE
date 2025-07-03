@@ -3731,7 +3731,7 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
             "no": 2,
             "sheetname": "過去分整理3列",
             "stocks": "古河電気工業",
-            "元組入銘柄解説": "",
+            "元組入銘柄解説": "日本を代表する電線メーカー。光ファイバおよび光ケーブルを米国内で一貫生産できる体制をもつグローバルで数少ない企業。今後は米国で高速インターネットの整備に向けた需要の拡大による業績拡大に期待。加えて、機能製品のAI関連需要の拡大にも注目。",
             "分類": "新規銘柄",
             "新組入銘柄解説": "日本を代表する電線メーカー。光ファイバおよび光ケーブルを米国内で一貫生産できる体制をもつグローバルで数少ない企業。今後は米国で高速インターネットの整備に向けた需要の拡大による業績拡大に期待。加えて、機能製品のAI関連需要の拡大にも注目。"
         },
@@ -3742,7 +3742,7 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
             "no": 3,
             "sheetname": "過去分整理3列",
             "stocks": "フジクラ",
-            "元組入銘柄解説": "",
+            "元組入銘柄解説": "一致 灰色， 更新蓝色",
             "分類": "新規銘柄",
             "新組入銘柄解説": "大手国内電線メーカー。事業環境悪化に伴い固定費の削減や高付加価値製品へのシフトなどの構造改革を行ない収益体質が改善。AI関連用途のコネクタなどによる業績拡大に注目。"
         }
@@ -3759,7 +3759,7 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
             "locations": [],
             "original_text": new_text,
             "page": pageNumber,
-            "reason_type": item.get("stocks", "")
+            "reason_type": item.get("分類", "")
         })
 
     return corrections
