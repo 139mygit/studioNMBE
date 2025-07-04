@@ -2512,7 +2512,7 @@ def allowed_file(filename):
     :param filename: 파일명
     :return: bool
     """
-    ALLOWED_EXTENSIONS = {'pdf', 'xlsx','txt','xls','XLSX','xlm','xlmx'}  # PDF와 Excel 파일 허용 
+    ALLOWED_EXTENSIONS = {'pdf', 'xlsx','txt','xls','XLSX','xlm','xlsm','xltx','xltm','xlsb'}   # PDF와 Excel 파일 허용 
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/api/test_token', methods=['GET'])
@@ -2675,7 +2675,7 @@ def check_upload():
                         "prompt_text": text  # Excel에서 읽어온 원본 텍스트
                     })
 
-                elif regcheck.search(r'\.(xls|xlsx|xlm|XLSX|xlmx)$',file.filename):
+                elif regcheck.search(r'\.(xls|xlsx|XLSX|xlsm|xlm|xltx|xltm|xlsb)$',file.filename):
                     """
                     엑셀 파일을 처리하여 GPT로 교정 후, 수정된 엑셀을 반환하는 함수
                     :param file_bytes: 업로드된 엑셀 파일 바이너리
@@ -2920,7 +2920,6 @@ replace_rules = {
     'SUV': 'SUV（スポーツ用多目的車）',
     'TALF': 'TALF（ターム物資産担保証券貸出制度）',
     'TOB': 'TOB（株式公開買付け）',
-    'TTM': '仲値',
     'TPP': 'TPP（環太平洋経済連携協定）',
     'UAE': 'UAE（アラブ首長国連邦）',
     'UAW': 'UAW（全米自動車労働組合）',
@@ -2959,7 +2958,6 @@ replace_rules = {
     'サブプライムローン': 'サブプライムローン（信用度の低い個人向け住宅融資）',
     'サプライチェーン': 'サプライチェーン（供給網）',
     'ジェネリック医薬品': 'ジェネリック医薬品（後発薬）',
-    'シャリア': 'シャリーア',
     'シクリカル': 'シクリカル（景気敏感）',
     'シャドーバンキング': 'シャドーバンキング（影の銀行）',
     'ショートポジション': 'ショートポジション（売り持ち）',
@@ -3009,6 +3007,16 @@ replace_rules = {
     'レラティブ・バリュー': 'レラティブ・バリュー（相対価値）',
     'ロックダウン': 'ロックダウン（都市封鎖）',
     'ロングポジション': 'ロングポジション（買い持ち）',
+    'EDAツール': 'EDAツール（電子設計自動化ツール）', #623
+    'TOPIX':'TOPIX（東証株価指数）', #63207
+    'ベンチマーク': 'ベンチマーク(分配金再投資)', #630
+
+    '利回りは上昇': '利回りは上昇（価格は下落）',
+    '利回りは低下': '利回りは低下（価格は上昇）',
+
+
+    'シャリア': 'シャリーア',
+    'TTM': '仲値',
     '殆ど': 'ほとんど',
     '真似': 'まね',
     '亘る': 'わたる',
@@ -3068,8 +3076,6 @@ replace_rules = {
     '政治的リスク': '政治リスク',
     '地政学リスク': '地政学的リスク',
     'への組み入れ': 'の組み入れ',
-    '利回りは上昇': '利回りは上昇（価格は下落）',
-    '利回りは低下': '利回りは低下（価格は上昇）',
     'マイナスに寄与': 'マイナスに影響',
     '米国国債': '米国債',
     '新型コロナ': '新型コロナウイルス',
@@ -3080,7 +3086,6 @@ replace_rules = {
     'NYダウ': 'ダウ平均株価',
     '中銀': '中央銀行', #623
 
-    'EDAツール': 'EDAツール（電子設計自動化ツール）', #623
     '行われ': '行なわれ', #623
     '行い': '行ない', #623
     '行った':'行なった',
@@ -3097,7 +3102,6 @@ replace_rules = {
     '売り付けました':'売り付けしました', #628
     '売り立てました':'売り立てしました', #628
     
-    'TOPIX':'TOPIX（東証株価指数）', #63207
 
     '積極姿勢': '高め',
     '消極姿勢': '低め',
@@ -3124,7 +3128,6 @@ replace_rules = {
     '牽': 'けん', #629
 
     '回ったこと': '回ったことや', #630
-    'ベンチマーク': 'ベンチマーク(分配金再投資)', #630
     '組み入れ': '組み入れし', #630
     'こと目指している': 'ことを目指している', #630
     'グローバルで事業': 'グローバルに事業', #630
@@ -3256,10 +3259,7 @@ replace_rules1 ={
     '積み増す': '積み増しする', #630 
     # '多く': '多くの',#630
     '取組み': '取り組み',
-    '魅力度': '<sup>※</sup>魅力度',
-    'TOPIX': '123123TOPIX'
-
-    
+    '魅力度': '<sup>※</sup>魅力度'
 }
 
 
@@ -3267,7 +3267,17 @@ def merge_brackets(content: str) -> str:
     """
     괄호 내부의 줄바꿈을 제거합니다. 예: 'CPI（消費者物\n価指数）' -> 'CPI（消費者物価指数）'
     """
-    return re.sub(r'（[^）\n\r]*[\n\r]+[^）]*）', lambda m: m.group(0).replace("\n", "").replace("\r", ""), content)
+    # return regcheck.sub(r'（[^）\n\r]*[\n\r]+[^）]*）', lambda m: m.group(0).replace("\n", "").replace("\r", ""), content)
+    # 전처리: '단어\n（내용）' -> '단어（내용）' 로 병합
+    content = regcheck.sub(r'([^\s\n\r])[\s\n\r]+（', r'\1（', content)
+
+    # 괄호 내부의 줄바꿈 및 공백 제거
+    def replacer(match):
+        inside = match.group(1)
+        cleaned = regcheck.sub(r'[\s\u3000]+', '', inside)
+        return f'（{cleaned}）'
+
+    return regcheck.sub(r'（(.*?)）', replacer, content, flags=regcheck.DOTALL)
 
 
 # (4月30日 → 2025年4月30日)
@@ -3305,6 +3315,7 @@ def opt_check_eng(content, rules):
 
     for line in lines:
         result = []
+        normalized_line = line.replace("\n", "").replace(" ", "")
 
         for k, v in rules.items():
             raw_key = k.replace("(", "（").replace(")", "）")
@@ -3340,16 +3351,21 @@ def opt_check_eng(content, rules):
                 else:
                     new_k = f"(?<![a-zA-Z]){escaped_k}(?![a-zA-Z])"
 
-            line_matched_full = regcheck.search(escaped_v, line)
-            line_matched_raw = regcheck.search(new_k, line)
+            matched_full = regcheck.search(escaped_v, normalized_line)
+            matched_raw = regcheck.search(new_k, normalized_line)
 
-            if line_matched_full and full_key not in seen_full:
-                result.append({raw_key: full_key})
+            # ✅ 정확한 full_key 첫 등장
+            if matched_full and full_key not in seen_full:
                 seen_raw.add(raw_key)
                 seen_full.add(full_key)
-            elif line_matched_full and full_key in seen_full:
+                continue
+
+            # ✅ full_key 재등장
+            elif matched_full and full_key in seen_full:
                 result.append({full_key: "删除"})
-            elif line_matched_raw and raw_key not in seen_raw:
+
+            # ✅ raw_key 첫 등장 && full_key는 이미 본 상태
+            elif matched_raw and raw_key not in seen_raw:
                 result.append({raw_key: full_key})
                 seen_raw.add(raw_key)
                 seen_full.add(full_key)
@@ -3357,7 +3373,6 @@ def opt_check_eng(content, rules):
         results.append(result)
 
     return results
-
 
 def opt_check_ruru1(content, rules):
     content = merge_brackets(content)  # 1️⃣ 괄호 내 줄바꿈 제거
@@ -3509,7 +3524,7 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
                 "intgr": False, # for debug 62
             })
 
-        # （全角→半角） -() → ()
+        # （半角括弧 → 全角括弧） -() → () ,with date format: \((?!\d{4}年\d{1,2}月\d{1,2}日)([^)]+)\)
         pattern_half_width_kuohao = r"\(([^)]+)\)"
         half_width_kuohao_matches = regcheck.findall(pattern_half_width_kuohao, input_text)
 
@@ -3519,7 +3534,7 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
             original_text = match  # 원본 텍스트
             converted = corrected_text_re  # 전각으로 변환된 텍스트
             target_text = re.sub(r'\(([^)]+)\)', r'（\1）', converted)
-            # 「％」表記の統一（半角→全角） -0.09% → -0.09％
+            # ()表記の統一(分配金再投資)） -(分配金再投資) → （分配金再投資）
             comment = f"{reason_type} {original_text} → {target_text}"
 
             corrections.append({
@@ -3606,32 +3621,31 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
 #-------------------
     # 英略词
     if fund_type == 'public':
-        # results = opt_check_eng(input_text, replace_rules)
-    
-        # # 데이터 순환
-        # for line_result in results:
-        #     if line_result:  # entry가 비어있지 않은 경우
-        #         for item in line_result:
-        #             if isinstance(item, dict):  # item이 딕셔너리인지 확인
-        #                 for original_text, corrected_text_re in item.items():
-        #                     # comment와 reason_type은 예시로 설정 (필요에 따라 수정)
-        #                     # comment = f"{key}에 대한 수정 사항입니다."
-        #                     reason_type = "用語の統一"
+        results = opt_check_eng(input_text, replace_rules)
+        # 데이터 순환
+        for line_result in results:
+            if line_result:  # entry가 비어있지 않은 경우
+                for item in line_result:
+                    if isinstance(item, dict):  # item이 딕셔너리인지 확인
+                        for original_text, corrected_text_re in item.items():
+                            # comment와 reason_type은 예시로 설정 (필요에 따라 수정)
+                            # comment = f"{key}에 대한 수정 사항입니다."
+                            reason_type = "用語の統一"
                         
-        #                     if corrected_text_re == "删除":
-        #                         comment = f"{original_text} → トルは不要"
-        #                     else:
-        #                         comment = f"{original_text} → {corrected_text_re}"
+                            if corrected_text_re == "删除":
+                                comment = f"{original_text} → トルは不要"
+                            else:
+                                comment = f"{original_text} → {corrected_text_re}"
 
-        #                     corrections.append({
-        #                         "page": pageNumber,
-        #                         "original_text": original_text,
-        #                         "comment": comment,
-        #                         "reason_type": reason_type,
-        #                         "check_point": input_text.strip(),
-        #                         "locations": [],
-        #                         "intgr": False,
-        #                     })
+                            corrections.append({
+                                "page": pageNumber,
+                                "original_text": original_text,
+                                "comment": comment,
+                                "reason_type": reason_type,
+                                "check_point": input_text.strip(),
+                                "locations": [],
+                                "intgr": False,
+                            })
 
 
         results_ruru1 = opt_check_ruru1(input_text, replace_rules1)
@@ -3653,7 +3667,6 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
                 "locations": [],  # 필요에 따라 입력
                 "intgr": False,  # for debug 62
             })
-
 # -----------------
     if fund_type == 'public':
         word_re = regcheck.findall(r"外国人投資家からの資金流入|外国人投資家の資金流出|魅力|投資妙味|割高|割高感|割安|割安感|加速|心理|"
@@ -3722,31 +3735,6 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
 
 
 #-------------------
-    # 73 debug
-    tenbrend = [
-        {
-            "fcode": "140012",
-            "filename": "140012_M2501_C.pdf",
-            "months": "202505",
-            "no": 2,
-            "sheetname": "過去分整理3列",
-            "stocks": "古河電気工業",
-            "元組入銘柄解説": "加速",
-            "分類": "新規銘柄",
-            "新組入銘柄解説": "日本を代表する電線メーカー。光ファイバおよび光ケーブルを米国内で一貫生産できる体制をもつグローバルで数少ない企業。今後は米国で高速インターネットの整備に向けた需要の拡大による業績拡大に期待。加えて、機能製品のAI関連需要の拡大にも注目。"
-        },
-        {
-            "fcode": "140012",
-            "filename": "140012_M2501_C.pdf",
-            "months": "202505",
-            "no": 3,
-            "sheetname": "過去分整理3列",
-            "stocks": "フジクラ",
-            "元組入銘柄解説": "加速",
-            "分類": "銘柄解説更新あり",
-            "新組入銘柄解説": "大手国内電線メーカー。事業環境悪化に伴い固定費の削減や高付加価値製品へのシフトなどの構造改革を行ない収益体質が改善。AI関連用途のコネクタなどによる業績拡大に注目。"
-        }
-        ]
     # tenbrend
     for item in tenbrend:
         old_text = item.get("元組入銘柄解説", "").strip()
@@ -3757,9 +3745,9 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
             "comment": f"{old_text} → {new_text}",
             "intgr": False,
             "locations": [],
-            "original_text": old_text,
+            "original_text": new_text,
             "page": pageNumber,
-            "reason_type": item.get("分類", "")
+            "reason_type": item.get("stocks", "")
         })
 
     return corrections
@@ -3801,7 +3789,7 @@ def extract_corrections(corrected_text, input_text):
             "original_text": reason,  # 전체 입력값 当月のファンドの騰落率は+0.2%となりました。
             "comment": comment, # +0.2% → 0.85%
             "reason_type": reason_type, # ファンドの騰落率
-            
+
             "check_point": input_text.strip(), # 当月のファンドの騰落率は+0.2%となりました。
             "locations": [],
             "intgr": True,
@@ -5121,7 +5109,6 @@ def save_local_link():
                 simu=simu,
                 resultngPath=resultngPath,
                 resultokPath=resultokPath
-
         )
 
         if not link_data:
@@ -5681,6 +5668,17 @@ def get_num(num):
     return ""
 
 
+def get_src(no_space, src_content):
+    content_flag = "".join([i + "☆" for i in no_space])
+    content_re = regcheck.escape(content_flag).replace("☆", ".?")
+    res = regcheck.search(content_re, src_content, flags=regcheck.DOTALL)
+    if res:
+        return res.group()
+    else:
+        return no_space
+
+
+
 # async call ,need FE promises
 def opt_common(input, prompt_result, pdf_base64, pageNumber, re_list, word_list, rule_list, rule1_list, rule3_list,symbol_list):  
     # ChatCompletion Call
@@ -5701,7 +5699,8 @@ def opt_common(input, prompt_result, pdf_base64, pageNumber, re_list, word_list,
     if isinstance(parsed_data, list):
         for re_index, data in enumerate(parsed_data):
             _re_rule = ".{,2}"
-            _original_re = regcheck.search(f"{_re_rule}{re.escape(data["original"])}{_re_rule}", input)
+            data["original"] = get_src(data["original"], input)
+            _original_re = regcheck.search(f"{_re_rule}{regcheck.escape(data["original"])}{_re_rule}", input)
             if _original_re:
                 _original_text = _original_re.group()
             else:
@@ -5875,6 +5874,13 @@ async def opt_common_wording(file_name,fund_type,input,prompt_result,excel_base6
         "debug_re_answer":re_answer, #610 debug
     })
 
+@app.route('/api/prompt_test', methods=['GET'])
+def get_prompt_data():
+    prompt_result1 = get_prompt("\"" + "111111111111111111111111111" + "\"")
+    prompt_result2 = loop_in_ruru("\"" + "1111111111111111111111111111" + "\"")
+    return jsonify(dict(xu=list(prompt_result1), tang=list(prompt_result2)))
+
+
 @app.route('/api/opt_typo', methods=['POST'])
 def opt_typo():
     try:
@@ -5902,7 +5908,7 @@ def opt_typo():
         if not input:
             return jsonify({"success": False, "error": "No input provided"}), 400
         
-        prompt_result = get_prompt("\"" + input + "\"")
+        prompt_result = get_prompt("\"" + input.replace('\n', '') + "\"")
         async def run_tasks():
             tasks = [handle_result(once) for once in prompt_result]
             return await asyncio.gather(*tasks)
@@ -5988,7 +5994,7 @@ def get_prompt(corrected):
     example_70 = "'original': '○月間の基準価額（分配金再投資）の騰落率は、毎月分配型が0.37％、年2回決算型は0.36％の上昇となり、参考指数の騰落率（0.58％の上昇）を下回りました。', 'correct': '○月間の基準価額（分配金再投資）の騰落率は、毎月分配型が0.37％の上昇、年2回決算型は0.36％の上昇となり、参考指数の騰落率（0.58％の上昇）を下回りました。', 'reason': 'Aが◯%、Bは△%の上昇の場合、「の上昇」がBだけにかかっていて、Aにもつけた方がわかりやすいため。'"
     prompt_list = [
         f"""
-         **Missing or Misused Function Words（機能語・助詞などの脱字・誤用）**
+        **Missing or Misused Function Words（機能語・助詞などの脱字・誤用）**
         -Detect and correct missing or misused function words that compromise grammatical structure, clarity, or completeness. This includes particles, auxiliary expressions, conjunctions, numerical elements, and word-level usage that are essential in formal Japanese writing.
         **Proofreading Requirements:**
         -Detect omissions or misuses of:
@@ -6016,13 +6022,15 @@ def get_prompt(corrected):
         {example_70}
         """,
         f"""
-        **Punctuation (句読点) Usage Check**
+       **Punctuation (句読点) Usage Check**
         -Check the sentence-ending punctuation and comma usage only within complete sentences.
         **Proofreading Requirements:**
-        -Ensure that every complete sentence ends with exactly one「。」.
+        -Only detect missing「。」at the end of grammatically complete sentences.
+        -If the sentence already ends with「。」, do not suggest any correction.
         -Do not flag missing or extra「。」in sentence fragments, headings, bullet points, or intentionally incomplete expressions.
         -Check for excessive or missing「、」only within grammatically complete sentences.
         -Do not flag cases where comma omission is stylistically natural and grammatically acceptable in Japanese (e.g.,「好感され月間では下落し」).
+
         **Example**：
         {example_2}
         """,
@@ -6427,24 +6435,18 @@ def loop_in_ruru(input):
                     "Output": "'original': '行って来い', 'correct': '一時上昇したものの、その後下落し、前日と同水準で終了しました。', 'reason': '「行って来い」は曖昧かつ口語的な表現であり、正式な金融文書では具体的な値動きを明記する必要があります。'",
                 }
             ]
-        },
-        {
-            "category": "一般的な送り仮名など",
-            "rule_id": "okurigana_usage",
-            "description": "Verify that the correct and standardized okurigana is used consistently in the report.",
-            "output_format": "'original': 'Incorrect text', 'correct': 'Corrected text', 'reason': 'Reason text'",
         }
     ]
 
     for ruru_split in ruru_all:
         result = f"""
-        You are a professional Japanese text proofreading assistant specialized in high-precision document validation.
+        You are a professional Japanese business document proofreader specialized in financial and public disclosure materials. 
         Your task is to carefully and strictly proofread the provided Japanese report based on the detailed rules specified below.
 
         The proofreading targets include:
 
         Important:
-        All subsequent instructions are divided into sections.
+        
         Each section must be strictly followed without omission.
         You are prohibited from making subjective judgments or skipping steps, even if an error seems minor.
         Always prioritize rule adherence over general readability or aesthetic preference.
@@ -6453,6 +6455,9 @@ def loop_in_ruru(input):
         Preserve the original sentence structure and paragraph formatting unless explicitly instructed otherwise.
         If no corrections are needed for a section, explicitly state "No errors detected" (検出された誤りなし).
         Follow all instructions strictly and proceed only according to the rules provided.:
+        
+        Do not correct or modify kana orthography variations (e.g., 「行なう」 vs 「行う」), unless explicitly instructed.
+        Do not apply standardization unless listed in the rules.
         
         **Report Content to Proofread:**
         {input}
@@ -6509,7 +6514,7 @@ def opt_wording():
         if not input:
             return jsonify({"success": False, "error": "No input provided"}), 400
 
-        prompt_result = loop_in_ruru("\"" + input + "\"")
+        prompt_result = loop_in_ruru("\"" + input.replace('\n', '') + "\"")
         async def run_tasks():
             tasks = [handle_result(once) for once in prompt_result]
             return await asyncio.gather(*tasks)
