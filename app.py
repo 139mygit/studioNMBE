@@ -3790,18 +3790,19 @@ def extract_corrections(corrected_text, input_text):
 
     for match in matches:
         original = match[0].strip()
-        reason = match[1].strip()
-        reason_type = match[2].strip()
+        reason = match[2].strip()
+        reason_type = match[1].strip()
         corrected = match[3].strip()
 
         comment = f"{reason} → {corrected}" if corrected else reason
 
         corrections.append({
             "page": 0,
-            "original_text": input_text.strip(),  # 전체 입력값
-            "comment": comment,
-            "reason_type": reason_type,
-            "check_point": input_text.strip(),
+            "original_text": input_text.strip(),  # 전체 입력값 当月のファンドの騰落率は+0.2%となりました。
+            "comment": comment, # ファンドの騰落率 → 0.85%
+            "reason_type": reason_type, # +0.2%
+            
+            "check_point": input_text.strip(), # 当月のファンドの騰落率は+0.2%となりました。
             "locations": [],
             "intgr": True,
         })
@@ -5526,9 +5527,7 @@ Return only HTML output. Do not explain or add comments.
         response = openai.ChatCompletion.create(
             deployment_id=deployment_id,  # Deploy Name
             messages=[
-                {"role": "system", "content": "You are a professional Japanese text proofreading assistant."
-                "This includes not only Japanese text but also English abbreviations (英略語), "
-                "foreign terms (外来語),and specialized terminology (専門用語)."},
+                {"role": "system", "content": "You are a professional Japanese text proofreading assistant."},
                 {"role": "user", "content": prompt_result}
             ],
             max_tokens=32768,
