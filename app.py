@@ -3798,9 +3798,9 @@ def extract_corrections(corrected_text, input_text):
 
         corrections.append({
             "page": 0,
-            "original_text": input_text.strip(),  # 전체 입력값 当月のファンドの騰落率は+0.2%となりました。
-            "comment": comment, # ファンドの騰落率 → 0.85%
-            "reason_type": reason_type, # +0.2%
+            "original_text": reason,  # 전체 입력값 当月のファンドの騰落率は+0.2%となりました。
+            "comment": comment, # +0.2% → 0.85%
+            "reason_type": reason_type, # ファンドの騰落率
             
             "check_point": input_text.strip(), # 当月のファンドの騰落率は+0.2%となりました。
             "locations": [],
