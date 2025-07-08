@@ -3807,7 +3807,6 @@ def add_comments_to_pdf(pdf_bytes, corrections):
     :param corrections: 수정 사항 리스트 (각 항목은 page, original_text, comment를 포함)
     :return: 수정된 PDF 파일의 BytesIO 객체
     """
-    # 입력 유효성 검사
     if not isinstance(pdf_bytes, bytes):
         raise ValueError("pdf_bytes must be a bytes object.")
     if not isinstance(corrections, list):
@@ -3822,46 +3821,30 @@ def add_comments_to_pdf(pdf_bytes, corrections):
     except Exception as e:
         raise ValueError(f"Invalid PDF file: {str(e)}")
 
-    for  idx,correction in enumerate(corrections):
+    for idx, correction in enumerate(corrections):
         page_num = correction["page"]
-        original_text = correction["original_text"]
         comment = correction["comment"]
+        reason_type = correction["reason_type"]
+        locations = correction["locations"][0]
+        text_instances = [fitz.Rect(locations["x0"], locations["y0"], locations["x1"], locations["y1"])]
+        if int(text_instances[0][0]) == 0:
+            continue
 
         # 페이지 번호 유효성 검사
         if page_num < 0 or page_num >= len(doc):
             raise ValueError(f"Invalid page number: {page_num}")
 
-        page = doc[page_num]
-        text_instances = page.search_for(original_text)
+        page = doc.load_page(page_num)
 
-        # 틀린 위치(좌표) 저장을 위해, 일단 빈 리스트로 초기화
-        found_locations = []
-
-        
-        for inst in text_instances:
-            rect = fitz.Rect(inst)  # 틀린 부분의 위치
-            # annot = page.add_text_annot(rect.top_left, comment)  # 코멘트 추가
-            annot = page.add_highlight_annot(rect)  # 텍스트 하이라이트 추가
-            # 코멘트 색상 및 투명도 설정
-            annot.set_colors(stroke=(0.5, 0.5, 0.5))  # 테두리 색상 (빨간색)
-            annot.set_colors(fill=(1, 0, 0.8))  # 배경색 (연한 노란색)
-            annot.set_opacity(0.5)  # 투명도 설정 (0: 완전 투명, 1: 완전 불투명),50%
-
-            # 코멘트 폰트 크기 조정 (옵션)
-            annot.set_info(title="コメントチェック", content=comment)
-
-            annot.update()  # 주석 업데이트
-
-            # === 틀린 위치(좌표) 정보 저장 ===
-            found_locations.append({
-                "x0": rect.x0,
-                "y0": rect.y0,
-                "x1": rect.x1,
-                "y1": rect.y1
+        for rect in text_instances:
+            highlight = page.add_rect_annot(rect)
+            highlight.set_colors(stroke=None, fill=(1, 1, 0))
+            highlight.set_opacity(0.5)
+            highlight.set_info({
+                "title": reason_type,  # 可选：显示在注释框标题栏
+                "content": comment
             })
-
-        # corrections 내 해당 항목에 위치 정보 저장
-        corrections[idx]["locations"] = found_locations
+            highlight.update()
 
     # 수정된 PDF를 BytesIO에 저장
     output = io.BytesIO()
@@ -3870,6 +3853,7 @@ def add_comments_to_pdf(pdf_bytes, corrections):
     doc.close()
 
     return output
+
 
 def add_comments_to_excel(excel_bytes, corrections):
     """
@@ -6139,6 +6123,13 @@ def opt_kanji():
         try:
             pdf_bytes = base64.b64decode(pdf_base64)
             find_locations_in_pdf(pdf_bytes, corrections)
+            updated_pdf = add_comments_to_pdf(pdf_bytes, corrections)
+            # return send_file(
+            #     updated_pdf,
+            #     mimetype='application/pdf',
+            #     as_attachment=True,
+            #     download_name='annotated.pdf'
+            # )
 
         except ValueError as e:
             return jsonify({"success": False, "error": str(e)}), 400
@@ -6147,7 +6138,8 @@ def opt_kanji():
     
         return jsonify({
                 "success": True,
-                "corrections": corrections  # 틀린 부분과 코멘트
+                "corrections": corrections,  # 틀린 부분과 코멘트
+                "updated_pdf": updated_pdf
             })
 
 
