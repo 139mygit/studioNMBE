@@ -5406,7 +5406,7 @@ def integrate_enhance():
             return jsonify({
                 "success": True,
                 "corrections": [{
-                    "page": 0,  # 페이지 번호 (0부터 시작, 필요 시 수정)
+                    "page": pageNumber,  # 페이지 번호 (0부터 시작, 필요 시 수정)
                     "original_text": "",
                     "check_point": content,
                     "comment": "",
@@ -5433,33 +5433,27 @@ def ruru_ask_gpt():
         orgtext = data.get("Org_Text", "")
         OrgType = data.get("Org_Type", "")
         TargetCondition = data.get("Target_Condition", "")
-        upload_type = data.get("upload_type", "")
-        comment_type = data.get("comment_type", "")
-        icon = data.get("icon", "")
         pageNumber = data.get('pageNumber',0)
         
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         input = loop.run_until_complete(get_original(_input, orgtext))
 
-        # input = get_original(_input, orgtext)
         if not input:
             return jsonify({
                 "success": True,
-                "corrections": []  # 틀린 부분과 코멘트
+                "corrections":  [{
+                    "page": pageNumber,  # 페이지 번호 (0부터 시작, 필요 시 수정)
+                    "original_text": "",
+                    "check_point": input,
+                    "comment": "",
+                    "reason_type":"整合性", # for debug 62
+                    "locations": [],  # 뒤에서 실제 PDF 위치(좌표)를 저장할 필드
+                    "intgr": True, # for debug 62
+                }]  # 틀린 부분과 코멘트
             })
 
-
         pdf_base64 = data.get("pdf_bytes", "")
-        excel_base64 = data.get("excel_bytes", "")
-        resutlmap = data.get("original_text", "")
-
-        fund_type = data.get("fund_type", "public")  # 기본값은 'public'
-        file_name_decoding = data.get("file_name", "")
-        icon = data.get("icon", "")
-
-        # URL 디코딩
-        file_name = urllib.parse.unquote(file_name_decoding)
 
         if not input:
             return jsonify({"success": False, "error": "No input provided"}), 400
@@ -5520,25 +5514,6 @@ Return only HTML output. Do not explain or add comments.
         # add the write logic
         # 틀린 부분 찾기
         corrections = extract_corrections(re_answer,input,pageNumber)
-
-        # 엑셀 처리
-        if excel_base64:
-            try:
-                excel_bytes_decoding = base64.b64decode(excel_base64)
-                modified_bytes = correct_text_box_in_excel(excel_bytes_decoding,resutlmap)
-
-                # 3) 수정된 XLSX를 반환(다운로드)
-                return send_file(
-                    io.BytesIO(modified_bytes),
-                    mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    as_attachment=True,
-                    download_name="annotated.xlsx"
-                )
-            except Exception as e:
-                return jsonify({
-                    "success": False,
-                    "error": str(e)
-                })
 
         if pdf_base64:
             try:
