@@ -6124,38 +6124,16 @@ def opt_kanji():
             pdf_bytes = base64.b64decode(pdf_base64)
             find_locations_in_pdf(pdf_bytes, corrections)
 
-            # Save temporarily (in memory or disk), generate a token or filename
-            updated_pdf = add_comments_to_pdf(pdf_bytes, corrections)
-            temp_filename = f"{uuid.uuid4()}.pdf"
-            temp_path = os.path.join("/tmp", temp_filename)
-            with open(temp_path, "wb") as f:
-                f.write(updated_pdf.read())
-                updated_pdf.seek(0)
-
             return jsonify({
                 "success": True,
                 "corrections": corrections,
-                "pdf_download_token": temp_filename
             })
-
-            # send_file = send_file(
-            #     updated_pdf,
-            #     mimetype='application/pdf',
-            #     as_attachment=True,
-            #     download_name=f'{file_name}.pdf'
-            # )
 
         except ValueError as e:
             return jsonify({"success": False, "error": str(e)}), 400
         except Exception as e:
             return jsonify({"success": False, "error": str(e)}), 500
     
-        return jsonify({
-                "success": True,
-                "corrections": corrections,  # 틀린 부분과 코멘트
-            })
-
-
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
     
@@ -6166,6 +6144,8 @@ def download_pdf(token):
     if not os.path.exists(temp_path):
         return jsonify({"error": "File not found"}), 404
     return send_file(temp_path, mimetype='application/pdf', as_attachment=True)
+
+
 
 def loop_in_ruru(input):
     ruru_all =[
@@ -6566,7 +6546,7 @@ def save_corrections():
         data = request.get_json()
         corrections = data.get('corrections','')
         fund_type = data.get("fund_type",'')
-        # link = data.get("link",'')
+        pdf_base64 = data.get("pdf_base64",'')
         file_name_decoding = data.get('file_name','')
         icon = data.get('icon','')
 
@@ -6588,9 +6568,6 @@ def save_corrections():
             parameters=[{"name": "@id", "value": file_name}],
             enable_cross_partition_query=True
         ))
-
-        # src_corrections = existing_item[0].get("result", {"corrections": []})["corrections"]
-        # corrections.extend(src_corrections)
 
         # 기존 corrections 가져오기
         existing_corrections = []
@@ -6627,6 +6604,28 @@ def save_corrections():
             container.upsert_item(existing_item[0])
 
             logging.info(f"🔄 Cosmos DB update success: {file_name}")
+
+        try:
+            pdf_bytes = base64.b64decode(pdf_base64)
+
+            # Save temporarily (in memory or disk), generate a token or filename
+            updated_pdf = add_comments_to_pdf(pdf_bytes, corrections)
+            temp_filename = f"{uuid.uuid4()}.pdf"
+            temp_path = os.path.join("/tmp", temp_filename)
+            with open(temp_path, "wb") as f:
+                f.write(updated_pdf.read())
+                updated_pdf.seek(0)
+
+            return jsonify({
+                "success": True,
+                "corrections": corrections,
+                "pdf_download_token": temp_filename
+            })
+
+        except ValueError as e:
+            return jsonify({"success": False, "error": str(e)}), 400
+        except Exception as e:
+            return jsonify({"success": False, "error": str(e)}), 500
 
         return jsonify({"success": True, "message": "Data Update Success"}), 200
     
