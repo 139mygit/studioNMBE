@@ -3764,7 +3764,7 @@ def extract_text(input_text, original_text):
     else:
         return None  # 매칭되지 않는 경우 None 반환
                 
-def extract_corrections(corrected_text, input_text):
+def extract_corrections(corrected_text, input_text,pageNumber):
     corrections = []
     
     # 여러 개의 correction span을 처리하는 정규식
@@ -3785,7 +3785,7 @@ def extract_corrections(corrected_text, input_text):
         comment = f"{reason} → {corrected}" if corrected else reason
 
         corrections.append({
-            "page": 0,
+            "page": pageNumber,
             "original_text": reason,  # 전체 입력값 当月のファンドの騰落率は+0.2%となりました。
             "comment": comment, # +0.2% → 0.85%
             "reason_type": reason_type, # ファンドの騰落率
@@ -5033,7 +5033,6 @@ async def get_original(input_data, org_text):
         "文章から原文に類似したテキストを抽出してください",
         "出力は以下のJSON形式でお願いします:",
         "- {'target': '[抽出されたテキスト:]'}",
-        "- 類似度は最低でも85％を超える必要があります",
         "- 類似したものがない場合は、空の文字列を返してください",
         "- 類似したものが存在する場合は、最も類似度の高いものを抽出してください",
 
@@ -5267,9 +5266,7 @@ def integrate_enhance():
         category = data.get("Org_Type", "")
         consult = data.get("Target_Consult", "")
         base_month = data.get("Base_month", "")
-        icon = data.get("icon", "")
-        upload_type = data.get("upload_type", "")
-        comment_type = data.get("comment_type", "")
+        pageNumber = data.get('pageNumber',0)
 
         org_text = data.get("Org_Text", "")
 
@@ -5277,7 +5274,6 @@ def integrate_enhance():
         asyncio.set_event_loop(loop)
         content = loop.run_until_complete(get_original(_content, org_text))
         
-        # content = get_original(_content, org_text)
         if not content:
             return jsonify({
                 "success": True,
@@ -5285,11 +5281,8 @@ def integrate_enhance():
             })
 
 
-
         pdf_base64 = data.get("pdf_bytes", "")
-        excel_base64 = data.get("excel_bytes", "")
 
-        fund_type = data.get("fund_type", "public")  # 기본값은 'public'
         file_name_decoding = data.get("file_name", "")
 
         # URL 디코딩
@@ -5323,7 +5316,7 @@ def integrate_enhance():
 
         input_list = [
             "以下の内容に基づいて、原文の記述が正しいかどうかを判断してください", "要件:",
-            "- 提供された『参考データ』のみに基づいて判断してください、提供されていないデータについては判断する必要はありません",
+            "- 『参考データ』に該当する情報がない場合、その記述については判断を行わず、「判定対象外」と明記してください。",
             "- 最後に原文の記述が正しいかどうかを明確に判断し、文末に『OK』または『NG』を記載してください",
             f"- 現在の参考データは20{base_month[1:3]}年{base_month[3:]}月の参考データです",
             f"- 文中に『先月末』『前月末』『○月末』などの表現があっても、現在の参考データ（月）を基準として判断してください",
@@ -5368,30 +5361,29 @@ def integrate_enhance():
             )
             _answer = _response['choices'][0]['message']['content'].strip().replace("`", "").replace("json", "", 1)
             parsed_data = ast.literal_eval(_answer)
-            format_data = []
             corrections = []
-            for once in parsed_data:
-                error_data = once.get("original", "")
-                reason = once.get("reason", "")
-                intgr_flag = True if error_data else False
-                corrections.append({
-                    "page": 0,  # 페이지 번호 (0부터 시작, 필요 시 수정)
-                    "original_text": error_data,
-                    "check_point": content,
-                    "comment": reason,
-                    "reason_type":reason, # for debug 62
-                    "locations": [],  # 뒤에서 실제 PDF 위치(좌표)를 저장할 필드
-                    "intgr": intgr_flag, # for debug 62
-                })
+            if parsed_data:
+                for once in parsed_data:
+                    error_data = once.get("original", "")
+                    reason = once.get("reason", "")
+                    corrections.append({
+                        "page": pageNumber,  # 페이지 번호 (0부터 시작, 필요 시 수정)
+                        "original_text": error_data,
+                        "check_point": content,
+                        "comment": reason,
+                        "reason_type":reason, # for debug 62
+                        "locations": [],  # 뒤에서 실제 PDF 위치(좌표)를 저장할 필드
+                        "intgr": True, # for debug 62
+                    })
             else:
                 corrections.append({
-                    "page": 0,  # 페이지 번호 (0부터 시작, 필요 시 수정)
+                    "page": pageNumber,  # 페이지 번호 (0부터 시작, 필요 시 수정)
                     "original_text": "",
                     "check_point": content,
                     "comment": "",
-                    "reason_type": "",  # for debug 62
+                    "reason_type": "整合性",  # for debug 62
                     "locations": [],  # 뒤에서 실제 PDF 위치(좌표)를 저장할 필드
-                    "intgr": False,  # for debug 66
+                    "intgr": True,  # for debug 66
                 })
 
             #5/8 position check
@@ -5418,7 +5410,7 @@ def integrate_enhance():
                     "original_text": "",
                     "check_point": content,
                     "comment": "",
-                    "reason_type":"", # for debug 62
+                    "reason_type":"整合性", # for debug 62
                     "locations": [],  # 뒤에서 실제 PDF 위치(좌표)를 저장할 필드
                     "intgr": True, # for debug 62
                 }]  # 틀린 부분과 코멘트
@@ -5444,6 +5436,7 @@ def ruru_ask_gpt():
         upload_type = data.get("upload_type", "")
         comment_type = data.get("comment_type", "")
         icon = data.get("icon", "")
+        pageNumber = data.get('pageNumber',0)
         
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
@@ -5526,7 +5519,7 @@ Return only HTML output. Do not explain or add comments.
 
         # add the write logic
         # 틀린 부분 찾기
-        corrections = extract_corrections(re_answer,input)
+        corrections = extract_corrections(re_answer,input,pageNumber)
 
         # 엑셀 처리
         if excel_base64:
