@@ -5465,11 +5465,13 @@ def ruru_ask_gpt():
                 seed=42
             )
             _answer = response['choices'][0]['message']['content'].strip().strip().replace("`", "").replace("json", "", 1)
+            _parsed_data = ast.literal_eval(_answer)
+            _similar = _parsed_data.get("target")
             corrections.append({
                     "page": pageNumber,  # 페이지 번호 (0부터 시작, 필요 시 수정)
                     "original_text": _input,
-                    "check_point": _answer,
-                    "comment": f"{_answer} → ", # +0.2% → 0.85% f"{reason} → {corrected}"
+                    "check_point": _similar,
+                    "comment": f"{_similar} → ", # +0.2% → 0.85% f"{reason} → {corrected}"
                     "reason_type": "整合性",  # for debug 62
                     "locations": [],  # 뒤에서 실제 PDF 위치(좌표)를 저장할 필드
                     "intgr": True,  # for debug 66
