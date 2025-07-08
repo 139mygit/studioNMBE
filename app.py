@@ -6124,11 +6124,11 @@ def opt_kanji():
             pdf_bytes = base64.b64decode(pdf_base64)
             find_locations_in_pdf(pdf_bytes, corrections)
             updated_pdf = add_comments_to_pdf(pdf_bytes, corrections)
-            sendfile = send_file(
+            return send_file(
                 updated_pdf,
                 mimetype='application/pdf',
                 as_attachment=True,
-                download_name='annotated.pdf'
+                download_name=f'{file_name}.pdf'
             )
 
         except ValueError as e:
