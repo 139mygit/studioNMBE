@@ -5469,7 +5469,7 @@ def ruru_ask_gpt():
             _similar = _parsed_data.get("target")
             corrections.append({
                     "page": pageNumber,  # 페이지 번호 (0부터 시작, 필요 시 수정)
-                    "original_text": _input,
+                    "original_text": _similar,
                     "check_point": _similar,
                     "comment": f"{_similar} → ", # +0.2% → 0.85% f"{reason} → {corrected}"
                     "reason_type": "整合性",  # for debug 62
