@@ -5379,7 +5379,7 @@ def integrate_enhance():
             else:
                 corrections.append({
                     "page": pageNumber,  # 페이지 번호 (0부터 시작, 필요 시 수정)
-                    "original_text": "",
+                    "original_text": content,
                     "check_point": content,
                     "comment": f"{content} → ",
                     "reason_type": "整合性",  # for debug 62
@@ -5408,7 +5408,7 @@ def integrate_enhance():
                 "success": True,
                 "corrections": [{
                     "page": pageNumber,  # 페이지 번호 (0부터 시작, 필요 시 수정)
-                    "original_text": "",
+                    "original_text": content,
                     "check_point": content,
                     "comment": f"{content} → ",
                     "reason_type":"整合性", # for debug 62
