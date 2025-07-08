@@ -6123,13 +6123,27 @@ def opt_kanji():
         try:
             pdf_bytes = base64.b64decode(pdf_base64)
             find_locations_in_pdf(pdf_bytes, corrections)
+
+            # Save temporarily (in memory or disk), generate a token or filename
             updated_pdf = add_comments_to_pdf(pdf_bytes, corrections)
-            return send_file(
-                updated_pdf,
-                mimetype='application/pdf',
-                as_attachment=True,
-                download_name=f'{file_name}.pdf'
-            )
+            temp_filename = f"{uuid.uuid4()}.pdf"
+            temp_path = os.path.join("/tmp", temp_filename)
+            with open(temp_path, "wb") as f:
+                f.write(updated_pdf.read())
+                updated_pdf.seek(0)
+
+            return jsonify({
+                "success": True,
+                "corrections": corrections,
+                "pdf_download_token": temp_filename
+            })
+
+            # send_file = send_file(
+            #     updated_pdf,
+            #     mimetype='application/pdf',
+            #     as_attachment=True,
+            #     download_name=f'{file_name}.pdf'
+            # )
 
         except ValueError as e:
             return jsonify({"success": False, "error": str(e)}), 400
@@ -6139,12 +6153,19 @@ def opt_kanji():
         return jsonify({
                 "success": True,
                 "corrections": corrections,  # 틀린 부분과 코멘트
-                "updated_pdf": sendfile
             })
 
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+    
+# 2. PDF download endpoint
+@app.route('/api/download_pdf/<token>', methods=['GET'])
+def download_pdf(token):
+    temp_path = os.path.join("/tmp", token)
+    if not os.path.exists(temp_path):
+        return jsonify({"error": "File not found"}), 404
+    return send_file(temp_path, mimetype='application/pdf', as_attachment=True)
 
 def loop_in_ruru(input):
     ruru_all =[
