@@ -5439,6 +5439,7 @@ def ruru_ask_gpt():
         asyncio.set_event_loop(loop)
         input = loop.run_until_complete(get_original(_input, orgtext))
         corrections = []
+        pdf_base64 = data.get("pdf_bytes", "")
         if not input:
             corrections.append({
                     "page": pageNumber,  # 페이지 번호 (0부터 시작, 필요 시 수정)
@@ -5449,70 +5450,7 @@ def ruru_ask_gpt():
                     "locations": [],  # 뒤에서 실제 PDF 위치(좌표)를 저장할 필드
                     "intgr": True,  # for debug 66
                 })
-
-        pdf_base64 = data.get("pdf_bytes", "")
-
-        if not input:
-            return jsonify({"success": False, "error": "No input provided"}), 400
-
-
-        prompt_result = f"""
-You are a professional Japanese financial report proofreader.  
-Your task is to **semantically** validate whether the factual content in the `{input}` is consistent with the numerical and financial data provided in `{result}`.  
-Only focus on **meaning-level discrepancies** — not textual similarity.
-
----
-
-### ✅ Validation and Highlighting Rules:
-
-1. Compare the values and facts in `{result}` with the claims made in `{input}`.
-2. If a sentence or phrase in `{input}` contains a value (e.g., "騰落率", "ベンチマークに対して") that is **semantically consistent** with the value in `{result}`, do **not highlight it**.
-3. If the value mentioned in `{input}` **differs from** the corresponding value in `{result}` (in meaning or number), highlight that specific phrase.
-4. Use the following format for incorrect parts:
-```html
-<span style="background-color:#ace4e6;color:red;">[Wrong phrase]</span>  
-(<span>提示: [Field or Reason] <s style="color:red">[Wrong value]</s> → [Correct value]</span>)
-
-5. If before includes the same meaning or exact phrase as after, even partially, treat it as correct and do not output anything.
-6. If all values are semantically correct, return nothing (empty).
-7. Use {OrgType} and {TargetCondition} only as context for understanding — but your judgment should be based solely on {input} vs {result}.
-
-Input:
-    Input Text:
-    {input}
-
-    Original Type:
-    {OrgType}
-
-    Target Condition:
-    {TargetCondition}
-
-    Result:
-    {result}
-
-Return only HTML output. Do not explain or add comments.
-
-        
-        """  
-        # ChatCompletion Call
-        response = openai.ChatCompletion.create(
-            deployment_id=deployment_id,  # Deploy Name
-            messages=[
-                {"role": "system", "content": "You are a professional Japanese text proofreading assistant."},
-                {"role": "user", "content": prompt_result}
-            ],
-            max_tokens=32768,
-            temperature=0,
-            seed=42  # 재현 가능한 결과를 위해 seed 설정
-        )
-        answer = response['choices'][0]['message']['content'].strip()
-        re_answer = remove_code_blocks(answer)
-
-        # add the write logic
-        # 틀린 부분 찾기
-        corrections = extract_corrections(re_answer,input,pageNumber)
-
-        if pdf_base64:
+                
             try:
                 pdf_bytes = base64.b64decode(pdf_base64)
                 # 위치 정보만 찾아 corrections에 저장
@@ -5522,6 +5460,79 @@ Return only HTML output. Do not explain or add comments.
                 return jsonify({"success": False, "error": str(e)}), 400
             except Exception as e:
                 return jsonify({"success": False, "error": str(e)}), 500
+
+        else:
+            if not input:
+                return jsonify({"success": False, "error": "No input provided"}), 400
+
+
+            prompt_result = f"""
+                            You are a professional Japanese financial report proofreader.  
+                            Your task is to **semantically** validate whether the factual content in the `{input}` is consistent with the numerical and financial data provided in `{result}`.  
+                            Only focus on **meaning-level discrepancies** — not textual similarity.
+
+                            ---
+
+                            ### ✅ Validation and Highlighting Rules:
+
+                            1. Compare the values and facts in `{result}` with the claims made in `{input}`.
+                            2. If a sentence or phrase in `{input}` contains a value (e.g., "騰落率", "ベンチマークに対して") that is **semantically consistent** with the value in `{result}`, do **not highlight it**.
+                            3. If the value mentioned in `{input}` **differs from** the corresponding value in `{result}` (in meaning or number), highlight that specific phrase.
+                            4. Use the following format for incorrect parts:
+                            ```html
+                            <span style="background-color:#ace4e6;color:red;">[Wrong phrase]</span>  
+                            (<span>提示: [Field or Reason] <s style="color:red">[Wrong value]</s> → [Correct value]</span>)
+
+                            5. If before includes the same meaning or exact phrase as after, even partially, treat it as correct and do not output anything.
+                            6. If all values are semantically correct, return nothing (empty).
+                            7. Use {OrgType} and {TargetCondition} only as context for understanding — but your judgment should be based solely on {input} vs {result}.
+
+                            Input:
+                                Input Text:
+                                {input}
+
+                                Original Type:
+                                {OrgType}
+
+                                Target Condition:
+                                {TargetCondition}
+
+                                Result:
+                                {result}
+
+                            Return only HTML output. Do not explain or add comments.
+
+            
+            """  
+            # ChatCompletion Call
+            response = openai.ChatCompletion.create(
+                deployment_id=deployment_id,  # Deploy Name
+                messages=[
+                    {"role": "system", "content": "You are a professional Japanese text proofreading assistant."},
+                    {"role": "user", "content": prompt_result}
+                ],
+                max_tokens=32768,
+                temperature=0,
+                seed=42  # 재현 가능한 결과를 위해 seed 설정
+            )
+            answer = response['choices'][0]['message']['content'].strip()
+            re_answer = remove_code_blocks(answer)
+
+            # add the write logic
+            # 틀린 부분 찾기
+            corrections = extract_corrections(re_answer,input,pageNumber)
+
+            if pdf_base64:
+                try:
+                    pdf_bytes = base64.b64decode(pdf_base64)
+                    # 위치 정보만 찾아 corrections에 저장
+                    find_locations_in_pdf(pdf_bytes, corrections)
+                    
+                except ValueError as e:
+                    return jsonify({"success": False, "error": str(e)}), 400
+                except Exception as e:
+                    return jsonify({"success": False, "error": str(e)}), 500
+        
 
         # 수정된 텍스트와 코멘트를 JSON으로 반환
         return jsonify({
