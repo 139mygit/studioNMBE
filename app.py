@@ -2210,6 +2210,7 @@ def convert_format(filtered_items):
                         "changes": [change],
                         "reason_type":correction["reason_type"], # for intergarteion reasion
                         "check_point":correction["check_point"], # 66 debug, add the check point
+                        "original_text":correction["original_text"], # 66 debug, add the check point
                     })
 
     return {'data': checkResults, 'code': 200}
@@ -5059,7 +5060,7 @@ async def get_original(input_data, org_text):
             score = SequenceMatcher(None, org_text, similar_content).ratio()
             if score > 0.85:
                 return similar_content
-        return jsonify({"similar": "", "answer": answer})
+        return ""
 
 LOCAL_LINK = "local_link"
 @app.route('/api/getaths', methods=['GET'])
@@ -5440,12 +5441,12 @@ def ruru_ask_gpt():
         input = loop.run_until_complete(get_original(_input, orgtext))
         corrections = []
         pdf_base64 = data.get("pdf_bytes", "")
-        if not input.get("similar"): # similar": "", "answer": answer
+        if not input:
             corrections.append({
                     "page": pageNumber,  # 페이지 번호 (0부터 시작, 필요 시 수정)
                     "original_text": _input,
-                    "check_point": input["answer"],
-                    "comment": f"{input["answer"]} → ", # +0.2% → 0.85% f"{reason} → {corrected}"
+                    "check_point": input,
+                    "comment": f"{input} → ", # +0.2% → 0.85% f"{reason} → {corrected}"
                     "reason_type": "整合性",  # for debug 62
                     "locations": [],  # 뒤에서 실제 PDF 위치(좌표)를 저장할 필드
                     "intgr": True,  # for debug 66
@@ -5464,7 +5465,6 @@ def ruru_ask_gpt():
         else:
             if not input:
                 return jsonify({"success": False, "error": "No input provided"}), 400
-
 
             prompt_result = f"""
                             You are a professional Japanese financial report proofreader.  
