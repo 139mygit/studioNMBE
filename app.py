@@ -5444,8 +5444,8 @@ def ruru_ask_gpt():
             corrections.append({
                     "page": pageNumber,  # 페이지 번호 (0부터 시작, 필요 시 수정)
                     "original_text": _input,
-                    "check_point": input.get("answer",""),
-                    "comment": f"{input} → ", # +0.2% → 0.85% f"{reason} → {corrected}"
+                    "check_point": input["answer"],
+                    "comment": f"{input["answer"]} → ", # +0.2% → 0.85% f"{reason} → {corrected}"
                     "reason_type": "整合性",  # for debug 62
                     "locations": [],  # 뒤에서 실제 PDF 위치(좌표)를 저장할 필드
                     "intgr": True,  # for debug 66
