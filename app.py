@@ -5438,20 +5438,17 @@ def ruru_ask_gpt():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         input = loop.run_until_complete(get_original(_input, orgtext))
-
+        corrections = []
         if not input:
-            return jsonify({
-                "success": True,
-                "corrections":  [{
+            corrections.append({
                     "page": pageNumber,  # 페이지 번호 (0부터 시작, 필요 시 수정)
-                    "original_text": "",
+                    "original_text": _input,
                     "check_point": input,
                     "comment": "",
-                    "reason_type":"整合性", # for debug 62
+                    "reason_type": "整合性",  # for debug 62
                     "locations": [],  # 뒤에서 실제 PDF 위치(좌표)를 저장할 필드
-                    "intgr": True, # for debug 62
-                }]  # 틀린 부분과 코멘트
-            })
+                    "intgr": True,  # for debug 66
+                })
 
         pdf_base64 = data.get("pdf_bytes", "")
 
