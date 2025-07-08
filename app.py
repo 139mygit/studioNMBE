@@ -5370,7 +5370,7 @@ def integrate_enhance():
                         "page": pageNumber,  # 페이지 번호 (0부터 시작, 필요 시 수정)
                         "original_text": error_data,
                         "check_point": content,
-                        "comment": reason,
+                        "comment": f"{error_data} → {reason}", #
                         "reason_type":reason, # for debug 62
                         "locations": [],  # 뒤에서 실제 PDF 위치(좌표)를 저장할 필드
                         "intgr": True, # for debug 62
@@ -5380,7 +5380,7 @@ def integrate_enhance():
                     "page": pageNumber,  # 페이지 번호 (0부터 시작, 필요 시 수정)
                     "original_text": "",
                     "check_point": content,
-                    "comment": "",
+                    "comment": f"{content} → ",
                     "reason_type": "整合性",  # for debug 62
                     "locations": [],  # 뒤에서 실제 PDF 위치(좌표)를 저장할 필드
                     "intgr": True,  # for debug 66
@@ -5409,7 +5409,7 @@ def integrate_enhance():
                     "page": pageNumber,  # 페이지 번호 (0부터 시작, 필요 시 수정)
                     "original_text": "",
                     "check_point": content,
-                    "comment": "",
+                    "comment": f"{content} → ",
                     "reason_type":"整合性", # for debug 62
                     "locations": [],  # 뒤에서 실제 PDF 위치(좌표)를 저장할 필드
                     "intgr": True, # for debug 62
@@ -5445,7 +5445,7 @@ def ruru_ask_gpt():
                     "page": pageNumber,  # 페이지 번호 (0부터 시작, 필요 시 수정)
                     "original_text": _input,
                     "check_point": input,
-                    "comment": "",
+                    "comment": f"{input} → ", # +0.2% → 0.85% f"{reason} → {corrected}"
                     "reason_type": "整合性",  # for debug 62
                     "locations": [],  # 뒤에서 실제 PDF 위치(좌표)를 저장할 필드
                     "intgr": True,  # for debug 66
