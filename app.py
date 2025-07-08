@@ -2208,9 +2208,9 @@ def convert_format(filtered_items):
                         "page": page,
                         "position": position,
                         "changes": [change],
-                        "reason_type":correction["reason_type"], # for intergarteion reasion
-                        "check_point":correction["check_point"], # 66 debug, add the check point
-                        "original_text":correction["original_text"], # 66 debug, add the check point
+                        "reason_type":correction["reason_type"],
+                        "check_point":correction["check_point"],
+                        "original_text":correction["original_text"],
                     })
 
     return {'data': checkResults, 'code': 200}
@@ -5442,11 +5442,34 @@ def ruru_ask_gpt():
         corrections = []
         pdf_base64 = data.get("pdf_bytes", "")
         if not input:
+            dt = [
+            "文章から原文に類似したテキストを抽出してください",
+            "出力は以下のJSON形式でお願いします:",
+            "- {'target': '[抽出されたテキスト:]'}",
+            "- 類似したものがない場合は、空の文字列を返してください",
+            "- 類似したものが存在する場合は、最も類似度の高いものを抽出してください",
+
+            f"原文:{orgtext}\n文章:{_input}"
+            ]
+            input_data = "\n".join(dt)
+
+            question = [
+                {"role": "system", "content": "あなたはテキスト抽出アシスタントです"},
+                {"role": "user", "content": input_data}
+            ]
+            response = openai.ChatCompletion.create(
+                deployment_id=deployment_id,  # Deploy Name
+                messages=question,
+                max_tokens=32768,
+                temperature=0,
+                seed=42
+            )
+            _answer = response['choices'][0]['message']['content'].strip().strip().replace("`", "").replace("json", "", 1)
             corrections.append({
                     "page": pageNumber,  # 페이지 번호 (0부터 시작, 필요 시 수정)
                     "original_text": _input,
-                    "check_point": input,
-                    "comment": f"{input} → ", # +0.2% → 0.85% f"{reason} → {corrected}"
+                    "check_point": _answer,
+                    "comment": f"{_answer} → ", # +0.2% → 0.85% f"{reason} → {corrected}"
                     "reason_type": "整合性",  # for debug 62
                     "locations": [],  # 뒤에서 실제 PDF 위치(좌표)를 저장할 필드
                     "intgr": True,  # for debug 66
