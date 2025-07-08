@@ -6124,12 +6124,12 @@ def opt_kanji():
             pdf_bytes = base64.b64decode(pdf_base64)
             find_locations_in_pdf(pdf_bytes, corrections)
             updated_pdf = add_comments_to_pdf(pdf_bytes, corrections)
-            # return send_file(
-            #     updated_pdf,
-            #     mimetype='application/pdf',
-            #     as_attachment=True,
-            #     download_name='annotated.pdf'
-            # )
+            sendfile = send_file(
+                updated_pdf,
+                mimetype='application/pdf',
+                as_attachment=True,
+                download_name='annotated.pdf'
+            )
 
         except ValueError as e:
             return jsonify({"success": False, "error": str(e)}), 400
@@ -6139,7 +6139,7 @@ def opt_kanji():
         return jsonify({
                 "success": True,
                 "corrections": corrections,  # 틀린 부분과 코멘트
-                "updated_pdf": updated_pdf
+                "updated_pdf": sendfile
             })
 
 
