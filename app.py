@@ -178,6 +178,10 @@ CONTAINER_NAME = os.getenv("CONTAINER_NAME")  # debug not used
 ACCOUNT_URL = os.getenv("ACCOUNT_URL")
 STORAGE_CONTAINER_NAME = os.getenv("STORAGE_CONTAINER_NAME")
 
+MAX_TOKENS=32768 # 16384 for _deployment_id
+TEMPERATURE=0
+SEED=42
+
 
 # Cosmos DB
 def get_db_connection(CONTAINER):
@@ -1755,9 +1759,9 @@ def ask_gpt():
                 "foreign terms (外来語),and specialized terminology (専門用語)."},
                 {"role": "user", "content": prompt_result}
             ],
-            max_tokens=32768,
-            temperature=0,
-            seed=42  # 재현 가능한 결과를 위해 seed 설정
+            max_tokens=MAX_TOKENS,
+            temperature=TEMPERATURE,
+            seed=SEED  # 재현 가능한 결과를 위해 seed 설정
         )
         answer = response['choices'][0]['message']['content'].strip()
         re_answer = remove_code_blocks(answer)
@@ -4531,9 +4535,9 @@ def gpt_correct_text(prompt):
             {"role": "system", "content": "You are a professional Japanese text proofreading assistant."},
             {"role": "user", "content": prompt_result}
         ],
-        max_tokens=32768,
-        temperature=0,
-        seed=42  # 재현 가능한 결과를 위해 seed 설정
+        max_tokens=MAX_TOKENS,
+        temperature=TEMPERATURE,
+        seed=SEED  # 재현 가능한 결과를 위해 seed 설정
     )
 
     
@@ -4682,9 +4686,9 @@ def prompt_upload():
                 {"role": "system", "content": "You are a professional Japanese text proofreading assistant."},
                 {"role": "user", "content": prompt_result}
             ],
-            max_tokens=32768,
-            temperature=0.1,
-            seed=42  # 재현 가능한 결과를 위해 seed 설정
+            max_tokens=MAX_TOKENS,
+            temperature=TEMPERATURE,
+            seed=SEED  # 재현 가능한 결과를 위해 seed 설정
         )
         answer = response['choices'][0]['message']['content'].strip()
         re_answer = remove_code_blocks(answer)
@@ -5032,9 +5036,9 @@ async def get_original(input_data, org_text):
     response = await openai.ChatCompletion.acreate(
         deployment_id=deployment_id,  # Deploy Name
         messages=question,
-        max_tokens=32768,
-        temperature=0,
-        seed=42
+        max_tokens=MAX_TOKENS,
+        temperature=TEMPERATURE,
+        seed=SEED  # 재현 가능한 결과를 위해 seed 설정
     )
     answer = response['choices'][0]['message']['content'].strip().strip().replace("`", "").replace("json", "", 1)
     if answer:
@@ -5317,11 +5321,11 @@ def integrate_enhance():
         ]
 
         response = openai.ChatCompletion.create(
-            deployment_id=_deployment_id,  # Deploy Name
+            deployment_id=deployment_id,  # Deploy Name
             messages=question,
-            max_tokens=16384,
-            temperature=0,
-            seed=42
+            max_tokens=MAX_TOKENS,
+            temperature=TEMPERATURE,
+            seed=SEED  # 재현 가능한 결과를 위해 seed 설정
         )
         answer = response['choices'][0]['message']['content'].strip()
         if answer:
@@ -5338,11 +5342,11 @@ def integrate_enhance():
                 {"role": "user", "content": summarize}
             ]
             _response = openai.ChatCompletion.create(
-                deployment_id=_deployment_id,  # Deploy Name
+                deployment_id=deployment_id,  # Deploy Name
                 messages=_question,
-                max_tokens=16384,
-                temperature=0,
-                seed=42
+                max_tokens=MAX_TOKENS,
+                temperature=TEMPERATURE,
+                seed=SEED  # 재현 가능한 결과를 위해 seed 설정
             )
             _answer = _response['choices'][0]['message']['content'].strip().replace("`", "").replace("json", "", 1)
             parsed_data = ast.literal_eval(_answer)
@@ -5444,9 +5448,9 @@ def ruru_ask_gpt():
             response = openai.ChatCompletion.create(
                 deployment_id=deployment_id,  # Deploy Name
                 messages=question,
-                max_tokens=32768,
-                temperature=0,
-                seed=42
+                max_tokens=MAX_TOKENS,
+                temperature=TEMPERATURE,
+                seed=SEED  # 재현 가능한 결과를 위해 seed 설정
             )
             _answer = response['choices'][0]['message']['content'].strip().strip().replace("`", "").replace("json", "", 1)
             _parsed_data = ast.literal_eval(_answer)
@@ -5520,9 +5524,9 @@ def ruru_ask_gpt():
                     {"role": "system", "content": "You are a professional Japanese text proofreading assistant."},
                     {"role": "user", "content": prompt_result}
                 ],
-                max_tokens=32768,
-                temperature=0,
-                seed=42  # 재현 가능한 결과를 위해 seed 설정
+                max_tokens=MAX_TOKENS,
+                temperature=TEMPERATURE,
+                seed=SEED  # 재현 가능한 결과를 위해 seed 설정정
             )
             answer = response['choices'][0]['message']['content'].strip()
             re_answer = remove_code_blocks(answer)
@@ -5673,9 +5677,9 @@ def opt_common(input, prompt_result, pdf_base64, pageNumber, re_list, word_list,
             {"role": "system", "content": "You are a Japanese text extraction tool capable of accurately extracting the required text."},
             {"role": "user", "content": prompt_result}
         ],
-        max_tokens=32768,
-        temperature=0,
-        seed=42  # 재현 가능한 결과를 위해 seed 설정
+        max_tokens=MAX_TOKENS,
+        temperature=TEMPERATURE,
+        seed=SEED  # 재현 가능한 결과를 위해 seed 설정정
     )
     answer = response['choices'][0]['message']['content'].strip().replace("`", "").replace("json", "", 1).replace("\n", "")
     parsed_data = ast.literal_eval(answer)
@@ -5803,9 +5807,9 @@ async def opt_common_wording(file_name,fund_type,input,prompt_result,excel_base6
             {"role": "system", "content": "あなたは曖昧な表現を定型語に変換する、厳格な金融校正AIです。出力形式・修正ルールはすべて厳守してください。"},
             {"role": "user", "content": prompt_result}
         ],
-        max_tokens=32768,
-        temperature=0,
-        seed=42  # 재현 가능한 결과를 위해 seed 설정
+        max_tokens=MAX_TOKENS,
+        temperature=TEMPERATURE,
+        seed=SEED  # 재현 가능한 결과를 위해 seed 설정
     )
     answer = response['choices'][0]['message']['content'].strip()
     re_answer = remove_code_blocks(answer)
@@ -5955,9 +5959,9 @@ async def handle_result(prompt_result):
             "content": "You are a professional Japanese business document proofreader specialized in financial and public disclosure materials."},
             {"role": "user", "content": prompt_result}
         ],
-        max_tokens=32768,
-        temperature=0,
-        seed=42  # 재현 가능한 결과를 위해 seed 설정
+        max_tokens=MAX_TOKENS,
+        temperature=TEMPERATURE,
+        seed=SEED  # 재현 가능한 결과를 위해 seed 설정
     )
     answer = response['choices'][0]['message']['content'].strip()
     return answer
@@ -6605,6 +6609,9 @@ def save_corrections():
 
             logging.info(f"🔄 Cosmos DB update success: {file_name}")
 
+        if not pdf_base64:
+            return jsonify({"success": True, "message": "Data Update Success"}), 200
+        
         try:
             pdf_bytes = base64.b64decode(pdf_base64)
 
@@ -6615,6 +6622,7 @@ def save_corrections():
             with open(temp_path, "wb") as f:
                 f.write(updated_pdf.read())
                 updated_pdf.seek(0)
+                
 
             return jsonify({
                 "success": True,
@@ -6627,7 +6635,7 @@ def save_corrections():
         except Exception as e:
             return jsonify({"success": False, "error": str(e)}), 500
 
-        return jsonify({"success": True, "message": "Data Update Success"}), 200
+        
     
     except CosmosHttpResponseError as e:
         logging.error(f"Cosmos DB Error: {str(e)}")
@@ -6662,9 +6670,9 @@ async def integrated_test():
         response = await openai.ChatCompletion.acreate(
             deployment_id=deployment_id,  # Deploy Name
             messages=question,
-            max_tokens=32768,
-            temperature=0,
-            seed=42
+            max_tokens=MAX_TOKENS,
+            temperature=TEMPERATURE,
+            seed=SEED  # 재현 가능한 결과를 위해 seed 설정
         )
         answer = response['choices'][0]['message']['content'].strip()
         return jsonify({"response_ai": answer})
