@@ -5897,6 +5897,9 @@ def opt_typo():
         if not input:
             return jsonify({"success": False, "error": "No input provided"}), 400
         
+        if len(input) < 5:
+            return jsonify({"success": True, "corrections": [],})
+
         prompt_result = get_prompt("\"" + input.replace('\n', '') + "\"")
         async def run_tasks():
             tasks = [handle_result(once) for once in prompt_result]
