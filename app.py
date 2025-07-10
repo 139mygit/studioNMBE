@@ -2182,7 +2182,7 @@ def convert_format(filtered_items):
         }
         if correction["intgr"]:
             name = "不一致"
-            colorSet = "rgba(172, 228, 230, 1)"
+            colorSet = "rgba(172, 228, 230, 0.5)"
         else:
             name = ""
             colorSet= "rgba(255, 255, 0, 0.5)"
