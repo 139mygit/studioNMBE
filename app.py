@@ -5986,22 +5986,18 @@ def get_prompt(corrected):
     example_70 = "'original': '○月間の基準価額（分配金再投資）の騰落率は、毎月分配型が0.37％、年2回決算型は0.36％の上昇となり、参考指数の騰落率（0.58％の上昇）を下回りました。', 'correct': '○月間の基準価額（分配金再投資）の騰落率は、毎月分配型が0.37％の上昇、年2回決算型は0.36％の上昇となり、参考指数の騰落率（0.58％の上昇）を下回りました。', 'reason': 'Aが◯%、Bは△%の上昇の場合、「の上昇」がBだけにかかっていて、Aにもつけた方がわかりやすいため。'"
     prompt_list = [
         f"""
-        **Missing or Misused Function Words（機能語・助詞などの脱字・誤用）**
-        -Detect and correct missing or misused function words that compromise grammatical structure, clarity, or completeness. This includes particles, auxiliary expressions, conjunctions, numerical elements, and word-level usage that are essential in formal Japanese writing.
-        **Proofreading Requirements:**
-        -Detect omissions or misuses of:
-        -Particles（助詞 such as「を」「に」「は」）
-        -Auxiliary expressions（補助動詞・接続表現 such as「ことを」「ように」「ために」）
-        -Conjunctions and connectors（e.g., duplicated「がが」or missing「こと」）
-        -Decimal formatting and numeric components（e.g., missing "0" in「.7％」→「0.7％」）
-        -Incorrect or misused words（単語の誤用・表記ミス） that result in unintended meaning or break natural usage.
-        -Even if an expression appears natural or understandable in spoken Japanese, any omission, misuse, or lexical error that violates formal written grammar must be corrected.
-        -Do not flag stylistically acceptable orthographic variants involving okurigana (送り仮名) usage. The following are examples of such variants that should not be treated as errors:
-        「取り込む」vs「取込む」
-        「行う」vs「行なう」
-        「書き換え」vs「書換え」
-
-
+        **Typographical Errors（脱字・誤字）Detection**
+        - Detect only character-level errors that clearly break grammar or meaning.
+        **Proofreading Requirements**：
+        - Only correct missing or misused characters that clearly break grammar or meaning.
+        - Correct obvious verb/kanji errors, even if they seem superficially natural.
+        - Do not flag stylistic or acceptable variations unless clearly wrong.
+        - Ensure each kanji accurately reflects the intended meaning.
+        - Detect cases where non-verb terms are incorrectly used as if they were verbs.
+        - Do **not** treat orthographic variants involving okurigana omission or abbreviation（e.g., 書き換え vs 書換え, 読み取る vs 読取る, 取り込む vs 取込）as typographical errors
+    　　 -Detect expressions where omitted repeated phrases (e.g., "の上昇", "の低下") may cause ambiguity between multiple items, and suggest repeating the term explicitly for each item to ensure clarity.
+        - Do not modify expressions that are grammatically valid and commonly accepted in Japanese, even if alternative phrasing may seem more natural. For example, do not rewrite "中国、米国など" as "中国や米国など" unless required. However, grammatically incorrect forms like "中国、米国など国" must be corrected to "中国、米国などの国".
+        
         **missing Example*：
         {example_0}  ”と”を脱字しました
         {example_1}  The kanji '剤' was incorrectly used instead of '済', resulting in a wrong word formation.
@@ -6047,6 +6043,17 @@ def get_prompt(corrected):
         **Monetary Unit(金額表記) Check**
         -Proofreading Requirements：
         -Ensure currency units (円、兆円、億円) are correctly used.
+        """,
+        f"""
+        **Incorrect Verb Usage of Compound Noun Phrases（複合名詞の誤動詞化）**
+        - Detect grammatically incorrect use of compound noun phrases such as「買い付け」「売り付け」「買い建て」when used in verb forms like「買い付けた」「売り付けた」.
+        
+        **Proofreading Requirements**:
+        - Compound noun phrases such as「値上がり」「買い付け」「売り付け」「買い建て」must not be used as if they were conjugatable verbs.
+        - Expressions like「買い付けた」「売り付けた」are grammatically incorrect and must be corrected to「買い付けした」「売り付けした」.
+        - Similarly, when followed by a comma such as「〜買い付け、〜」, the correct form is「〜買い付けし、〜」.
+        - These terms function as fixed nominal expressions, not inflectable verbs. All such cases must be explicitly identified and corrected.
+
         """
     ]
 
@@ -6056,29 +6063,30 @@ def get_prompt(corrected):
         else:
             special_word = ""
         common_result = f"""
-        You are a professional Japanese business document proofreader specialized in financial and public disclosure materials. 
-
-        あなたは金融機関の対外発表文書に特化した、日本語ビジネス文書の校正専門家です。  
-        必ず以下のポリシーを守って校正を行ってください：  
-        文法的正確性だけでなく、ビジネス文書としての自然さ・厳密さを重視する。  
-        金融機関向け公式発表として恥ずかしくない完璧な日本語表現を目指す。  
-        曖昧な推測は禁止。必ず明確な根拠とルールに基づき指摘する。
-
+        You are a professional Japanese proofreading assistant specializing in official financial documents.
+        あなたは金融機関の公式文書に特化した日本語校正アシスタントです。
+        校正の目的は「明らかな誤りのみに限定し、余計な修正を一切行わないこと」です。
+    
         以下の校正基準を厳守すること：  
-        - 修正を行った場合、必ず**文法的に成立する自然な文に仕上げる**こと。修正後に不自然または誤用となる表現は禁止。
-        - 修正は**明示的にルール内で定義された語句・表現**に限ること。それ以外は**勝手に「よりよい表現」として書き換えない**。
-        - **原文に明確な問題がない限り、修正を加えないこと。**
+        - 文法的に明確な誤り以外は修正禁止。
+        - 意味や機能に問題がない表現には、一切手を加えないこと。
+        - 表現の改善提案は不要かつ禁止。
+        - あくまで機械的・ルールベースの確認のみ行い、スタイルの好みは介入しないこと。
+        - 曖昧なケースや判断に迷う場合は「修正不要」と判断すること。
         {special_word}
-        - 校正により変更された結果、文全体の意味や論理、文法が破綻しないよう、**必ず前後関係を考慮すること。**
-        - 常用外漢字に関する内容は校正不要です。
-        - 送り仮名の一致については校正不要です。
-        - 回答は200字以内に制限してください。
+        - 修正する場合、必ず文法的に正しく、自然な文であること。
+        - 修正は文法・語形・表記の客観的エラーに限る。
+        - 原文に明らかな問題がない限り、修正を加えてはならない。
+        - 表現の優劣に基づく改変や、「よりよい言い回し」は禁止。
+        - 回答は50字以内に制限してください。
+        - 送り仮名・常用外漢字・（）の全角／半角などチェック不要。
 
         **Proofreading Targets：**
         "{corrected}"
 
         {target_prompt}
 
+        **Please check each sentence **individually** for okurigana consistency.**
         """
         yield common_result
 
@@ -6216,45 +6224,57 @@ def loop_in_ruru(input):
         {
         "category": "表現ルール：『大手』の語順と企業名の一般化",
         "rule_id": "CorrectOoteOrder_And_GeneralizeCompanyNames",
-        "description": "正式な文書では、企業名の直接記載を避けるとともに、『大手』という語は業種や企業タイプの直前に配置してください。『○○大手』の語順は不自然であり、『大手○○企業』や『大手○○メーカー』などの表現が適切です。",
+        "description": "このルールは、『大手』という語が文中に使われている場合にのみ適用されます。『○○大手』のように語順が逆転している場合は『大手○○企業』に修正し、かつ企業名が含まれる場合には業種・地域に一般化します。ただし、『大手』という語が含まれない場合は、このルールを適用しないでください。企業名を一律に削除・一般化することは禁止します。",
         "requirements": [
             {
-            "condition": "『○○大手』の形式で『大手』が後置されている場合、語順を修正して『大手○○』の形にする。",
-            "correction": "例：『ゲーム大手企業』⇒『大手ゲーム企業』"
+                "condition": "『大手』という語が表現内に含まれており、かつ『○○大手』のように後置されている場合、語順を『大手○○』に修正する。",
+                "correction": "例：『ゲーム大手企業』⇒『大手ゲーム企業』"
             },
             {
-            "condition": "特定企業名（例：クレディ・スイス）が含まれる場合、社名を削除し、地域や業種に一般化し、『大手』を業種の直前に置く。",
-            "correction": "例：『スイス金融大手クレディ・スイス』⇒『スイスの大手金融グループ』"
+                "condition": "『大手』が含まれており、かつ特定企業名（例：クレディ・スイスなど）が記載されている場合、企業名を削除して地域や業種に一般化する。",
+                "correction": "例：『スイス金融大手クレディ・スイス』⇒『スイスの大手金融グループ』"
+            },
+            {
+                "condition": "『大手』という語が含まれていない場合、このルールは適用しない。企業名のみが記載されている場合（例：アマゾン、任天堂など）は原文のままとし、一般化・語順修正は行わない。",
+                "correction": "例：『任天堂』⇒ 修正不要（大手という語がないため）"
             }
         ],
         "output_format": "'original': '誤りのある表現', 'correct': '修正後の表現', 'reason': '修正の理由'",
         "examples": [
             {
-            "input": "通信大手が新サービスを発表しました。",
-            "output": {
-                "original": "通信大手",
-                "correct": "大手通信会社",
-                "reason": "『大手』は業種（通信）の直前に置く必要があります。"
-            }
+                "input": "通信大手が新サービスを発表しました。",
+                "output": {
+                    "original": "通信大手",
+                    "correct": "大手通信会社",
+                    "reason": "『大手』は業種（通信）の直前に置く必要があります。"
+                }
             },
             {
-            "input": "ゲーム大手企業の株価が上昇した。",
-            "output": {
-                "original": "ゲーム大手企業",
-                "correct": "大手ゲーム企業",
-                "reason": "『大手』は『ゲーム』の直前に配置するのが適切です。"
-            }
+                "input": "ゲーム大手企業の株価が上昇した。",
+                "output": {
+                    "original": "ゲーム大手企業",
+                    "correct": "大手ゲーム企業",
+                    "reason": "『大手』は『ゲーム』の直前に配置するのが適切です。"
+                }
             },
             {
-            "input": "スイス金融大手クレディ・スイスは経営破綻した。",
-            "output": {
-                "original": "スイス金融大手クレディ・スイス",
-                "correct": "スイスの大手金融グループ",
-                "reason": "個別企業名は省略し、『大手』は業種の直前に置きます。"
-            }
+                "input": "スイス金融大手クレディ・スイスは経営破綻した。",
+                "output": {
+                    "original": "スイス金融大手クレディ・スイス",
+                    "correct": "スイスの大手金融グループ",
+                    "reason": "個別企業名は省略し、『大手』は業種の直前に置きます。"
+                }
+            },
+            {
+                "input": "任天堂は新作ゲームを発表した。",
+                "output": {
+                    "original": "任天堂",
+                    "correct": "任天堂",
+                    "reason": "『大手』という語が含まれていないため、修正の必要はありません。"
+                }
             }
         ]
-        },
+    },
         {
             "category": "YieldMovementdescription",
             "rule_id": "1.3",
