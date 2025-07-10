@@ -2173,6 +2173,7 @@ def convert_format(filtered_items):
     for correction in filtered_items.get("result", {}).get("corrections", []):
         page = correction["page"] + 1  # 페이지 번호를 1부터 시작하도록 변환
         position = {}
+        colorSet = "rgb(172 228 230)"
 
         # 수정 내역 변환
         change = {
@@ -2181,8 +2182,10 @@ def convert_format(filtered_items):
         }
         if correction["intgr"]:
             name = "不一致"
+            colorSet = "rgba(172, 228, 230, 1)"
         else:
             name = ""
+            colorSet= "rgba(255, 255, 0, 0.5)"
 
         # 위치 정보가 있는 경우 변환
         if correction["locations"]:
@@ -2208,7 +2211,7 @@ def convert_format(filtered_items):
                 if not existing_item:
                     checkResults[page][0]["items"].append({
                         "name": name,
-                        "color": "rgba(255, 255, 0, 0.5)", # green background rgba(0, 255, 0, 0.5)
+                        "color": colorSet, #"rgba(255, 255, 0, 0.5)", # green background rgba(0, 255, 0, 0.5)
                         "page": page,
                         "position": position,
                         "changes": [change],
