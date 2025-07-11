@@ -2816,7 +2816,7 @@ half_to_full_dict = {
     "ﾔ": "ヤ", "ﾕ": "ユ", "ﾖ": "ヨ",
     "ﾗ": "ラ", "ﾘ": "リ", "ﾙ": "ル", "ﾚ": "レ", "ﾛ": "ロ",
     "ﾜ": "ワ", "ﾝ": "ン",
-    "%": "％", "@": "＠","(":"（",")":"）"
+    "%": "％", "@": "＠"
 }
 
 full_to_half_dict = {
@@ -3532,28 +3532,28 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
                 "intgr": False, # for debug 62
             })
 
-        # （半角括弧 → 全角括弧） -() → () ,with date format: \((?!\d{4}年\d{1,2}月\d{1,2}日)([^)]+)\)
-        pattern_half_width_kuohao = r"\(([^)]+)\)"
-        half_width_kuohao_matches = regcheck.findall(pattern_half_width_kuohao, input_text)
+        # # （半角括弧 → 全角括弧） -() → () ,with date format: \((?!\d{4}年\d{1,2}月\d{1,2}日)([^)]+)\)
+        # pattern_half_width_kuohao = r"\(([^)]+)\)"
+        # half_width_kuohao_matches = regcheck.findall(pattern_half_width_kuohao, input_text)
 
-        for match in half_width_kuohao_matches:
-            corrected_text_re = half_and_full_process(match,half_to_full_dict)  # 반각 카타카나를 전각으로 변환
-            reason_type = "半角括弧を全角括弧に統一"  # 수정 이유
-            original_text = match  # 원본 텍스트
-            converted = corrected_text_re  # 전각으로 변환된 텍스트
-            target_text = re.sub(r'\(([^)]+)\)', r'（\1）', converted)
-            # ()表記の統一(分配金再投資)） -(分配金再投資) → （分配金再投資）
-            comment = f"{reason_type} {original_text} → {target_text}"
+        # for match in half_width_kuohao_matches:
+        #     corrected_text_re = half_and_full_process(match,half_to_full_dict)  # 반각 카타카나를 전각으로 변환
+        #     reason_type = "半角括弧を全角括弧に統一"  # 수정 이유
+        #     original_text = match  # 원본 텍스트
+        #     converted = corrected_text_re  # 전각으로 변환된 텍스트
+        #     target_text = re.sub(r'\(([^)]+)\)', r'（\1）', converted)
+        #     # ()表記の統一(分配金再投資)） -(分配金再投資) → （分配金再投資）
+        #     comment = f"{reason_type} {original_text} → {target_text}"
 
-            corrections.append({
-                "page": pageNumber,
-                "original_text": original_text,#corrected_text_re
-                "comment": comment,
-                "reason_type": reason_type,
-                "check_point": input_text.strip(),
-                "locations": [],
-                "intgr": False, # for debug 62
-            })
+        #     corrections.append({
+        #         "page": pageNumber,
+        #         "original_text": original_text,#corrected_text_re
+        #         "comment": comment,
+        #         "reason_type": reason_type,
+        #         "check_point": input_text.strip(),
+        #         "locations": [],
+        #         "intgr": False, # for debug 62
+        #     })
 
         # 半角→全角
         pattern_full_width_numbers_and_letters = r"[０-９Ａ-Ｚ＋－]+"
@@ -5672,7 +5672,7 @@ def get_src(no_space, src_content):
 
 
 # async call ,need FE promises
-def opt_common(input, prompt_result, pdf_base64, pageNumber, re_list, word_list, rule_list, rule1_list, rule3_list,symbol_list):  
+def opt_common(input, prompt_result, pdf_base64, pageNumber, re_list, rule_list, rule1_list, rule3_list,symbol_list):  
     # ChatCompletion Call
     response = openai.ChatCompletion.create(
         deployment_id=deployment_id,  # Deploy Name
@@ -5757,17 +5757,17 @@ def opt_common(input, prompt_result, pdf_base64, pageNumber, re_list, word_list,
                 "intgr": False,  # for debug 62
             })
 
-    if word_list:
-        for word_result in word_list:
-            combine_corrections.append({
-                "page": pageNumber,
-                "original_text": word_result,  # 전체 입력
-                "comment": f"{word_result} → 値上がりし",
-                "reason_type": "動詞固定用法",
-                "check_point": word_result,
-                "locations": [],
-                "intgr": False,  # for debug 62
-            })
+    # if word_list:
+    #     for word_result in word_list:
+    #         combine_corrections.append({
+    #             "page": pageNumber,
+    #             "original_text": word_result,  # 전체 입력
+    #             "comment": f"{word_result} → 値上がりし",
+    #             "reason_type": "動詞固定用法",
+    #             "check_point": word_result,
+    #             "locations": [],
+    #             "intgr": False,  # for debug 62
+    #         })
     
     # され、下落し
     if symbol_list:
@@ -5945,13 +5945,13 @@ def opt_typo():
         ]
         sec_prompt = "\n".join(dt)
         re_list = regcheck.findall(r"(\d{4,})[人種万円兆億]", input)
-        word_list = regcheck.findall(r".{,2}値上がり(?!し).{,2}", input)
+        # word_list = regcheck.findall(r".{,2}値上がり(?!し).{,2}", input)
         rule_list = regcheck.findall(r"当月投資配分", input)
         rule1_list = regcheck.findall(r"【(先月の投資環境|先月の運用経過|今後の運用方針)】", input)
         rule3_list = regcheck.findall(r"-[\d.％]{4,6}下落", input)
         symbol_list = regcheck.findall(r"され、下落し", input)
 
-        _content = opt_common(input, sec_prompt, pdf_base64,pageNumber,re_list,word_list,rule_list,rule1_list,rule3_list,symbol_list)
+        _content = opt_common(input, sec_prompt, pdf_base64,pageNumber,re_list,rule_list,rule1_list,rule3_list,symbol_list)
         return _content
 
     except Exception as e:
@@ -5979,8 +5979,8 @@ def get_prompt(corrected):
     example_11 = "'original': '我々は新しいプロジェクトに取り組みし、成果を上げました。'"
     example_110 = "'original': 'セクター配分において特化型（物流施設）をアンダーウェイト（参考指数と比べ低めの投資比率）したことなどがプラスに寄与しました。', 'correct': 'セクター配分において特化型（物流施設）をアンダーウェイト（参考指数と比べ低めの投資比率）としたことなどがプラスに寄与しました。', 'reason': '動詞活用の誤り（「遊ばれる」→「遊ぼれる」）'"
     example_111 = "'original': '電子部品や通信機器などの製造・販売を行なうグローバルで事業を展開する電子モジュール・部品メーカー。', 'correct': '電子部品や通信機器などの製造・販売を行なうグローバルに事業を展開する電子モジュール・部品メーカー。', 'reason': 'グローバルは「に」を使用する'"
-    example_2 = "'original': '今後はトランプ次期米大統領が掲げる減税や規制緩和の政策が米景気を押し上げることが、市場の下支えになると考えています。引き続き、FRBによる金融政策や新政権の政策により影響を受けるセクターなどを注視しながら、銘柄を選定して運用を行ないます', 'correct': '今後はトランプ次期米大統領が掲げる減税や規制緩和の政策が米景気を押し上げることが、市場の下支えになると考えています。引き続き、FRBによる金融政策や新政権の政策により影響を受けるセクターなどを注視しながら、銘柄を選定して運用を行ないます。', 'reason': '文法誤用'"
-    example_4 = "'original': '半導体メーカー。マイクロコントローラーや 関連の複合信号製品', 'correct': '半導体メーカー。マイクロコントローラーや関連の複合信号製品', 'reason': '不要スペース削除'"
+    # example_2 = "'original': '今後はトランプ次期米大統領が掲げる減税や規制緩和の政策が米景気を押し上げることが、市場の下支えになると考えています。引き続き、FRBによる金融政策や新政権の政策により影響を受けるセクターなどを注視しながら、銘柄を選定して運用を行ないます', 'correct': '今後はトランプ次期米大統領が掲げる減税や規制緩和の政策が米景気を押し上げることが、市場の下支えになると考えています。引き続き、FRBによる金融政策や新政権の政策により影響を受けるセクターなどを注視しながら、銘柄を選定して運用を行ないます。', 'reason': '文法誤用'"
+    # example_4 = "'original': '半導体メーカー。マイクロコントローラーや 関連の複合信号製品', 'correct': '半導体メーカー。マイクロコントローラーや関連の複合信号製品', 'reason': '不要スペース削除'"
     example_5 = "'original': '東南アジアや欧州など市場調査開始して', 'correct': '東南アジアや欧州などの市場調査を開始して', 'reason': '欧州など“の”市場を省略不可'"
     example_6 = "'original': '東南アジアや欧州など市場調査開始して', 'correct': '東南アジアや欧州などの市場調査を開始して', 'reason': '市場調査”を”開始省略不可'"
     example_60 = "'original': 'ECB（欧州中央銀行）など海外主要中銀による', 'correct': 'ECB（欧州中央銀行）などの海外主要中銀による', 'reason': 'など”の”海外主要省略不可'"
@@ -6012,19 +6012,19 @@ def get_prompt(corrected):
         "取り組みし"は自然な連用形表現のため、修正不要'
         {example_70}
         """,
-        f"""
-       **Punctuation (句読点) Usage Check**
-        -Check the sentence-ending punctuation and comma usage only within complete sentences.
-        **Proofreading Requirements:**
-        -Only detect missing「。」at the end of grammatically complete sentences.
-        -If the sentence already ends with「。」, do not suggest any correction.
-        -Do not flag missing or extra「。」in sentence fragments, headings, bullet points, or intentionally incomplete expressions.
-        -Check for excessive or missing「、」only within grammatically complete sentences.
-        -Do not flag cases where comma omission is stylistically natural and grammatically acceptable in Japanese (e.g.,「好感され月間では下落し」).
+    #     f"""
+    #    **Punctuation (句読点) Usage Check**
+    #     -Check the sentence-ending punctuation and comma usage only within complete sentences.
+    #     **Proofreading Requirements:**
+    #     -Only detect missing「。」at the end of grammatically complete sentences.
+    #     -If the sentence already ends with「。」, do not suggest any correction.
+    #     -Do not flag missing or extra「。」in sentence fragments, headings, bullet points, or intentionally incomplete expressions.
+    #     -Check for excessive or missing「、」only within grammatically complete sentences.
+    #     -Do not flag cases where comma omission is stylistically natural and grammatically acceptable in Japanese (e.g.,「好感され月間では下落し」).
 
-        **Example**：
-        {example_2}
-        """,
+    #     **Example**：
+    #     {example_2}
+    #     """,
         f"""
         **Omission of Particles (助詞の省略・誤用) Detection**
         - Detect omissions and misuses of grammatical particles (助詞), especially「の」「を」「に」, that lead to structurally incorrect or unnatural expressions.
@@ -6555,7 +6555,7 @@ def opt_wording():
         ]
         sec_prompt = "\n".join(dt)
 
-        _content = opt_common(input,sec_prompt,pdf_base64,pageNumber,False,False,False,False,False,False)
+        _content = opt_common(input,sec_prompt,pdf_base64,pageNumber,False,False,False,False,False)
         
         return _content
     
