@@ -3527,7 +3527,7 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
                 "original_text": original_text,#corrected_text_re
                 "comment": comment,
                 "reason_type": reason_type,
-                "check_point": input_text.strip(),
+                "check_point": reason_type,
                 "locations": [],
                 "intgr": False, # for debug 62
             })
@@ -3572,7 +3572,7 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
                 "original_text": original_text,
                 "comment": comment,
                 "reason_type": reason_type,
-                "check_point": input_text.strip(),
+                "check_point": reason_type,
                 "locations": [],
                 "intgr": False, # for debug 62
             })
@@ -3594,7 +3594,7 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
                 "original_text": original_text,
                 "comment": comment,
                 "reason_type": reason_type,
-                "check_point": input_text.strip(),
+                "check_point": reason_type,
                 "locations": [],
                 "intgr": False, # for debug 62
             })
@@ -3622,7 +3622,7 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
                 "original_text": original_text,
                 "comment": comment,
                 "reason_type": '年度用語の統一',
-                "check_point": input_text.strip(),
+                "check_point": '年度用語の統一'
                 "locations": [],  # 위치 정보는 필요에 따라 추가
                 "intgr": False,  # for debug
             })
@@ -3650,7 +3650,7 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
                                 "original_text": original_text,
                                 "comment": comment,
                                 "reason_type": reason_type,
-                                "check_point": input_text.strip(),
+                                "check_point": reason_type,
                                 "locations": [],
                                 "intgr": False,
                             })
@@ -3671,7 +3671,7 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
                 "original_text": extract_text(input_text, original_text),# original_text,
                 "comment": comment,
                 "reason_type": reason_type,
-                "check_point": input_text.strip(),  # 필요에 따라 입력
+                "check_point": reason_type,  # 필요에 따라 입력
                 "locations": [],  # 필요에 따라 입력
                 "intgr": False,  # for debug 62
             })
