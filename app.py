@@ -3622,7 +3622,7 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
                 "original_text": original_text,
                 "comment": comment,
                 "reason_type": '年度用語の統一',
-                "check_point": '年度用語の統一'
+                "check_point": '年度用語の統一',
                 "locations": [],  # 위치 정보는 필요에 따라 추가
                 "intgr": False,  # for debug
             })
