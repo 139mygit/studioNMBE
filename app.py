@@ -4859,6 +4859,7 @@ def integeration_ruru_cosmos():
         target_type = data['Target_Type']
         target_condition = data['Target_Condition']
         result = data['result']
+        flag = data['flag']
         id = data['id']
         No = data['No']
 
@@ -4882,6 +4883,7 @@ def integeration_ruru_cosmos():
             "Org_Type": org_type,
             "Target_SheetName": target_sheet_name,
             "Target_Text": target_text,
+            "flag": flag,
             "Target_Type": target_type,
             "Target_Condition": target_condition,
             "result": result,
