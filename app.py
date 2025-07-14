@@ -5459,10 +5459,8 @@ def ruru_ask_gpt():
             _parsed_data = ast.literal_eval(_answer)
             _similar = _parsed_data.get("target")
 
-            # 정규식 패턴
-            pattern = r'([ABCDEF]コースが[+-]?\d+(?:\.\d+)?％)'
+            pattern = r'([ABCDEF]コース.?[+-]?\d+(?:\.\d+)?％|[ABCDEF]コース.?基準価額は(?:下落|上昇)(?:ました)?)'
 
-            # 정규식 검색
             matches_list = re.findall(pattern, _similar)
             for re_result in matches_list:
                                 
