@@ -3794,11 +3794,11 @@ def extract_corrections(corrected_text, input_text,pageNumber):
 
         corrections.append({
             "page": pageNumber,
-            "original_text": reason,  # 전체 입력값 当月のファンドの騰落率は+0.2%となりました。
-            "comment": comment, # +0.2% → 0.85%
-            "reason_type": reason_type, # ファンドの騰落率
+            "original_text": reason,  # 전체 입력값 当月のファンドの騰落率は+0.2%となりました。 上升
+            "comment": comment, # +0.2% → 0.85% , 上升 -> 下落
+            "reason_type": reason_type, # ファンドの騰落率，B-xxx
 
-            "check_point": input_text.strip(), # 当月のファンドの騰落率は+0.2%となりました。
+            "check_point": input_text.strip(), # 当月のファンドの騰落率は+0.2%となりました。 A B -xxx
             "locations": [],
             "intgr": True,
         })
@@ -5458,15 +5458,23 @@ def ruru_ask_gpt():
             _answer = response['choices'][0]['message']['content'].strip().strip().replace("`", "").replace("json", "", 1)
             _parsed_data = ast.literal_eval(_answer)
             _similar = _parsed_data.get("target")
-            corrections.append({
-                    "page": pageNumber,  # 페이지 번호 (0부터 시작, 필요 시 수정)
-                    "original_text": _similar,
-                    "check_point": _similar,
-                    "comment": f"{_similar} → ", # +0.2% → 0.85% f"{reason} → {corrected}"
-                    "reason_type": "整合性",  # for debug 62
-                    "locations": [],  # 뒤에서 실제 PDF 위치(좌표)를 저장할 필드
-                    "intgr": True,  # for debug 66
-                })
+
+            # 정규식 패턴
+            pattern = r'([ABCDEF]コースが[+-]?\d+(?:\.\d+)?％)'
+
+            # 정규식 검색
+            matches_list = re.findall(pattern, _similar)
+            for re_result in matches_list:
+                                
+                corrections.append({
+                        "page": pageNumber,  # 페이지 번호 (0부터 시작, 필요 시 수정)
+                        "original_text": re_result,
+                        "check_point": re_result,
+                        "comment": f"{re_result} → ", # +0.2% → 0.85% f"{reason} → {corrected}"
+                        "reason_type": "整合性",  # for debug 62
+                        "locations": [],  # 뒤에서 실제 PDF 위치(좌표)를 저장할 필드
+                        "intgr": True,  # for debug 66
+                    })
                 
             try:
                 pdf_bytes = base64.b64decode(pdf_base64)
