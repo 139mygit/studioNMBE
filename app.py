@@ -1987,9 +1987,9 @@ def download_excel_template():
 
     # 根据类型拼接路径
     if fund_type == '私募':
-        file_url = "https://nriazureaistudio.blob.core.windows.net/1225-container/10銘柄マスタ管理_私募.xlsx"
+        file_url = ACCOUNT_URL + STORAGE_CONTAINER_NAME + "/10銘柄マスタ管理_私募.xlsx"
     else:
-        file_url = "https://nriazureaistudio.blob.core.windows.net/1225-container/10銘柄マスタ管理_公募.xlsx"
+        file_url = ACCOUNT_URL + STORAGE_CONTAINER_NAME + "/10銘柄マスタ管理_公募.xlsx"
 
     try:
         # 注意:send_file 不能直接下载远程链接，改为重定向
@@ -6740,7 +6740,7 @@ def after_request(response):
 #10铭柄新追加
 
 # PDF 容器路径
-PDF_DIR = "https://nriazureaistudio.blob.core.windows.net/1225-container"
+PDF_DIR = ACCOUNT_URL + STORAGE_CONTAINER_NAME
 
 def copy_row_style(ws, source_row_idx, target_row_idx):
     """
