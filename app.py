@@ -1987,9 +1987,9 @@ def download_excel_template():
 
     # 根据类型拼接路径
     if fund_type == '私募':
-        file_url = "https://nriazureaistudiorpa.blob.core.windows.net/1225-container/10銘柄マスタ管理_私募.xlsx"
+        file_url = "https://nriazureaistudio.blob.core.windows.net/1225-container/10銘柄マスタ管理_私募.xlsx"
     else:
-        file_url = "https://nriazureaistudiorpa.blob.core.windows.net/1225-container/10銘柄マスタ管理_公募.xlsx"
+        file_url = "https://nriazureaistudio.blob.core.windows.net/1225-container/10銘柄マスタ管理_公募.xlsx"
 
     try:
         # 注意:send_file 不能直接下载远程链接，改为重定向
@@ -3794,7 +3794,7 @@ def extract_corrections(corrected_text, input_text,pageNumber):
 
         corrections.append({
             "page": pageNumber,
-            "original_text": half_and_full_process(reason,half_to_full_dict),  # 반각 카타카나를 전각으로 변환,  # 전체 입력값 当月のファンドの騰落率は+0.2%となりました。 上升
+            "original_text": reason,# half_and_full_process(reason,half_to_full_dict),  # 반각 카타카나를 전각으로 변환,  # 전체 입력값 当月のファンドの騰落率は+0.2%となりました。 上升
             "comment": comment, # +0.2% → 0.85% , 上升 -> 下落
             "reason_type": reason_type, # ファンドの騰落率，B-xxx
 
@@ -6740,7 +6740,7 @@ def after_request(response):
 #10铭柄新追加
 
 # PDF 容器路径
-PDF_DIR = "https://nriazureaistudiorpa.blob.core.windows.net/1225-container"
+PDF_DIR = "https://nriazureaistudio.blob.core.windows.net/1225-container"
 
 def copy_row_style(ws, source_row_idx, target_row_idx):
     """
