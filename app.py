@@ -3791,10 +3791,10 @@ def extract_corrections(corrected_text, input_text,pageNumber):
         corrected = match[3].strip()
 
         comment = f"{reason} → {corrected}" if corrected else reason
-
+        # "%": "％"
         corrections.append({
             "page": pageNumber,
-            "original_text": half_and_full_process(reason,half_to_full_dict),  # 반각 카타카나를 전각으로 변환,  # 전체 입력값 当月のファンドの騰落率は+0.2%となりました。 上升
+            "original_text": reason.replace("%",'').replace('％',''),# half_and_full_process(reason,half_to_full_dict),  # 반각 카타카나를 전각으로 변환,  # 전체 입력값 当月のファンドの騰落率は+0.2%となりました。 上升
             "comment": comment, # +0.2% → 0.85% , 上升 -> 下落
             "reason_type": reason_type, # ファンドの騰落率，B-xxx
 
