@@ -5567,6 +5567,7 @@ def ruru_ask_gpt():
         return jsonify({
             "success": True,
             "corrections": corrections,  # 틀린 부분과 코멘트
+            "input": input,  # 틀린 부분과 코멘트
         })
 
     except Exception as e:
