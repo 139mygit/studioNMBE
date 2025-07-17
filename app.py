@@ -8015,6 +8015,7 @@ def handle_sheet_plus41(pdf_url, fcode, sheetname, fund_type, container, filenam
             # 转为 BytesIO 对象传给 extract_excel_table
             excel_file = io.BytesIO(response.content)
             tables = extract_excel_table(excel_file)
+            return tables
         else:
             pdf_response = requests.get(pdf_url)
             if pdf_response.status_code != 200:
