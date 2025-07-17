@@ -181,7 +181,7 @@ STORAGE_CONTAINER_NAME = os.getenv("STORAGE_CONTAINER_NAME")
 MAX_TOKENS=32768 # 16384 for _deployment_id
 TEMPERATURE=0
 SEED=42
-
+PDF_DIR = ACCOUNT_URL + STORAGE_CONTAINER_NAME
 
 # Cosmos DB
 def get_db_connection(CONTAINER):
@@ -6749,10 +6749,8 @@ def after_request(response):
 
 
 #10铭柄新追加
-# ACCOUNT_URL
-# STORAGE_CONTAINER_NAME
+
 # PDF 容器路径
-PDF_DIR = ACCOUNT_URL + STORAGE_CONTAINER_NAME
 
 def copy_row_style(ws, source_row_idx, target_row_idx):
     """
@@ -8015,7 +8013,7 @@ def handle_sheet_plus41(pdf_url, fcode, sheetname, fund_type, container, filenam
             # 转为 BytesIO 对象传给 extract_excel_table
             excel_file = io.BytesIO(response.content)
             tables = extract_excel_table(excel_file)
-            return tables
+            return tables # 717 debug
         else:
             pdf_response = requests.get(pdf_url)
             if pdf_response.status_code != 200:
