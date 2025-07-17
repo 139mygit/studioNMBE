@@ -1987,9 +1987,9 @@ def download_excel_template():
 
     # 根据类型拼接路径
     if fund_type == '私募':
-        file_url = "https://nriazureaistudiorpa.blob.core.windows.net/1225-container/10銘柄マスタ管理_私募.xlsx"
+        file_url = "https://nriazureaistudiorparpa.blob.core.windows.net/1225-container/10銘柄マスタ管理_私募.xlsx"
     else:
-        file_url = "https://nriazureaistudiorpa.blob.core.windows.net/1225-container/10銘柄マスタ管理_公募.xlsx"
+        file_url = "https://nriazureaistudiorparpa.blob.core.windows.net/1225-container/10銘柄マスタ管理_公募.xlsx"
 
     try:
         # 注意:send_file 不能直接下载远程链接，改为重定向
@@ -7488,7 +7488,7 @@ def check_tenbrend(filename, fund_type):
         result = list(container.query_items(query=query, parameters=parameters, enable_cross_partition_query=True))
 
         if not result:
-            return []
+            return "数据库没有查到数据,没有这个fcode的数据"
 
         sheetname = result[0]["sheetname"]
         pdf_url = f"{PDF_DIR}/{filename}"
@@ -7496,19 +7496,19 @@ def check_tenbrend(filename, fund_type):
         if sheetname == "過去分整理3列":
             pdf_response = requests.get(pdf_url)
             if pdf_response.status_code != 200:
-                return []
+                return "PDF下载失败，没有找到pdf"
             if fcode in ["140193","140386","140675","140565-6","140655-6","140695-6","180291-2","180295-8"]:
                 tables = extract_pdf_table_special(io.BytesIO(pdf_response.content))
             else:
                     
                 tables = extract_pdf_table(io.BytesIO(pdf_response.content))
             if not tables:
-                return []
+                return "PDF中未提取到表格"
             
             excel_url = f"{PDF_DIR}/10mingbing.xlsx"
             excel_response = requests.get(excel_url)
             if excel_response.status_code != 200:
-                return []
+                return "Excel文件下载失败，不能打开excel"
 
             wb = load_workbook(filename=io.BytesIO(excel_response.content))
             ws = wb.active
@@ -7634,22 +7634,22 @@ def check_tenbrend(filename, fund_type):
             insert_tenbrend_history(diff_rows)
             update_excel_with_diff_rows(diff_rows, fund_type)
 
-            return diff_rows or []
+            return diff_rows or "全部一致，无需更新"
 
         elif sheetname == "過去分整理4列ESG一緒":
             pdf_response = requests.get(pdf_url)
             if pdf_response.status_code != 200:
-                return []
+                return "PDF下载失败，没有找到pdf"
 
             tables = extract_pdf_table(io.BytesIO(pdf_response.content))
             if not tables:
-                return []
+                return "PDF中未提取到表格"
         
 
             excel_url = f"{PDF_DIR}/10mingbing.xlsx"
             excel_response = requests.get(excel_url)
             if excel_response.status_code != 200:
-                return []
+                return "Excel文件下载失败，不能打开excel"
 
             wb = load_workbook(filename=io.BytesIO(excel_response.content))
             ws = wb.active
@@ -7780,7 +7780,7 @@ def check_tenbrend(filename, fund_type):
             insert_tenbrend_history(diff_rows)
             update_excel_with_diff_rows4(diff_rows, fund_type)
 
-            return diff_rows or []
+            return diff_rows or "全部一致，无需更新"
 
         elif sheetname == "過去分整理4列+4列〇二行":
             return handle_sheet_plus42(pdf_url, fcode, sheetname, fund_type, container, filename)
@@ -7796,7 +7796,7 @@ def check_tenbrend(filename, fund_type):
             return handle_sheet_plus_si5(pdf_url, fcode, sheetname, fund_type, container, filename)
             
         else:
-            return []
+            return "找不到这个sheet页"
 
     except Exception as e:
         return f"❌ check_tenbrend error: {str(e)}"
@@ -7806,16 +7806,16 @@ def handle_sheet_plus42(pdf_url, fcode, sheetname, fund_type, container, filenam
     try:
         pdf_response = requests.get(pdf_url)
         if pdf_response.status_code != 200:
-            return []
+            return "PDF下载失败"
 
         tables = extract_pdf_table(io.BytesIO(pdf_response.content))
         if not tables:
-            return []
+            return "PDF中未提取到表格"
 
         excel_url = f"{PDF_DIR}/10mingbing.xlsx"
         excel_response = requests.get(excel_url)
         if excel_response.status_code != 200:
-            return []
+            return "Excel文件下载失败"
 
         wb = load_workbook(filename=io.BytesIO(excel_response.content))
         ws = wb.active
@@ -7960,14 +7960,15 @@ def handle_sheet_plus42(pdf_url, fcode, sheetname, fund_type, container, filenam
         insert_tenbrend_history42(diff_rows)
         update_excel_with_diff_rows42(diff_rows, fund_type)
 
-        return diff_rows or []
+        return diff_rows or "全部一致，无需更新"
 
     except Exception as e:
         return f"❌ handle_sheet_plus42 error: {str(e)}"
-    
-def extract_excel_table(file_like, sheet_name="銘柄解説"):
+
+def extract_excel_table(file_like):
     try:
         # 支持传入 BytesIO 或本地路径
+        sheet_name ="銘柄解説"
         df = pd.read_excel(file_like, sheet_name=sheet_name, header=1, usecols="A:C", dtype=str)
     except Exception as e:
         print(f"❌ Excel 读取失败: {e}")
@@ -7987,8 +7988,7 @@ def extract_excel_table(file_like, sheet_name="銘柄解説"):
                 results.append([stock, desc, esg])
 
     return results
-
-
+    
 def handle_sheet_plus41(pdf_url, fcode, sheetname, fund_type, container, filename):
     try:
         if fcode in ['140752','140302-3']:
@@ -7998,24 +7998,25 @@ def handle_sheet_plus41(pdf_url, fcode, sheetname, fund_type, container, filenam
             # 下载 Excel 文件内容
             response = requests.get(excel_url)
             if response.status_code != 200:
-                return []
+                return "Excel下载失败"
 
             # 转为 BytesIO 对象传给 extract_excel_table
             excel_file = io.BytesIO(response.content)
-            tables = extract_excel_table(excel_file, sheetname)
+            tables = extract_excel_table(excel_file)
         else:
             pdf_response = requests.get(pdf_url)
             if pdf_response.status_code != 200:
-                return []
-            
+                return "PDF下载失败"
+
             tables = extract_structured_tables(io.BytesIO(pdf_response.content))
+        
         if not tables:
-            return []
+            return "PDF中未提取到表格"
 
         excel_url = f"{PDF_DIR}/10mingbing.xlsx"
         excel_response = requests.get(excel_url)
         if excel_response.status_code != 200:
-            return []
+            return "Excel文件下载失败"
 
         wb = load_workbook(filename=io.BytesIO(excel_response.content))
         ws = wb.active
@@ -8132,7 +8133,7 @@ def handle_sheet_plus41(pdf_url, fcode, sheetname, fund_type, container, filenam
         insert_tenbrend_history41(diff_rows)
         update_excel_with_diff_rows41(diff_rows, fund_type)
 
-        return diff_rows or []
+        return diff_rows or "全部一致，无需更新"
 
     except Exception as e:
         return f"❌ handle_sheet_plus41 error: {str(e)}"
@@ -8158,21 +8159,79 @@ def insert_tenbrend_history4(diff_rows):
         }
         container.create_item(body=history_item)
 
+
+def format_date(value):
+    try:
+        if pd.isna(value):
+            return ""
+        # Excel日期序列号（数字）
+        if isinstance(value, (int, float, np.integer, np.floating)):
+            base = datetime(1899, 12, 30)  # Excel序列号起点
+            real_date = base + timedelta(days=float(value))
+            return f"{real_date.year}年{real_date.month}月"
+        # datetime 或 pd.Timestamp 类型
+        elif isinstance(value, (datetime, pd.Timestamp)):
+            return f"{value.year}年{value.month}月"
+        # 字符串类型
+        else:
+            parsed = pd.to_datetime(str(value), errors='coerce')
+            if pd.isna(parsed):
+                return str(value)
+            return f"{parsed.year}年{parsed.month}月"
+    except Exception:
+        return str(value)
+
+def extract_excel_table4(file_like):
+    try:
+        # 支持传入 BytesIO 或本地路径
+        sheet_name="組入銘柄"
+        df = pd.read_excel(file_like, sheet_name=sheet_name, header=1, usecols="A:C", dtype=str)
+    except Exception as e:
+        print(f"❌ Excel 读取失败: {e}")
+        return []
+
+    df = df.reset_index(drop=True)
+    results = []
+
+    for i in range(len(df)):
+        index_val = str(df.iloc[i, 0]).strip()
+        if index_val in [str(n) for n in range(1, 11)]:
+            stock = clean_text(df.iloc[i, 1])
+            desc = clean_text(df.iloc[i, 2])
+            date_val = df.iloc[i, 3]
+            date_str = format_date(date_val)
+            if stock:
+                results.append([stock, desc, date_str])
+
+    return results
     
 def handle_sheet_plus4(pdf_url, fcode, sheetname, fund_type, container, filename):
     try:
-            pdf_response = requests.get(pdf_url)
-            if pdf_response.status_code != 200:
-                return []
+            if fcode in ['140749']:
+                # 将 .pdf 替换为 .xlsx 作为 Excel 文件路径
+                excel_url = pdf_url.replace(".pdf", ".xlsx")
 
-            tables = extract_pdf_table(io.BytesIO(pdf_response.content))
-            if not tables:
-                return []
+                # 下载 Excel 文件内容
+                response = requests.get(excel_url)
+                if response.status_code != 200:
+                    return "Excel下载失败"
+
+                # 转为 BytesIO 对象传给 extract_excel_table
+                excel_file = io.BytesIO(response.content)
+                tables = extract_excel_table4(excel_file)
+            else:
+                pdf_response = requests.get(pdf_url)
+                if pdf_response.status_code != 200:
+                    return "PDF下载失败，没有找到pdf"
+
+                tables = extract_pdf_table(io.BytesIO(pdf_response.content))
+                if not tables:
+                    return "PDF中未提取到表格"
         
             excel_url = f"{PDF_DIR}/10mingbing.xlsx"
             excel_response = requests.get(excel_url)
             if excel_response.status_code != 200:
-                return []
+                return "Excel文件下载失败，不能打开excel"
 
             wb = load_workbook(filename=io.BytesIO(excel_response.content))
             ws = wb.active
@@ -8297,7 +8356,7 @@ def handle_sheet_plus4(pdf_url, fcode, sheetname, fund_type, container, filename
             insert_tenbrend_history4(diff_rows)
             update_excel_with_diff_rows_shang(diff_rows, fund_type)
 
-            return diff_rows or []
+            return diff_rows or "全部一致，无需更新"
 
     except Exception as e:
         return f"❌ handle_sheet_4plus41 error: {str(e)}"
@@ -8306,16 +8365,16 @@ def handle_sheet_plus5(pdf_url, fcode, sheetname, fund_type, container, filename
     try:
         pdf_response = requests.get(pdf_url)
         if pdf_response.status_code != 200:
-            return []
+            return "PDF下载失败"
 
         tables = extract_structured_tables(io.BytesIO(pdf_response.content))
         if not tables:
-            return []
+            return "PDF中未提取到表格"
 
         excel_url = f"{PDF_DIR}/10mingbing.xlsx"
         excel_response = requests.get(excel_url)
         if excel_response.status_code != 200:
-            return []
+            return "Excel文件下载失败"
 
 
         seen_stocks = set()
@@ -8436,7 +8495,7 @@ def handle_sheet_plus5(pdf_url, fcode, sheetname, fund_type, container, filename
         insert_tenbrend_history5(diff_rows)
         update_excel_with_diff_rows5(diff_rows, fund_type)
 
-        return diff_rows or []
+        return diff_rows or "全部一致，无需更新"
 
     except Exception as e:
         return f"❌ handle_sheet_plus5 error: {str(e)}"
@@ -8551,16 +8610,16 @@ def handle_sheet_plus_si4(pdf_url, fcode, sheetname, fund_type, container, filen
     try:
             pdf_response = requests.get(pdf_url)
             if pdf_response.status_code != 200:
-                return []
+                return "PDF下载失败，没有找到pdf"
 
             tables = extract_pdf_table(io.BytesIO(pdf_response.content))
             if not tables:
-                return []
+                return "PDF中未提取到表格"
         
             excel_url = f"{PDF_DIR}/10mingbing.xlsx"
             excel_response = requests.get(excel_url)
             if excel_response.status_code != 200:
-                return []
+                return "Excel文件下载失败，不能打开excel"
 
             seen_stocks = set()
             unique_rows = []
@@ -8664,7 +8723,7 @@ def handle_sheet_plus_si4(pdf_url, fcode, sheetname, fund_type, container, filen
             insert_tenbrend_history_si4(diff_rows)
             update_excel_with_diff_si4(diff_rows, fund_type)
 
-            return diff_rows or []
+            return diff_rows or "全部一致，无需更新"
 
     except Exception as e:
         return f"❌ handle_sheet_4plus41 error: {str(e)}"
@@ -8841,16 +8900,16 @@ def handle_sheet_plus_si5(pdf_url, fcode, sheetname, fund_type, container, filen
     try:
         pdf_response = requests.get(pdf_url)
         if pdf_response.status_code != 200:
-            return []
+            return "PDF下载失败"
 
         tables = extract_structured_tables(io.BytesIO(pdf_response.content))
         if not tables:
-            return []
+            return "PDF中未提取到表格"
         
         excel_url = f"{PDF_DIR}/10mingbing.xlsx"
         excel_response = requests.get(excel_url)
         if excel_response.status_code != 200:
-            return []
+            return "Excel文件下载失败"
 
 
         seen_stocks = set()
@@ -8967,7 +9026,7 @@ def handle_sheet_plus_si5(pdf_url, fcode, sheetname, fund_type, container, filen
         insert_tenbrend_history_si5(diff_rows)
         update_excel_with_diff_si5(diff_rows, fund_type)
 
-        return diff_rows or []
+        return diff_rows or "全部一致，无需更新"
 
     except Exception as e:
         return f"❌ handle_sheet_plussi5 error: {str(e)}"
