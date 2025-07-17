@@ -5269,16 +5269,18 @@ def integrate_enhance():
 
         org_text = data.get("Org_Text", "")
 
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        content = loop.run_until_complete(get_original(_content, org_text))
-        
-        if not content:
-            return jsonify({
-                "success": True,
-                "corrections": []  # 틀린 부분과 코멘트
-            })
+        if org_text == "銘柄名1～10":
+                    content = _content
+        else:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            content = loop.run_until_complete(get_original(_content, org_text))
 
+            if not content:
+                return jsonify({
+                    "success": True,
+                    "corrections": []  # 틀린 부분과 코멘트
+                })
 
         pdf_base64 = data.get("pdf_bytes", "")
 
