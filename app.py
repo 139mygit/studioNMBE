@@ -3753,9 +3753,9 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
             "comment": f"{old_text} → {new_text}",
             "intgr": False,
             "locations": [],
-            "original_text": new_text[:10],
+            "original_text": new_text[:20],
             "page": pageNumber,
-            "reason_type": item.get("stocks", "")
+            "reason_type": item.get("分類", "")
         })
 
     return corrections
