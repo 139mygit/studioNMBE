@@ -3794,7 +3794,7 @@ def extract_corrections(corrected_text, input_text,pageNumber):
 
         corrections.append({
             "page": pageNumber,
-            "original_text": reason,# half_and_full_process(reason,half_to_full_dict),  # 반각 카타카나를 전각으로 변환,  # 전체 입력값 当月のファンドの騰落率は+0.2%となりました。 上升
+            "original_text": half_and_full_process(reason,half_to_full_dict),  # 반각 카타카나를 전각으로 변환,  # 전체 입력값 当月のファンドの騰落率は+0.2%となりました。 上升
             "comment": comment, # +0.2% → 0.85% , 上升 -> 下落
             "reason_type": reason_type, # ファンドの騰落率，B-xxx
 
@@ -5558,7 +5558,9 @@ def ruru_ask_gpt():
         # 수정된 텍스트와 코멘트를 JSON으로 반환
         return jsonify({
             "success": True,
-            "corrections": corrections  # 틀린 부분과 코멘트
+            "corrections": corrections,  # 틀린 부분과 코멘트
+            "re_answer": re_answer, 
+            "answer": answer, 
         })
 
     except Exception as e:
