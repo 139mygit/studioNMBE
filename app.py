@@ -1870,7 +1870,7 @@ def tenbrend():
             parameters.append({"name": "@fcode", "value": raw_fcode})
         else:
             try:
-                fcode_num = int(raw_fcode)
+                fcode_num = raw_fcode
                 query = "SELECT * FROM c WHERE c.fcode = @fcode"
                 parameters.append({"name": "@fcode", "value": fcode_num})
             except ValueError:
