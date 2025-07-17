@@ -1870,7 +1870,7 @@ def tenbrend():
             parameters.append({"name": "@fcode", "value": raw_fcode})
         else:
             try:
-                fcode_num = raw_fcode
+                fcode_num = int(raw_fcode)
                 query = "SELECT * FROM c WHERE c.fcode = @fcode"
                 parameters.append({"name": "@fcode", "value": fcode_num})
             except ValueError:
@@ -3753,7 +3753,7 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
             "comment": f"{old_text} → {new_text}",
             "intgr": False,
             "locations": [],
-            "original_text": new_text,
+            "original_text": new_text[:10],
             "page": pageNumber,
             "reason_type": item.get("stocks", "")
         })
