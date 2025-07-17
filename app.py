@@ -3744,19 +3744,24 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
 
 #-------------------
     # tenbrend
-    for item in tenbrend:
-        old_text = item.get("元組入銘柄解説", "").strip()
-        new_text = item.get("新組入銘柄解説", "").strip()
+    if isinstance(tenbrend, list):
+        for item in tenbrend:
+            # 각 item이 딕셔너리인지 확인
+            if not isinstance(item, dict):
+                continue
 
-        corrections.append({
-            "check_point": "組入銘柄解説",
-            "comment": f"{old_text} → {new_text}",
-            "intgr": False,
-            "locations": [],
-            "original_text": new_text[:20],
-            "page": pageNumber,
-            "reason_type": item.get("分類", "")
-        })
+            old_text = item.get("元組入銘柄解説", "").strip()
+            new_text = item.get("新組入銘柄解説", "").strip()
+
+            corrections.append({
+                "check_point": "組入銘柄解説",
+                "comment": f"{old_text} → {new_text}",
+                "intgr": False,
+                "locations": [],
+                "original_text": new_text[:20],
+                "page": pageNumber,
+                "reason_type": item.get("分類", "")
+            })
 
     return corrections
 
