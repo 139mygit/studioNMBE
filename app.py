@@ -8208,26 +8208,35 @@ def insert_tenbrend_history4(diff_rows):
             "created_at": datetime.now(UTC).isoformat()  # ✅ 当前时间
         }
         container.create_item(body=history_item)
-
-
+    
 def format_date(value):
     try:
         if pd.isna(value):
             return ""
-        # Excel日期序列号（数字）
-        if isinstance(value, (int, float, np.integer, np.floating)):
+
+        # 尝试将纯数字字符串当作数字处理
+        try:
+            value_numeric = float(value)
+            is_numeric = True
+        except (ValueError, TypeError):
+            is_numeric = False
+
+        if is_numeric:
             base = datetime(1899, 12, 30)  # Excel序列号起点
-            real_date = base + timedelta(days=float(value))
+            real_date = base + timedelta(days=value_numeric)
             return f"{real_date.year}年{real_date.month}月"
+
         # datetime 或 pd.Timestamp 类型
         elif isinstance(value, (datetime, pd.Timestamp)):
             return f"{value.year}年{value.month}月"
-        # 字符串类型
+
+        # 其余字符串
         else:
             parsed = pd.to_datetime(str(value), errors='coerce')
             if pd.isna(parsed):
                 return str(value)
             return f"{parsed.year}年{parsed.month}月"
+
     except Exception:
         return str(value)
 
@@ -8271,7 +8280,7 @@ def handle_sheet_plus4(pdf_url, fcode, sheetname, fund_type, container, filename
             # 转为 BytesIO 对象传给 extract_excel_table
             excel_file = io.BytesIO(response.content)
             tables = extract_excel_table4(excel_file)
-            return tables # 718 debug
+            
         else:
             pdf_response = requests.get(pdf_url)
             if pdf_response.status_code != 200:
@@ -8297,7 +8306,7 @@ def handle_sheet_plus4(pdf_url, fcode, sheetname, fund_type, container, filename
                 pdf_stock = clean_text(row[0])
 
                 pdf_desc = clean_text(row[1])
-                pdf_esg = clean_text(row[2])
+                pdf_esg = re.sub(r"(\d{4})年(\d{1,2})月", lambda m: f"{m.group(1)}/{int(m.group(2))}/1", clean_text(row[2]))
 
                 seen_stocks.add(pdf_stock)
                 unique_rows.append([pdf_stock, pdf_desc, pdf_esg])
