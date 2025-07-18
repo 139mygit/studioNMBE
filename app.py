@@ -6810,8 +6810,11 @@ def extract_pdf_table_special(pdf_path):
 #         return ""
 #     return re.sub(r'\s+', '', text.replace('\n', '').strip())
 def clean_text(text):
-    if not text:
+    if pd.isna(text):   # Excel 空单元格或 NaN 情况
         return ""
+    
+    text = str(text)    # 无条件转字符串，防止 float 报错
+
     # 全角转半角，并去掉换行、空白符（含全角空格）
     text = jaconv.z2h(text, kana=False, digit=True, ascii=True)
     return re.sub(r'[\s\u3000]+', '', text.strip())
@@ -8228,7 +8231,7 @@ def extract_excel_table4(file_like):
     try:
         # 支持传入 BytesIO 或本地路径
         sheet_name = "組入銘柄"
-        df = pd.read_excel(file_like, sheet_name=sheet_name, header=1, usecols="A:C", dtype=str)
+        df = pd.read_excel(file_like, sheet_name=sheet_name, header=1, usecols="A:D", dtype=str)
     except Exception as e:
         print(f"❌ Excel 读取失败: {e}")
         return []
@@ -9155,6 +9158,7 @@ def handle_sheet_plus_si5(pdf_url, fcode, sheetname, fund_type, container, filen
 
     except Exception as e:
         return f"❌ handle_sheet_plussi5 error: {str(e)}"
+
 
 
 app = WsgiToAsgi(app)
