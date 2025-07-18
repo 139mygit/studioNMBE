@@ -2938,7 +2938,8 @@ replace_rules = {
     'WTI': 'WTI（ウエスト・テキサス・インターミディエート）',
     'WTO': 'WTO（世界貿易機関）',
     'アセットアロケーション': 'アセットアロケーション（資産配分）',
-    'アンダーウェイト': 'アンダーウェイト（ベンチマーク※に比べ低めの投資比率）※参考指数を用いているものはベンチマークの代わりに参考指数を使うこと',
+    'アンダーウェイト': 'アンダーウェイト（ベンチマークに比べ低めの投資比率）',
+    'オーバーウエイト': 'オーバーウエイト（ベンチマークに比べ高めの投資比率）',
     'E-コマース': 'Eコマース（電子商取引）',
     'e-コマース': 'eコマース（電子商取引）',
     'イールドカーブ': 'イールドカーブ（利回り曲線）',
@@ -3136,7 +3137,7 @@ replace_rules = {
     '牽': 'けん', #629
 
     '回ったこと': '回ったことや', #630
-    '組み入れ': '組み入れし', #630
+    # '組み入れ': '組み入れし', #718
     'こと目指している': 'ことを目指している', #630
     'グローバルで事業': 'グローバルに事業', #630
     '伸び': '伸び率', #630
@@ -3260,7 +3261,7 @@ replace_rules1 ={
     '牽': 'けん', #629
 
     '回ったこと': '回ったことや', #630
-    '組み入れ': '組み入れし', #630
+    # '組み入れ': '組み入れし', #718
     'こと目指している': 'ことを目指している', #630
     'グローバルで事業': 'グローバルに事業', #630
     '伸び': '伸び率', #630
@@ -6768,6 +6769,7 @@ def copy_row_style(ws, source_row_idx, target_row_idx):
             target_cell.protection = copy(source_cell.protection)
             target_cell.alignment = copy(source_cell.alignment)
 
+
 def write_wrapped_stock_cell(ws, row, col, stock_value):
     """
     写入 stock 到 Excel 单元格，自动在英日分界处换行并设置 wrap_text。
@@ -6780,7 +6782,8 @@ def write_wrapped_stock_cell(ws, row, col, stock_value):
 
     cell = ws.cell(row=row, column=col, value=stock_value)
     cell.alignment = Alignment(wrap_text=True)
-                
+
+
 def extract_pdf_table(pdf_path):
     tables = []
     with pdfplumber.open(pdf_path) as pdf:
@@ -6790,6 +6793,7 @@ def extract_pdf_table(pdf_path):
                 tables += page.extract_tables()
     return tables
 
+
 def extract_pdf_table_special(pdf_path):
     tables = []
     with pdfplumber.open(pdf_path) as pdf:
@@ -6798,7 +6802,9 @@ def extract_pdf_table_special(pdf_path):
             if "組入銘柄解説" in text:
                 tables += page.extract_tables()
     return tables
-#清除样式
+
+
+# 清除样式
 # def clean_text(text):
 #     if not text:
 #         return ""
@@ -6809,16 +6815,18 @@ def clean_text(text):
     # 全角转半角，并去掉换行、空白符（含全角空格）
     text = jaconv.z2h(text, kana=False, digit=True, ascii=True)
     return re.sub(r'[\s\u3000]+', '', text.strip())
-#获取决算月
+
+
+# 获取决算月
 def get_prev_month_str():
     today = datetime.today()
     prev_month_date = (today.replace(day=1) - timedelta(days=1))
     return prev_month_date.strftime("%Y%m")
 
-#往10铭柄的履历表里写
+
+# 往10铭柄的履历表里写
 def insert_tenbrend_history(diff_rows):
     container = get_db_connection(TENBREND_CONTAINER_NAME)
-    
 
     for record in diff_rows:
         history_item = {
@@ -6830,11 +6838,12 @@ def insert_tenbrend_history(diff_rows):
             "元組入銘柄解説": record["元組入銘柄解説"],
             "新組入銘柄解説": record["新組入銘柄解説"],
             "分類": record["分類"],
-            "no":record["no"],
+            "no": record["no"],
             "created_at": datetime.now(UTC).isoformat()  # ✅ 当前时间
         }
         container.create_item(body=history_item)
-        
+
+
 def insert_tenbrend_history42(diff_rows):
     container = get_db_connection(TENBREND_CONTAINER_NAME)
 
@@ -6858,11 +6867,12 @@ def insert_tenbrend_history42(diff_rows):
             "元ESG理由": record["元ESG理由"],
             "新ESG理由": record["新ESG理由"],
             "分類": record["分類"],
-            "no":record["no"],
+            "no": record["no"],
             "created_at": datetime.now(UTC).isoformat()  # ✅ 当前时间
         }
         container.create_item(body=history_item)
-        
+
+
 def insert_tenbrend_history41(diff_rows):
     container = get_db_connection(TENBREND_CONTAINER_NAME)
 
@@ -6878,11 +6888,12 @@ def insert_tenbrend_history41(diff_rows):
             "元ESG理由": record["元ESG理由"],
             "新ESG理由": record["新ESG理由"],
             "分類": record["分類"],
-            "no":record["no"],
+            "no": record["no"],
             "created_at": datetime.now(UTC).isoformat()  # ✅ 当前时间
         }
         container.create_item(body=history_item)
-        
+
+
 def insert_tenbrend_history5(diff_rows):
     container = get_db_connection(TENBREND_CONTAINER_NAME)
 
@@ -6900,10 +6911,11 @@ def insert_tenbrend_history5(diff_rows):
             "元ESG理由": record["元ESG理由"],
             "新ESG理由": record["新ESG理由"],
             "分類": record["分類"],
-            "no":record["no"],
+            "no": record["no"],
             "created_at": datetime.now(UTC).isoformat()  # ✅ 当前时间
         }
         container.create_item(body=history_item)
+
 
 # 🚩读取源文件并更新 diff_rows，往10铭柄的excel中写入
 def update_excel_with_diff_rows(diff_rows, fund_type):
@@ -6923,7 +6935,7 @@ def update_excel_with_diff_rows(diff_rows, fund_type):
         raise Exception("Excel文件下载失败")
 
     wb = load_workbook(filename=io.BytesIO(excel_response.content))
-    
+
     for row in diff_rows:
         sheetname = row["sheetname"]
         fcode = row["fcode"]
@@ -6934,9 +6946,8 @@ def update_excel_with_diff_rows(diff_rows, fund_type):
         try:
             no = int(row["no"])
         except (KeyError, TypeError, ValueError):
-            no = 0 
+            no = 0
         months = row["months"]
-
 
         if sheetname not in wb.sheetnames:
             continue
@@ -6996,6 +7007,7 @@ def update_excel_with_diff_rows(diff_rows, fund_type):
     blob_client = container_client.get_blob_client(target_excel_name)
     blob_client.upload_blob(output_stream, overwrite=True)
 
+
 def find_column_by_keyword(header_row, keywords):
     """
     在 header_row 中查找包含关键字的列索引
@@ -7006,6 +7018,7 @@ def find_column_by_keyword(header_row, keywords):
             if key in title:
                 return idx
     return None
+
 
 def update_excel_with_diff_rows4(diff_rows, fund_type):
     if not diff_rows:
@@ -7024,7 +7037,7 @@ def update_excel_with_diff_rows4(diff_rows, fund_type):
         raise Exception("Excel文件下载失败")
 
     wb = load_workbook(filename=io.BytesIO(excel_response.content))
-    
+
     for row in diff_rows:
         sheetname = row["sheetname"]
         fcode = row["fcode"]
@@ -7041,7 +7054,7 @@ def update_excel_with_diff_rows4(diff_rows, fund_type):
 
         # 获取表头位置
         header_row = ws[3]
-        
+
         stock_col = find_column_by_keyword(header_row, ["組入銘柄", "銘柄"])
         desc_col = find_column_by_keyword(header_row, ["組入銘柄解説", "銘柄解説"])
         esg_col = find_column_by_keyword(header_row, ["最高益更新回数"])  # 仅当你处理ESG表时需要
@@ -7094,10 +7107,11 @@ def update_excel_with_diff_rows4(diff_rows, fund_type):
     output_stream = io.BytesIO()
     wb.save(output_stream)
     output_stream.seek(0)
-    container_client =get_storage_container()
+    container_client = get_storage_container()
     blob_client = container_client.get_blob_client(target_excel_name)
     blob_client.upload_blob(output_stream, overwrite=True)
-    
+
+
 def update_excel_with_diff_rows42(diff_rows, fund_type):
     if not diff_rows:
         return
@@ -7115,7 +7129,7 @@ def update_excel_with_diff_rows42(diff_rows, fund_type):
         raise Exception("Excel文件下载失败")
 
     wb = load_workbook(filename=io.BytesIO(excel_response.content))
-    
+
     for row in diff_rows:
         sheetname = row["sheetname"]
         fcode = row["fcode"]
@@ -7136,7 +7150,7 @@ def update_excel_with_diff_rows42(diff_rows, fund_type):
 
         # 获取表头位置
         header_row = ws[2]
-        
+
         stock_col = find_column_by_keyword(header_row, ["組入銘柄", "銘柄"])
         desc_col = find_column_by_keyword(header_row, ["組入銘柄解説", "銘柄解説"])
         esg_col = find_column_by_keyword(header_row, ["ESGへの取り組みが企業価値向上に資する理由"])  # 仅当你处理ESG表时需要
@@ -7200,7 +7214,8 @@ def update_excel_with_diff_rows42(diff_rows, fund_type):
     container_client = get_storage_container()
     blob_client = container_client.get_blob_client(target_excel_name)
     blob_client.upload_blob(output_stream, overwrite=True)
-    
+
+
 def update_excel_with_diff_rows41(diff_rows, fund_type):
     if not diff_rows:
         return
@@ -7218,7 +7233,7 @@ def update_excel_with_diff_rows41(diff_rows, fund_type):
         raise Exception("Excel文件下载失败")
 
     wb = load_workbook(filename=io.BytesIO(excel_response.content))
-    
+
     for row in diff_rows:
         sheetname = row["sheetname"]
         fcode = row["fcode"]
@@ -7235,10 +7250,11 @@ def update_excel_with_diff_rows41(diff_rows, fund_type):
 
         # 获取表头位置
         header_row = ws[3]
-        
+
         stock_col = find_column_by_keyword(header_row, ["組入銘柄", "銘柄"])
-        desc_col = find_column_by_keyword(header_row, ["組入銘柄解説", "銘柄解説","組入発行体解説"])
-        esg_col = find_column_by_keyword(header_row, ["ESGへの取り組みが企業価値向上に資する理由","脱炭素社会の実現への貢献と企業評価のポイント"])  # 仅当你处理ESG表时需要
+        desc_col = find_column_by_keyword(header_row, ["組入銘柄解説", "銘柄解説", "組入発行体解説"])
+        esg_col = find_column_by_keyword(header_row, ["ESGへの取り組みが企業価値向上に資する理由",
+                                                      "脱炭素社会の実現への貢献と企業評価のポイント"])  # 仅当你处理ESG表时需要
         no_col = find_column_by_keyword(header_row, ["No"])
         months_col = find_column_by_keyword(header_row, ["決算月"])
         fcode_col = find_column_by_keyword(header_row, ["Fコード"])
@@ -7291,7 +7307,8 @@ def update_excel_with_diff_rows41(diff_rows, fund_type):
     container_client = get_storage_container()
     blob_client = container_client.get_blob_client(target_excel_name)
     blob_client.upload_blob(output_stream, overwrite=True)
-    
+
+
 def update_excel_with_diff_rows_shang(diff_rows, fund_type):
     if not diff_rows:
         return
@@ -7309,7 +7326,7 @@ def update_excel_with_diff_rows_shang(diff_rows, fund_type):
         raise Exception("Excel文件下载失败")
 
     wb = load_workbook(filename=io.BytesIO(excel_response.content))
-    
+
     for row in diff_rows:
         sheetname = row["sheetname"]
         fcode = row["fcode"]
@@ -7326,7 +7343,7 @@ def update_excel_with_diff_rows_shang(diff_rows, fund_type):
 
         # 获取表头位置
         header_row = ws[3]
-        
+
         stock_col = find_column_by_keyword(header_row, ["組入銘柄", "銘柄"])
         desc_col = find_column_by_keyword(header_row, ["組入銘柄解説", "銘柄解説"])
         esg_col = find_column_by_keyword(header_row, ["上場年月"])  # 仅当你处理ESG表时需要
@@ -7383,6 +7400,7 @@ def update_excel_with_diff_rows_shang(diff_rows, fund_type):
     blob_client = container_client.get_blob_client(target_excel_name)
     blob_client.upload_blob(output_stream, overwrite=True)
 
+
 def update_excel_with_diff_rows5(diff_rows, fund_type):
     if not diff_rows:
         return
@@ -7400,7 +7418,7 @@ def update_excel_with_diff_rows5(diff_rows, fund_type):
         raise Exception("Excel文件下载失败")
 
     wb = load_workbook(filename=io.BytesIO(excel_response.content))
-    
+
     for row in diff_rows:
 
         sheetname = row["sheetname"]
@@ -7419,11 +7437,13 @@ def update_excel_with_diff_rows5(diff_rows, fund_type):
 
         # 获取表头位置
         header_row = ws[3]
-        
+
         stock_col = find_column_by_keyword(header_row, ["組入銘柄", "銘柄"])
-        keti_col = find_column_by_keyword(header_row, ["解決すべき社会的課題", "業種","投資分野","分野","目指すインパクト"])
+        keti_col = find_column_by_keyword(header_row,
+                                          ["解決すべき社会的課題", "業種", "投資分野", "分野", "目指すインパクト"])
         desc_col = find_column_by_keyword(header_row, ["組入銘柄解説", "銘柄解説"])
-        esg_col = find_column_by_keyword(header_row, ["ESGへの取り組みが企業価値向上に資する理由","社会的課題の解決と利益成長を両立させるポイント"])
+        esg_col = find_column_by_keyword(header_row, ["ESGへの取り組みが企業価値向上に資する理由",
+                                                      "社会的課題の解決と利益成長を両立させるポイント"])
         no_col = find_column_by_keyword(header_row, ["No"])
         months_col = find_column_by_keyword(header_row, ["決算月"])
         fcode_col = find_column_by_keyword(header_row, ["Fコード"])
@@ -7448,7 +7468,7 @@ def update_excel_with_diff_rows5(diff_rows, fund_type):
                 current_stock = clean_text(current_stock)
                 if current_stock == stock:
                     target_row_idx = row_idx
-                    
+
                     break
 
         if classify == "新規銘柄" and fcode_block_end:
@@ -7478,10 +7498,9 @@ def update_excel_with_diff_rows5(diff_rows, fund_type):
     container_client = get_storage_container()
     blob_client = container_client.get_blob_client(target_excel_name)
     blob_client.upload_blob(output_stream, overwrite=True)
-    
 
 
-#10铭柄的check
+# 10铭柄的check
 def check_tenbrend(filename, fund_type):
     try:
         fcode = os.path.basename(filename).split("_")[0]
@@ -7507,14 +7526,14 @@ def check_tenbrend(filename, fund_type):
             pdf_response = requests.get(pdf_url)
             if pdf_response.status_code != 200:
                 return "PDF下载失败，没有找到pdf"
-            if fcode in ["140193","140386","140675","140565-6","140655-6","140695-6","180291-2","180295-8"]:
+            if fcode in ["140193", "140386", "140675", "140565-6", "140655-6", "140695-6", "180291-2", "180295-8"]:
                 tables = extract_pdf_table_special(io.BytesIO(pdf_response.content))
             else:
-                    
+
                 tables = extract_pdf_table(io.BytesIO(pdf_response.content))
             if not tables:
                 return "PDF中未提取到表格"
-            
+
             excel_url = f"{PDF_DIR}/10mingbing.xlsx"
             excel_response = requests.get(excel_url)
             if excel_response.status_code != 200:
@@ -7537,7 +7556,7 @@ def check_tenbrend(filename, fund_type):
                     if not row[1]:
                         pdf_stock = clean_text(row[2])
                     else:
-                        
+
                         pdf_stock = clean_text(row[1])
                     if not row[2]:
                         pdf_desc = clean_text(row[3])
@@ -7586,10 +7605,10 @@ def check_tenbrend(filename, fund_type):
                 matched = list(container.query_items(query=query, parameters=params, enable_cross_partition_query=True))
 
                 # return matched[0]["組入銘柄解説"]
-                
+
                 if matched:
                     old_desc = clean_text(matched[0]["組入銘柄解説"])
-                    
+
                     if old_desc != desc:
                         # ✅ 差异更新
                         matched_item = matched[0]
@@ -7637,7 +7656,7 @@ def check_tenbrend(filename, fund_type):
                         "stocks": stock,
                         "元組入銘柄解説": "",
                         "no": max_no + 1,
-                        "months" : get_prev_month_str(),
+                        "months": get_prev_month_str(),
                         "新組入銘柄解説": desc,
                         "分類": "新規銘柄"
                     })
@@ -7654,7 +7673,6 @@ def check_tenbrend(filename, fund_type):
             tables = extract_pdf_table(io.BytesIO(pdf_response.content))
             if not tables:
                 return "PDF中未提取到表格"
-        
 
             excel_url = f"{PDF_DIR}/10mingbing.xlsx"
             excel_response = requests.get(excel_url)
@@ -7667,16 +7685,15 @@ def check_tenbrend(filename, fund_type):
             seen_stocks = set()
             unique_rows = []
 
-
             for table in tables:
                 header_found = False
                 for row in table:
                     if len(row) < 4:
                         continue
-                    
+
                     if (row[1] == "組入銘柄" and
-                        "最高益更新回数" in row[2] and
-                        "組入銘柄解説" in row[3]):
+                            "最高益更新回数" in row[2] and
+                            "組入銘柄解説" in row[3]):
                         header_found = True
                         continue
                     if not header_found:
@@ -7800,11 +7817,11 @@ def check_tenbrend(filename, fund_type):
             return handle_sheet_plus4(pdf_url, fcode, sheetname, fund_type, container, filename)
         elif sheetname == "過去分整理5列＆（5+1）":
             return handle_sheet_plus5(pdf_url, fcode, sheetname, fund_type, container, filename)
-        elif sheetname in ["300355","300469","300481"]:
+        elif sheetname in ["300355", "300469", "300481"]:
             return handle_sheet_plus_si4(pdf_url, fcode, sheetname, fund_type, container, filename)
-        elif sheetname in ["300449","300462","300387"]:
+        elif sheetname in ["300449", "300462", "300387"]:
             return handle_sheet_plus_si5(pdf_url, fcode, sheetname, fund_type, container, filename)
-            
+
         else:
             return "找不到这个sheet页"
 
@@ -7975,10 +7992,11 @@ def handle_sheet_plus42(pdf_url, fcode, sheetname, fund_type, container, filenam
     except Exception as e:
         return f"❌ handle_sheet_plus42 error: {str(e)}"
 
+
 def extract_excel_table(file_like):
     try:
         # 支持传入 BytesIO 或本地路径
-        sheet_name ="銘柄解説"
+        sheet_name = "銘柄解説"
         df = pd.read_excel(file_like, sheet_name=sheet_name, header=1, usecols="A:C", dtype=str)
     except Exception as e:
         print(f"❌ Excel 读取失败: {e}")
@@ -7998,10 +8016,11 @@ def extract_excel_table(file_like):
                 results.append([stock, desc, esg])
 
     return results
-    
+
+
 def handle_sheet_plus41(pdf_url, fcode, sheetname, fund_type, container, filename):
     try:
-        if fcode in ['140752','140302-3']:
+        if fcode in ['140752', '140302-3']:
             # 将 .pdf 替换为 .xlsx 作为 Excel 文件路径
             excel_url = pdf_url.replace(".pdf", ".xlsx")
 
@@ -8013,14 +8032,13 @@ def handle_sheet_plus41(pdf_url, fcode, sheetname, fund_type, container, filenam
             # 转为 BytesIO 对象传给 extract_excel_table
             excel_file = io.BytesIO(response.content)
             tables = extract_excel_table(excel_file)
-            # return tables # 717 debug
         else:
             pdf_response = requests.get(pdf_url)
             if pdf_response.status_code != 200:
                 return "PDF下载失败"
 
             tables = extract_structured_tables(io.BytesIO(pdf_response.content))
-        
+
         if not tables:
             return "PDF中未提取到表格"
 
@@ -8040,33 +8058,44 @@ def handle_sheet_plus41(pdf_url, fcode, sheetname, fund_type, container, filenam
         # 合并所有表格行为一个大列表
         all_rows = tables
 
-        while i < len(all_rows) - 1:
-            row1 = all_rows[i]
-            row2 = all_rows[i + 1]
-            return row1 # 718 debug
-        
-            if len(row1) < 2 or str(row1[0]).strip() not in [str(n) for n in range(1, 11)]:
-                i += 1
-                continue
+        if fcode in ['140752', '140302-3']:
+            for row in all_rows:
+                stock = clean_text(row[0])
+                desc = clean_text(row[1])
+                esg = clean_text(row[2])
+                seen_stocks.add(stock)
+                unique_rows.append([stock, desc, esg])
 
-            stock = clean_text(row1[1])
-            if not stock or stock in seen_stocks:
-                i += 1  # ❗ 这里是跳1行而不是2行
-                continue
-            if fcode in ["140793-6","140764-5"]:
-                desc = clean_text(row1[3]) if len(row1) > 2 else ""
-                esg = clean_text(row2[3]) if len(row2) > 2 else "" 
-            else:
-                
-                desc = clean_text(row1[2]) if len(row1) > 2 else ""
-                esg = clean_text(row2[2]) if len(row2) > 2 else ""
+                if len(unique_rows) >= 10:
+                    break
+        else:
 
-            seen_stocks.add(stock)
-            unique_rows.append([stock, desc, esg])
-            i += 2  # ✅ 只有追加成功才跳过2行
+            while i < len(all_rows) - 1:
+                row1 = all_rows[i]
+                row2 = all_rows[i + 1]
 
-            if len(unique_rows) >= 10:
-                break
+                if len(row1) < 2 or str(row1[0]).strip() not in [str(n) for n in range(1, 11)]:
+                    i += 1
+                    continue
+
+                stock = clean_text(row1[1])
+                if not stock or stock in seen_stocks:
+                    i += 1  # ❗ 这里是跳1行而不是2行
+                    continue
+                if fcode in ["140793-6", "140764-5"]:
+                    desc = clean_text(row1[3]) if len(row1) > 2 else ""
+                    esg = clean_text(row2[3]) if len(row2) > 2 else ""
+                else:
+
+                    desc = clean_text(row1[2]) if len(row1) > 2 else ""
+                    esg = clean_text(row2[2]) if len(row2) > 2 else ""
+
+                seen_stocks.add(stock)
+                unique_rows.append([stock, desc, esg])
+                i += 2  # ✅ 只有追加成功才跳过2行
+
+                if len(unique_rows) >= 10:
+                    break
 
         diff_rows = []
         for row in unique_rows:
@@ -8085,7 +8114,7 @@ def handle_sheet_plus41(pdf_url, fcode, sheetname, fund_type, container, filenam
             if matched:
                 old_desc = clean_text(matched[0].get("組入銘柄解説", ""))
                 old_esg = clean_text(matched[0].get("ESGへの取り組みが企業価値向上に資する理由", ""))
-                if old_desc != desc or old_esg != esg :
+                if old_desc != desc or old_esg != esg:
                     matched_item = matched[0]
                     matched_item.update({
                         "組入銘柄解説": desc,
@@ -8149,8 +8178,9 @@ def handle_sheet_plus41(pdf_url, fcode, sheetname, fund_type, container, filenam
 
     except Exception as e:
         return f"❌ handle_sheet_plus41 error: {str(e)}"
-    
-#往10铭柄的履历表里写
+
+
+# 往10铭柄的履历表里写
 def insert_tenbrend_history4(diff_rows):
     container = get_db_connection(TENBREND_CONTAINER_NAME)
 
@@ -8166,7 +8196,7 @@ def insert_tenbrend_history4(diff_rows):
             "元上場年月": record["元上場年月"],
             "新上場年月": record["新上場年月"],
             "分類": record["分類"],
-            "no":record["no"],
+            "no": record["no"],
             "created_at": datetime.now(UTC).isoformat()  # ✅ 当前时间
         }
         container.create_item(body=history_item)
@@ -8193,10 +8223,11 @@ def format_date(value):
     except Exception:
         return str(value)
 
+
 def extract_excel_table4(file_like):
     try:
         # 支持传入 BytesIO 或本地路径
-        sheet_name="組入銘柄"
+        sheet_name = "組入銘柄"
         df = pd.read_excel(file_like, sheet_name=sheet_name, header=1, usecols="A:C", dtype=str)
     except Exception as e:
         print(f"❌ Excel 读取失败: {e}")
@@ -8216,41 +8247,55 @@ def extract_excel_table4(file_like):
                 results.append([stock, desc, date_str])
 
     return results
-    
+
+
 def handle_sheet_plus4(pdf_url, fcode, sheetname, fund_type, container, filename):
     try:
-            if fcode in ['140749']:
-                # 将 .pdf 替换为 .xlsx 作为 Excel 文件路径
-                excel_url = pdf_url.replace(".pdf", ".xlsx")
+        if fcode in ['140749']:
+            # 将 .pdf 替换为 .xlsx 作为 Excel 文件路径
+            excel_url = pdf_url.replace(".pdf", ".xlsx")
 
-                # 下载 Excel 文件内容
-                response = requests.get(excel_url)
-                if response.status_code != 200:
-                    return "Excel下载失败"
+            # 下载 Excel 文件内容
+            response = requests.get(excel_url)
+            if response.status_code != 200:
+                return "Excel下载失败"
 
-                # 转为 BytesIO 对象传给 extract_excel_table
-                excel_file = io.BytesIO(response.content)
-                tables = extract_excel_table4(excel_file)
-            else:
-                pdf_response = requests.get(pdf_url)
-                if pdf_response.status_code != 200:
-                    return "PDF下载失败，没有找到pdf"
+            # 转为 BytesIO 对象传给 extract_excel_table
+            excel_file = io.BytesIO(response.content)
+            tables = extract_excel_table4(excel_file)
+        else:
+            pdf_response = requests.get(pdf_url)
+            if pdf_response.status_code != 200:
+                return "PDF下载失败，没有找到pdf"
 
-                tables = extract_pdf_table(io.BytesIO(pdf_response.content))
-                if not tables:
-                    return "PDF中未提取到表格"
-        
-            excel_url = f"{PDF_DIR}/10mingbing.xlsx"
-            excel_response = requests.get(excel_url)
-            if excel_response.status_code != 200:
-                return "Excel文件下载失败，不能打开excel"
+            tables = extract_pdf_table(io.BytesIO(pdf_response.content))
+            if not tables:
+                return "PDF中未提取到表格"
 
-            wb = load_workbook(filename=io.BytesIO(excel_response.content))
-            ws = wb.active
+        excel_url = f"{PDF_DIR}/10mingbing.xlsx"
+        excel_response = requests.get(excel_url)
+        if excel_response.status_code != 200:
+            return "Excel文件下载失败，不能打开excel"
 
-            seen_stocks = set()
-            unique_rows = []
+        wb = load_workbook(filename=io.BytesIO(excel_response.content))
+        ws = wb.active
 
+        seen_stocks = set()
+        unique_rows = []
+        if fcode in ['140749']:
+            for row in tables:
+
+                pdf_stock = clean_text(row[0])
+
+                pdf_desc = clean_text(row[1])
+                pdf_esg = re.sub(r"(\d{4})年(\d{1,2})月", lambda m: f"{m.group(1)}/{int(m.group(2))}/1",
+                                 clean_text(row[2]))
+
+                seen_stocks.add(pdf_stock)
+                unique_rows.append([pdf_stock, pdf_desc, pdf_esg])
+                if len(unique_rows) >= 10:
+                    break
+        else:
 
             for table in tables:
                 header_found = False
@@ -8261,9 +8306,10 @@ def handle_sheet_plus4(pdf_url, fcode, sheetname, fund_type, container, filename
                     if not row or str(row[0]).strip() not in [str(i) for i in range(1, 11)]:
                         continue
                     pdf_stock = clean_text(row[1])
-                    
+
                     pdf_desc = clean_text(row[2])
-                    pdf_esg = re.sub(r"(\d{4})年(\d{1,2})月", lambda m: f"{m.group(1)}/{int(m.group(2))}/1", clean_text(row[3]))
+                    pdf_esg = re.sub(r"(\d{4})年(\d{1,2})月", lambda m: f"{m.group(1)}/{int(m.group(2))}/1",
+                                     clean_text(row[3]))
 
                     if not pdf_stock or pdf_stock in seen_stocks:
                         continue
@@ -8275,111 +8321,158 @@ def handle_sheet_plus4(pdf_url, fcode, sheetname, fund_type, container, filename
                 if len(unique_rows) >= 10:
                     break
 
-            # ✅ Excel 最后一行写入（调试用）
-            for row in unique_rows:
-                ws.append(row)
+        # ✅ Excel 最后一行写入（调试用）
+        for row in unique_rows:
+            ws.append(row)
 
-            output_stream = io.BytesIO()
-            wb.save(output_stream)
-            output_stream.seek(0)
-            container_client = get_storage_container()
-            blob_client = container_client.get_blob_client("10mingbing.xlsx")
-            blob_client.upload_blob(output_stream, overwrite=True)
-            
-            # ✅ 比对逻辑
-            diff_rows = []
-            for stock, desc, esg in unique_rows:
-                query = """
+        output_stream = io.BytesIO()
+        wb.save(output_stream)
+        output_stream.seek(0)
+        container_client = get_storage_container()
+        blob_client = container_client.get_blob_client("10mingbing.xlsx")
+        blob_client.upload_blob(output_stream, overwrite=True)
+
+        # ✅ 比对逻辑
+        diff_rows = []
+        for stock, desc, esg in unique_rows:
+            query = """
                     SELECT * FROM c
                     WHERE c.sheetname = @sheetname AND c.fcode = @fcode AND c.stocks = @stock
                 """
-                params = [
-                    {"name": "@sheetname", "value": sheetname},
-                    {"name": "@fcode", "value": fcode},
-                    {"name": "@stock", "value": stock}
-                ]
-                matched = list(container.query_items(query=query, parameters=params, enable_cross_partition_query=True))
+            params = [
+                {"name": "@sheetname", "value": sheetname},
+                {"name": "@fcode", "value": fcode},
+                {"name": "@stock", "value": stock}
+            ]
+            matched = list(container.query_items(query=query, parameters=params, enable_cross_partition_query=True))
 
-                if matched:
-                    old_desc = clean_text(matched[0].get("組入銘柄解説", ""))
-                    old_esg = clean_text(matched[0].get("上場年月", ""))
+            if matched:
+                old_desc = clean_text(matched[0].get("組入銘柄解説", ""))
+                old_esg = clean_text(matched[0].get("上場年月", ""))
 
-                    classify = None
-                    if old_desc != desc or old_esg != esg:
-                        classify = "銘柄解説更新あり"
+                classify = None
+                if old_desc != desc or old_esg != esg:
+                    classify = "銘柄解説更新あり"
 
-                    if classify:
-                        matched_item = matched[0]
-                        matched_item["組入銘柄解説"] = desc
-                        matched_item["上場年月"] = esg
-                        container.replace_item(item=matched_item["id"], body=matched_item)
-
-                        diff_rows.append({
-                            "filename": filename,
-                            "fcode": fcode,
-                            "sheetname": sheetname,
-                            "stocks": stock,
-                            "元組入銘柄解説": old_desc,
-                            "新組入銘柄解説": desc,
-                            "元上場年月": old_esg,
-                            "新上場年月": esg,
-                            "分類": classify,
-                            "no": matched_item.get("no", 0),
-                            "months": matched_item.get("months", ""),
-                            "分類": "銘柄解説更新あり"
-                        })
-
-                else:
-                    query_max = "SELECT VALUE MAX(c.no) FROM c WHERE c.fcode = @fcode"
-                    max_no = list(container.query_items(
-                        query=query_max,
-                        parameters=[{"name": "@fcode", "value": fcode}],
-                        enable_cross_partition_query=True
-                    ))[0] or 0
-
-                    new_item = {
-                        "id": str(uuid.uuid4()),
-                        "filename": filename,
-                        "fcode": fcode,
-                        "months": get_prev_month_str(),
-                        "no": max_no + 1,
-                        "sheetname": sheetname,
-                        "stocks": stock,
-                        "組入銘柄解説": desc,
-                        "上場年月": esg,
-                        "コメント": ""
-                    }
-                    container.create_item(body=new_item)
+                if classify:
+                    matched_item = matched[0]
+                    matched_item["組入銘柄解説"] = desc
+                    matched_item["上場年月"] = esg
+                    container.replace_item(item=matched_item["id"], body=matched_item)
 
                     diff_rows.append({
                         "filename": filename,
                         "fcode": fcode,
                         "sheetname": sheetname,
                         "stocks": stock,
-                        "元組入銘柄解説": "",
+                        "元組入銘柄解説": old_desc,
                         "新組入銘柄解説": desc,
-                        "元上場年月": "",
+                        "元上場年月": old_esg,
                         "新上場年月": esg,
-                        "分類": "新規銘柄",
-                        "no": max_no + 1,
-                        "months": get_prev_month_str()
+                        "分類": classify,
+                        "no": matched_item.get("no", 0),
+                        "months": matched_item.get("months", ""),
+                        "分類": "銘柄解説更新あり"
                     })
 
-            insert_tenbrend_history4(diff_rows)
-            update_excel_with_diff_rows_shang(diff_rows, fund_type)
+            else:
+                query_max = "SELECT VALUE MAX(c.no) FROM c WHERE c.fcode = @fcode"
+                max_no = list(container.query_items(
+                    query=query_max,
+                    parameters=[{"name": "@fcode", "value": fcode}],
+                    enable_cross_partition_query=True
+                ))[0] or 0
 
-            return diff_rows or "全部一致，无需更新"
+                new_item = {
+                    "id": str(uuid.uuid4()),
+                    "filename": filename,
+                    "fcode": fcode,
+                    "months": get_prev_month_str(),
+                    "no": max_no + 1,
+                    "sheetname": sheetname,
+                    "stocks": stock,
+                    "組入銘柄解説": desc,
+                    "上場年月": esg,
+                    "コメント": ""
+                }
+                container.create_item(body=new_item)
+
+                diff_rows.append({
+                    "filename": filename,
+                    "fcode": fcode,
+                    "sheetname": sheetname,
+                    "stocks": stock,
+                    "元組入銘柄解説": "",
+                    "新組入銘柄解説": desc,
+                    "元上場年月": "",
+                    "新上場年月": esg,
+                    "分類": "新規銘柄",
+                    "no": max_no + 1,
+                    "months": get_prev_month_str()
+                })
+
+        insert_tenbrend_history4(diff_rows)
+        update_excel_with_diff_rows_shang(diff_rows, fund_type)
+
+        return diff_rows or "全部一致，无需更新"
 
     except Exception as e:
         return f"❌ handle_sheet_4plus41 error: {str(e)}"
 
+
+def extract_excel_table5(excel_file):
+    try:
+        # 支持传入 BytesIO 或本地路径
+        sheet_name = "銘柄解説"
+        df = pd.read_excel(excel_file, sheet_name=sheet_name, header=1, usecols="A:G", dtype=str)
+    except Exception as e:
+        print(f"❌ Excel 读取失败: {e}")
+        return []
+
+    df = df.reset_index(drop=True)
+    results = []
+
+    for i in range(len(df) - 1):
+        no_val = str(df.iloc[i, 0]).strip()
+        if not no_val.isdigit():
+            continue  # 只处理数字编号行
+
+        stock = clean_text(df.iloc[i, 1])  # 銘柄名
+        category = clean_text(df.iloc[i, 2])  # 分野
+        tmp_cat = clean_text(df.iloc[i, 4])
+        if category == tmp_cat or tmp_cat == '':
+            desc = clean_text(df.iloc[i, 6])  # 組入銘柄解説（G列，第1行）
+            esg = clean_text(df.iloc[i + 1, 6])  # ESG理由（G列，第2行）
+        else:
+            desc = clean_text(df.iloc[i, 4])  # 組入銘柄解説（G列，第1行）
+            esg = clean_text(df.iloc[i + 1, 4])  # ESG理由（G列，第2行）
+
+        if stock:
+            results.append([stock, category, desc, esg])
+
+    return results
+
+
 def handle_sheet_plus5(pdf_url, fcode, sheetname, fund_type, container, filename):
     try:
-        pdf_response = requests.get(pdf_url)
-        if pdf_response.status_code != 200:
-            return "PDF下载失败"
+        if fcode in ['140787', '180342-3']:
+            # 将 .pdf 替换为 .xlsx 作为 Excel 文件路径
+            excel_url = pdf_url.replace(".pdf", ".xlsx")
 
-        tables = extract_structured_tables(io.BytesIO(pdf_response.content))
+            # 下载 Excel 文件内容
+            response = requests.get(excel_url)
+            if response.status_code != 200:
+                return "Excel下载失败"
+
+            # 转为 BytesIO 对象传给 extract_excel_table
+            excel_file = io.BytesIO(response.content)
+            tables = extract_excel_table5(excel_file)
+        else:
+            pdf_response = requests.get(pdf_url)
+            if pdf_response.status_code != 200:
+                return "PDF下载失败"
+
+            tables = extract_structured_tables(io.BytesIO(pdf_response.content))
         if not tables:
             return "PDF中未提取到表格"
 
@@ -8387,7 +8480,6 @@ def handle_sheet_plus5(pdf_url, fcode, sheetname, fund_type, container, filename
         excel_response = requests.get(excel_url)
         if excel_response.status_code != 200:
             return "Excel文件下载失败"
-
 
         seen_stocks = set()
         unique_rows = []
@@ -8397,36 +8489,51 @@ def handle_sheet_plus5(pdf_url, fcode, sheetname, fund_type, container, filename
         # 合并所有表格行为一个大列表
         all_rows = tables
 
-        while i < len(all_rows) - 1:
-            row1 = all_rows[i]
-            row2 = all_rows[i + 1]
+        if fcode in ['140787', '180342-3']:
+            for row in all_rows:
 
-            if len(row1) < 2 or str(row1[0]).strip() not in [str(n) for n in range(1, 11)]:
-                i += 1
-                continue
+                stock = clean_text(row[0])
 
-            stock = clean_text(row1[1])
-            if not stock or stock in seen_stocks:
-                i += 1  # ❗ 这里是跳1行而不是2行
-                continue
-            keti = clean_text(row1[2]) if len(row1) > 3 else ""
-            if fcode in ["140793-6","140406-7","180340-1"]:
-                desc = clean_text(row1[3]) if len(row1) > 3 else ""
-                esg = clean_text(row2[3]) if len(row2) > 3 else ""
-            else:
-                desc = clean_text(row1[4]) if len(row1) > 3 else ""
-                esg = clean_text(row2[4]) if len(row2) > 3 else ""
+                keti = clean_text(row[1])
+                desc = clean_text(row[2])
+                esg = clean_text(row[3])
 
-            seen_stocks.add(stock)
-            unique_rows.append([stock, keti, desc, esg])
-            i += 2  # ✅ 只有追加成功才跳过2行
+                seen_stocks.add(stock)
+                unique_rows.append([stock, keti, desc, esg])
+                if len(unique_rows) >= 10:
+                    break
+        else:
 
-            if len(unique_rows) >= 10:
-                break
+            while i < len(all_rows) - 1:
+                row1 = all_rows[i]
+                row2 = all_rows[i + 1]
+
+                if len(row1) < 2 or str(row1[0]).strip() not in [str(n) for n in range(1, 11)]:
+                    i += 1
+                    continue
+
+                stock = clean_text(row1[1])
+                if not stock or stock in seen_stocks:
+                    i += 1  # ❗ 这里是跳1行而不是2行
+                    continue
+                keti = clean_text(row1[2]) if len(row1) > 3 else ""
+                if fcode in ["140793-6", "140406-7", "180340-1"]:
+                    desc = clean_text(row1[3]) if len(row1) > 3 else ""
+                    esg = clean_text(row2[3]) if len(row2) > 3 else ""
+                else:
+                    desc = clean_text(row1[4]) if len(row1) > 3 else ""
+                    esg = clean_text(row2[4]) if len(row2) > 3 else ""
+
+                seen_stocks.add(stock)
+                unique_rows.append([stock, keti, desc, esg])
+                i += 2  # ✅ 只有追加成功才跳过2行
+
+                if len(unique_rows) >= 10:
+                    break
 
         diff_rows = []
         for row in unique_rows:
-            stock, keti,desc, esg = row
+            stock, keti, desc, esg = row
             query = """
                 SELECT * FROM c
                 WHERE c.sheetname = @sheetname AND c.fcode = @fcode AND c.stocks = @stock
@@ -8442,7 +8549,7 @@ def handle_sheet_plus5(pdf_url, fcode, sheetname, fund_type, container, filename
                 old_keti = clean_text(matched[0].get("解決すべき社会的課題", ""))
                 old_desc = clean_text(matched[0].get("組入銘柄解説", ""))
                 old_esg = clean_text(matched[0].get("ESGへの取り組みが企業価値向上に資する理由", ""))
-                if old_desc != desc or old_esg != esg :
+                if old_desc != desc or old_esg != esg:
                     matched_item = matched[0]
                     matched_item.update({
                         "解決すべき社会的課題": keti,
@@ -8512,7 +8619,8 @@ def handle_sheet_plus5(pdf_url, fcode, sheetname, fund_type, container, filename
     except Exception as e:
         return f"❌ handle_sheet_plus5 error: {str(e)}"
 
-#私募相关的处理
+
+# 私募相关的处理
 def insert_tenbrend_history_si4(diff_rows):
     container = get_db_connection(TENBREND_CONTAINER_NAME)
 
@@ -8526,7 +8634,7 @@ def insert_tenbrend_history_si4(diff_rows):
             "元組入銘柄解説": record["元組入銘柄解説"],
             "新組入銘柄解説": record["新組入銘柄解説"],
             "分類": record["分類"],
-            "no":record["no"],
+            "no": record["no"],
             "created_at": datetime.now(UTC).isoformat()  # ✅ 当前时间
         }
         container.create_item(body=history_item)
@@ -8549,7 +8657,7 @@ def update_excel_with_diff_si4(diff_rows, fund_type):
         raise Exception("Excel文件下载失败")
 
     wb = load_workbook(filename=io.BytesIO(excel_response.content))
-    
+
     for row in diff_rows:
         sheetname = row["sheetname"]
         fcode = row["fcode"]
@@ -8565,10 +8673,10 @@ def update_excel_with_diff_si4(diff_rows, fund_type):
 
         # 获取表头位置
         header_row = ws[3]
-        
+
         stock_col = find_column_by_keyword(header_row, ["銘柄"])
         desc_col = find_column_by_keyword(header_row, ["組入銘柄解説", "銘柄解説"])
-        no_col = find_column_by_keyword(header_row, ["No","NO"])
+        no_col = find_column_by_keyword(header_row, ["No", "NO"])
         months_col = find_column_by_keyword(header_row, ["決算月"])
         fcode_col = find_column_by_keyword(header_row, ["Fコード"])
 
@@ -8618,127 +8726,128 @@ def update_excel_with_diff_si4(diff_rows, fund_type):
     blob_client = container_client.get_blob_client(target_excel_name)
     blob_client.upload_blob(output_stream, overwrite=True)
 
+
 def handle_sheet_plus_si4(pdf_url, fcode, sheetname, fund_type, container, filename):
     try:
-            pdf_response = requests.get(pdf_url)
-            if pdf_response.status_code != 200:
-                return "PDF下载失败，没有找到pdf"
+        pdf_response = requests.get(pdf_url)
+        if pdf_response.status_code != 200:
+            return "PDF下载失败，没有找到pdf"
 
-            tables = extract_pdf_table(io.BytesIO(pdf_response.content))
-            if not tables:
-                return "PDF中未提取到表格"
-        
-            excel_url = f"{PDF_DIR}/10mingbing.xlsx"
-            excel_response = requests.get(excel_url)
-            if excel_response.status_code != 200:
-                return "Excel文件下载失败，不能打开excel"
+        tables = extract_pdf_table(io.BytesIO(pdf_response.content))
+        if not tables:
+            return "PDF中未提取到表格"
 
-            seen_stocks = set()
-            unique_rows = []
+        excel_url = f"{PDF_DIR}/10mingbing.xlsx"
+        excel_response = requests.get(excel_url)
+        if excel_response.status_code != 200:
+            return "Excel文件下载失败，不能打开excel"
 
-            
-            for table in tables:
-                for row in table:
-                    if len(row) < 3:
-                        continue
+        seen_stocks = set()
+        unique_rows = []
 
-                    if not row or str(row[0]).strip() not in [str(i) for i in range(1, 11)]:
-                        continue
-                    pdf_stock = clean_text(row[1])
-                    if not row[2]:
-                        pdf_desc = clean_text(row[3]) if len(row) > 3 else ""
-                    else:
-                        pdf_desc = clean_text(row[2])
+        for table in tables:
+            for row in table:
+                if len(row) < 3:
+                    continue
 
-                    if not pdf_stock or pdf_stock in seen_stocks:
-                        continue
+                if not row or str(row[0]).strip() not in [str(i) for i in range(1, 11)]:
+                    continue
+                pdf_stock = clean_text(row[1])
+                if not row[2]:
+                    pdf_desc = clean_text(row[3]) if len(row) > 3 else ""
+                else:
+                    pdf_desc = clean_text(row[2])
 
-                    seen_stocks.add(pdf_stock)
-                    unique_rows.append([pdf_stock, pdf_desc])
-                    if len(unique_rows) >= 10:
-                        break
+                if not pdf_stock or pdf_stock in seen_stocks:
+                    continue
+
+                seen_stocks.add(pdf_stock)
+                unique_rows.append([pdf_stock, pdf_desc])
                 if len(unique_rows) >= 10:
                     break
-            
-            # ✅ 比对逻辑
-            diff_rows = []
-            for stock, desc in unique_rows:
-                query = """
+            if len(unique_rows) >= 10:
+                break
+
+        # ✅ 比对逻辑
+        diff_rows = []
+        for stock, desc in unique_rows:
+            query = """
                     SELECT * FROM c
                     WHERE c.sheetname = @sheetname AND c.fcode = @fcode AND c.stocks = @stock
                 """
-                params = [
-                    {"name": "@sheetname", "value": sheetname},
-                    {"name": "@fcode", "value": fcode},
-                    {"name": "@stock", "value": stock}
-                ]
-                matched = list(container.query_items(query=query, parameters=params, enable_cross_partition_query=True))
+            params = [
+                {"name": "@sheetname", "value": sheetname},
+                {"name": "@fcode", "value": fcode},
+                {"name": "@stock", "value": stock}
+            ]
+            matched = list(container.query_items(query=query, parameters=params, enable_cross_partition_query=True))
 
-                if matched:
-                    old_desc = clean_text(matched[0].get("組入銘柄解説", ""))
+            if matched:
+                old_desc = clean_text(matched[0].get("組入銘柄解説", ""))
 
-                    classify = None
-                    if old_desc != desc :
-                        classify = "銘柄解説更新あり"
+                classify = None
+                if old_desc != desc:
+                    classify = "銘柄解説更新あり"
 
-                    if classify:
-                        matched_item = matched[0]
-                        matched_item["組入銘柄解説"] = desc
-                        container.replace_item(item=matched_item["id"], body=matched_item)
-
-                        diff_rows.append({
-                            "filename": filename,
-                            "fcode": fcode,
-                            "sheetname": sheetname,
-                            "stocks": stock,
-                            "元組入銘柄解説": old_desc,
-                            "新組入銘柄解説": desc,
-                            "分類": classify,
-                            "no": matched_item.get("no", 0),
-                            "months": matched_item.get("months", ""),
-                            "分類": "銘柄解説更新あり"
-                        })
-
-                else:
-                    query_max = "SELECT VALUE MAX(c.no) FROM c WHERE c.fcode = @fcode"
-                    max_no = list(container.query_items(
-                        query=query_max,
-                        parameters=[{"name": "@fcode", "value": fcode}],
-                        enable_cross_partition_query=True
-                    ))[0] or 0
-
-                    new_item = {
-                        "id": str(uuid.uuid4()),
-                        "filename": filename,
-                        "fcode": fcode,
-                        "months": get_prev_month_str(),
-                        "no": max_no + 1,
-                        "sheetname": sheetname,
-                        "stocks": stock,
-                        "組入銘柄解説": desc,
-                        "コメント": ""
-                    }
-                    container.create_item(body=new_item)
+                if classify:
+                    matched_item = matched[0]
+                    matched_item["組入銘柄解説"] = desc
+                    container.replace_item(item=matched_item["id"], body=matched_item)
 
                     diff_rows.append({
                         "filename": filename,
                         "fcode": fcode,
                         "sheetname": sheetname,
                         "stocks": stock,
-                        "元組入銘柄解説": "",
+                        "元組入銘柄解説": old_desc,
                         "新組入銘柄解説": desc,
-                        "分類": "新規銘柄",
-                        "no": max_no + 1,
-                        "months": get_prev_month_str()
+                        "分類": classify,
+                        "no": matched_item.get("no", 0),
+                        "months": matched_item.get("months", ""),
+                        "分類": "銘柄解説更新あり"
                     })
 
-            insert_tenbrend_history_si4(diff_rows)
-            update_excel_with_diff_si4(diff_rows, fund_type)
+            else:
+                query_max = "SELECT VALUE MAX(c.no) FROM c WHERE c.fcode = @fcode"
+                max_no = list(container.query_items(
+                    query=query_max,
+                    parameters=[{"name": "@fcode", "value": fcode}],
+                    enable_cross_partition_query=True
+                ))[0] or 0
 
-            return diff_rows or "全部一致，无需更新"
+                new_item = {
+                    "id": str(uuid.uuid4()),
+                    "filename": filename,
+                    "fcode": fcode,
+                    "months": get_prev_month_str(),
+                    "no": max_no + 1,
+                    "sheetname": sheetname,
+                    "stocks": stock,
+                    "組入銘柄解説": desc,
+                    "コメント": ""
+                }
+                container.create_item(body=new_item)
+
+                diff_rows.append({
+                    "filename": filename,
+                    "fcode": fcode,
+                    "sheetname": sheetname,
+                    "stocks": stock,
+                    "元組入銘柄解説": "",
+                    "新組入銘柄解説": desc,
+                    "分類": "新規銘柄",
+                    "no": max_no + 1,
+                    "months": get_prev_month_str()
+                })
+
+        insert_tenbrend_history_si4(diff_rows)
+        update_excel_with_diff_si4(diff_rows, fund_type)
+
+        return diff_rows or "全部一致，无需更新"
 
     except Exception as e:
         return f"❌ handle_sheet_4plus41 error: {str(e)}"
+
 
 def insert_tenbrend_history_si5(diff_rows):
     container = get_db_connection(TENBREND_CONTAINER_NAME)
@@ -8757,10 +8866,11 @@ def insert_tenbrend_history_si5(diff_rows):
             "新ESGコメント": record["新ESGコメント"],
             "元ESGコメント": record["元ESGコメント"],
             "分類": record["分類"],
-            "no":record["no"],
+            "no": record["no"],
             "created_at": datetime.now(UTC).isoformat()  # ✅ 当前时间
         }
         container.create_item(body=history_item)
+
 
 def update_excel_with_diff_si5(diff_rows, fund_type):
     if not diff_rows:
@@ -8779,7 +8889,7 @@ def update_excel_with_diff_si5(diff_rows, fund_type):
         raise Exception("Excel文件下载失败")
 
     wb = load_workbook(filename=io.BytesIO(excel_response.content))
-    
+
     for row in diff_rows:
         sheetname = row["sheetname"]
         fcode = row["fcode"]
@@ -8797,8 +8907,8 @@ def update_excel_with_diff_si5(diff_rows, fund_type):
 
         # 获取表头位置
         header_row = ws[3]
-        
-        stock_col = find_column_by_keyword(header_row, ["組入銘柄", "銘柄","銘柄名"])
+
+        stock_col = find_column_by_keyword(header_row, ["組入銘柄", "銘柄", "銘柄名"])
         keti_col = find_column_by_keyword(header_row, ["社会的課題", "目指すインパクト"])
         desc_col = find_column_by_keyword(header_row, ["コメント"])
         esg_col = find_column_by_keyword(header_row, ["ESGコメント"])  # 仅当你处理ESG表时需要
@@ -8855,9 +8965,11 @@ def update_excel_with_diff_si5(diff_rows, fund_type):
     container_client = get_storage_container()
     blob_client = container_client.get_blob_client(target_excel_name)
     blob_client.upload_blob(output_stream, overwrite=True)
-    
+
+
 def clean_text_si(text):
     return text.replace("\n", "").replace(" ", " ").strip()
+
 
 def split_by_numbered_blocks(text_block):
     parts = re.split(r'\n?(?=\s*([1-9]|10)[^\d])', text_block)
@@ -8865,7 +8977,7 @@ def split_by_numbered_blocks(text_block):
     i = 1
     while i < len(parts):
         num = parts[i].strip()
-        content = parts[i+1].strip() if i+1 < len(parts) else ""
+        content = parts[i + 1].strip() if i + 1 < len(parts) else ""
         combined_parts.append(f"{num} {content}")
         i += 2
 
@@ -8880,6 +8992,7 @@ def split_by_numbered_blocks(text_block):
             if no and company and description:
                 results.append([no, company, description])
     return results
+
 
 def extract_structured_tables(pdf_input):
     all_rows = []
@@ -8907,7 +9020,8 @@ def extract_structured_tables(pdf_input):
                         if len(cleaned_row) >= 3:
                             all_rows.append(cleaned_row)
     return all_rows
-    
+
+
 def handle_sheet_plus_si5(pdf_url, fcode, sheetname, fund_type, container, filename):
     try:
         pdf_response = requests.get(pdf_url)
@@ -8917,12 +9031,11 @@ def handle_sheet_plus_si5(pdf_url, fcode, sheetname, fund_type, container, filen
         tables = extract_structured_tables(io.BytesIO(pdf_response.content))
         if not tables:
             return "PDF中未提取到表格"
-        
+
         excel_url = f"{PDF_DIR}/10mingbing.xlsx"
         excel_response = requests.get(excel_url)
         if excel_response.status_code != 200:
             return "Excel文件下载失败"
-
 
         seen_stocks = set()
         unique_rows = []
@@ -8957,7 +9070,7 @@ def handle_sheet_plus_si5(pdf_url, fcode, sheetname, fund_type, container, filen
 
         diff_rows = []
         for row in unique_rows:
-            stock, keti,desc, esg = row
+            stock, keti, desc, esg = row
             query = """
                 SELECT * FROM c
                 WHERE c.sheetname = @sheetname AND c.fcode = @fcode AND c.stocks = @stock
@@ -8973,7 +9086,7 @@ def handle_sheet_plus_si5(pdf_url, fcode, sheetname, fund_type, container, filen
                 old_keti = clean_text(matched[0].get("社会的課題", ""))
                 old_desc = clean_text(matched[0].get("コメント", ""))
                 old_esg = clean_text(matched[0].get("ESGコメント", ""))
-                if old_desc != desc or old_esg != esg :
+                if old_desc != desc or old_esg != esg:
                     matched_item = matched[0]
                     matched_item.update({
                         "社会的課題": keti,
@@ -9042,7 +9155,6 @@ def handle_sheet_plus_si5(pdf_url, fcode, sheetname, fund_type, container, filen
 
     except Exception as e:
         return f"❌ handle_sheet_plussi5 error: {str(e)}"
-
 
 
 app = WsgiToAsgi(app)
