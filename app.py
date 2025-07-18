@@ -8013,7 +8013,7 @@ def handle_sheet_plus41(pdf_url, fcode, sheetname, fund_type, container, filenam
             # 转为 BytesIO 对象传给 extract_excel_table
             excel_file = io.BytesIO(response.content)
             tables = extract_excel_table(excel_file)
-            return tables # 717 debug
+            # return tables # 717 debug
         else:
             pdf_response = requests.get(pdf_url)
             if pdf_response.status_code != 200:
@@ -8043,7 +8043,8 @@ def handle_sheet_plus41(pdf_url, fcode, sheetname, fund_type, container, filenam
         while i < len(all_rows) - 1:
             row1 = all_rows[i]
             row2 = all_rows[i + 1]
-
+            return row1 # 718 debug
+        
             if len(row1) < 2 or str(row1[0]).strip() not in [str(n) for n in range(1, 11)]:
                 i += 1
                 continue
