@@ -8296,8 +8296,7 @@ def handle_sheet_plus4(pdf_url, fcode, sheetname, fund_type, container, filename
                 pdf_stock = clean_text(row[0])
 
                 pdf_desc = clean_text(row[1])
-                pdf_esg = re.sub(r"(\d{4})年(\d{1,2})月", lambda m: f"{m.group(1)}/{int(m.group(2))}/1",
-                                 clean_text(row[2]))
+                pdf_esg = clean_text(row[2])
 
                 seen_stocks.add(pdf_stock)
                 unique_rows.append([pdf_stock, pdf_desc, pdf_esg])
