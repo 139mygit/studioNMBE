@@ -3674,32 +3674,32 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
             })
 #-------------------
     # 年度
-    if fund_type == 'public':
-        cleaned_text = regcheck.sub(r'\n\s*', '', input_text)
-        date_pattern = r'(?<!\d{4}年)(\d{1,2})月(\d{1,2})日'  # 연도 없는 날짜만
+    # if fund_type == 'public':
+    #     cleaned_text = regcheck.sub(r'\n\s*', '', input_text)
+    #     date_pattern = r'(?<!\d{4}年)(\d{1,2})月(\d{1,2})日'  # 연도 없는 날짜만
 
-        for match in regcheck.finditer(date_pattern, cleaned_text):
-            date_str = match.group(0)               # 예: '4月30日'
-            date_pos = match.start()                # 위치
-            full_date = insert_year_by_regex(date_str, cleaned_text, date_pos)  # 연도 추가
-            half_date = year_half_dict(full_date)     # 전각 숫자 → 반각
+    #     for match in regcheck.finditer(date_pattern, cleaned_text):
+    #         date_str = match.group(0)               # 예: '4月30日'
+    #         date_pos = match.start()                # 위치
+    #         full_date = insert_year_by_regex(date_str, cleaned_text, date_pos)  # 연도 추가
+    #         half_date = year_half_dict(full_date)     # 전각 숫자 → 반각
 
-            # 원본 주변 텍스트 추출
-            context_pattern = r'.{0,8}' + regcheck.escape(date_str)
-            context_match = regcheck.search(context_pattern, cleaned_text)
-            original_text = context_match.group() if context_match else date_str
+    #         # 원본 주변 텍스트 추출
+    #         context_pattern = r'.{0,8}' + regcheck.escape(date_str)
+    #         context_match = regcheck.search(context_pattern, cleaned_text)
+    #         original_text = context_match.group() if context_match else date_str
 
-            comment = f"{original_text} → {half_date}"
+    #         comment = f"{original_text} → {half_date}"
 
-            corrections.append({
-                "page": pageNumber,
-                "original_text": original_text,
-                "comment": comment,
-                "reason_type": '年度用語の統一',
-                "check_point": '年度用語の統一',
-                "locations": [],  # 위치 정보는 필요에 따라 추가
-                "intgr": False,  # for debug
-            })
+    #         corrections.append({
+    #             "page": pageNumber,
+    #             "original_text": original_text,
+    #             "comment": comment,
+    #             "reason_type": '年度用語の統一',
+    #             "check_point": '年度用語の統一',
+    #             "locations": [],  # 위치 정보는 필요에 따라 추가
+    #             "intgr": False,  # for debug
+    #         })
 #-------------------
     # 英略词
     if fund_type == 'public':
@@ -3760,7 +3760,7 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
                 corrected_text_re = v  # 값(v)을 corrected_text_re에 저장 AI（人工知能）
                 reason_type = "用語の統一"  # 수정 이유
 
-                comment = f"{reason_type} {original_text} → {corrected_text_re}"
+                comment = f"{reason_type} {original_text} → "
 
             corrections.append({
                 "page": pageNumber,
