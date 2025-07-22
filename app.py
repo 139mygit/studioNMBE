@@ -3874,10 +3874,12 @@ def extract_text(input_text, original_text):
     else:
         return None  # 매칭되지 않는 경우 None 반환
 
-def extract_percent_number(reason):
-    reason = reason.replace('%', '').replace('％', '')
-    match = re.match(r'[-+]?\d*\.?\d+', reason)
-    return float(match.group()) if match else reason
+def clean_percent_prefix(value: str):
+    # split으로 %, ％ 기준으로 나누고 첫 번째 부분 추출
+    for symbol in ['%', '％']:
+        if symbol in value:
+            return value.split(symbol)[0].strip()
+    return value.strip()  # %가 없으면 그대로 반환
                 
 def extract_corrections(corrected_text, input_text,pageNumber):
     corrections = []
@@ -3888,7 +3890,6 @@ def extract_corrections(corrected_text, input_text,pageNumber):
         r'\(<span>提示:\s*(.*?)\s*<s.*?>(.*?)<\/s>\s*→\s*(.*?)<\/span>\)',
         re.DOTALL
     )
-
 
     matches = pattern_alt.findall(corrected_text)
 
@@ -3902,7 +3903,7 @@ def extract_corrections(corrected_text, input_text,pageNumber):
         # "%": "％"
         corrections.append({
             "page": pageNumber,
-            "original_text": extract_percent_number(reason),# half_and_full_process(reason,half_to_full_dict),  # 반각 카타카나를 전각으로 변환,  # 전체 입력값 当月のファンドの騰落率は+0.2%となりました。 上升
+            "original_text": clean_percent_prefix(reason),# half_and_full_process(reason,half_to_full_dict),  # 반각 카타카나를 전각으로 변환,  # 전체 입력값 当月のファンドの騰落率は+0.2%となりました。 上升
             "comment": comment, # +0.2% → 0.85% , 上升 -> 下落
             "reason_type": reason_type, # ファンドの騰落率，B-xxx
 
