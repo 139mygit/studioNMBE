@@ -5135,9 +5135,9 @@ async def get_original(input_data, org_text):
     dt = [
         "文章から原文に類似したテキストを抽出してください",
         "出力は以下のJSON形式でお願いします:",
-        "- {'target': '[抽出されたテキスト:]'}",
-        "- 類似したものがない場合は、空の文字列を返してください",
-        "- 類似したものが存在する場合は、最も類似度の高いものを抽出してください",
+        "- [{'target': '[抽出されたテキスト:]'}]",
+        "- 類似したものがない場合は、空の文字列を返してください。",
+        "- 類似する内容が存在する場合は、原文との類似度が50％を超えるすべてのテキストを抽出してください。",
 
         f"原文:{org_text}\n文章:{input_data}"
     ]
@@ -5155,14 +5155,19 @@ async def get_original(input_data, org_text):
         seed=SEED  # 재현 가능한 결과를 위해 seed 설정
     )
     answer = response['choices'][0]['message']['content'].strip().strip().replace("`", "").replace("json", "", 1)
+
+    src_score = 0
+    src_content = ""
     if answer:
         parsed_data = ast.literal_eval(answer)
-        similar_content = parsed_data.get("target")
-        if similar_content:
-            score = SequenceMatcher(None, org_text, similar_content).ratio()
-            if score > 0.85:
-                return similar_content
-        return ""
+        for once in parsed_data:
+            similar_content = once.get("target")
+            if similar_content:
+                score = SequenceMatcher(None, org_text, similar_content).ratio()
+                if score > src_score:
+                    src_score = score
+                    src_content = similar_content
+    return src_content
 
 LOCAL_LINK = "local_link"
 @app.route('/api/getaths', methods=['GET'])
