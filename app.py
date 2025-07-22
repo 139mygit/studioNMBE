@@ -3873,6 +3873,11 @@ def extract_text(input_text, original_text):
         return match.group(0)  # 매칭된 텍스트 반환
     else:
         return None  # 매칭되지 않는 경우 None 반환
+
+def extract_percent_number(reason):
+    reason = reason.replace('%', '').replace('％', '')
+    match = re.match(r'[-+]?\d*\.?\d+', reason)
+    return float(match.group()) if match else reason
                 
 def extract_corrections(corrected_text, input_text,pageNumber):
     corrections = []
@@ -3884,10 +3889,6 @@ def extract_corrections(corrected_text, input_text,pageNumber):
         re.DOTALL
     )
 
-    def extract_percent_number(reason):
-        reason = reason.replace('%', '').replace('％', '')
-        match = re.match(r'[-+]?\d*\.?\d+', reason)
-        return float(match.group()) if match else None
 
     matches = pattern_alt.findall(corrected_text)
 
