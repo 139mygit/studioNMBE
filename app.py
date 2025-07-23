@@ -6109,7 +6109,7 @@ def get_prompt(corrected):
     #     """,
         f"""
         **Omission of Particles (助詞の省略・誤用) Detection**
-        - Detect omissions of the particles「の」「を」「は」.
+        - Detect omissions of the particles「の」「を」「は」.All other cases are excluded from the check.
 
         **Example**：
         {example_61}
