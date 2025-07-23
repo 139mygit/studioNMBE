@@ -5389,7 +5389,6 @@ def integrate_enhance():
             if not content:
                 return jsonify({
                     "success": True,
-                    "answer": _answer,
                     "corrections": []  # 틀린 부분과 코멘트
                 })
 
@@ -5512,6 +5511,7 @@ def integrate_enhance():
 
             return jsonify({
                 "success": True,
+                "answer": _answer,
                 "corrections": corrections  # 틀린 부분과 코멘트
             })
         else:
@@ -5525,7 +5525,6 @@ def integrate_enhance():
                     "reason_type":"整合性", # for debug 62
                     "locations": [],  # 뒤에서 실제 PDF 위치(좌표)를 저장할 필드
                     "intgr": True, # for debug 62
-                    "answer": _answer
                 }]  # 틀린 부분과 코멘트
             })
 
