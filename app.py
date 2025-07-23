@@ -6673,10 +6673,21 @@ def save_corrections():
 
         # merged_corrections = {dict_key(c): c for c in (corrections + existing_corrections)}
         # final_corrections = list(merged_corrections.values())
-        if existing_corrections:
-            final_corrections = [c for c in corrections if dict_key(c) not in list(map(lambda x: dict_key(x), existing_corrections))]
-        else:
-            final_corrections = corrections
+        # 723 debug
+        # if existing_corrections:
+        #     final_corrections = [c for c in corrections if dict_key(c) not in list(map(lambda x: dict_key(x), existing_corrections))]
+        # else:
+        #     final_corrections = corrections
+
+
+        # 기존과 신규를 모두 합친 후, dict_key 기준 중복 제거
+        merged_corrections = existing_corrections + corrections
+
+        unique_dict = {}
+        for c in merged_corrections:
+            unique_dict[dict_key(c)] = c  # 중복일 경우 마지막 것으로 덮음
+
+        final_corrections = list(unique_dict.values())
 
         # 새 데이터 생성
         item = {
