@@ -3457,72 +3457,24 @@ def opt_check_ruru1(content, rules):
         
     return result
 
-def opt_check_ruru2(content, rules):
-    content = merge_brackets(content)  # 1️⃣ 괄호 내 줄바꿈 제거
+def keyword_pair_exists(content, keyword_a, keyword_b):
+    return keyword_a in content and keyword_b in content
+
+# 地政学リスク/政治的リスク
+def opt_check_ruru2(content, replace_rules2):
+    content = merge_brackets(content)
 
     result = []
-    for k, v in rules.items():
-        raw_key = k.replace("(", "（").replace(")", "）")
-        full_key = v.replace("(", "（").replace(")", "）")
 
-        escaped_k = regcheck.escape(raw_key)
-        escaped_v = regcheck.escape(full_key)
+    keyword_pairs = [
+        ("地政学リスク", "地政学的リスク"),
+        ("政治的リスク", "政治リスク")
+    ]
 
-        new_k = escaped_k
-        if raw_key.isalpha() or raw_key in ["S&L", "M&A"]:
-            if raw_key == "OPEC":
-                new_k = f"(?<![a-zA-Z]){escaped_k}(?!プラス|[a-zA-Z])"
-            elif raw_key == "スティープ化":
-                new_k = f"(?<!イールドカーブの){escaped_k}"
-            elif raw_key == "イールドカーブ":
-                new_k = f"{escaped_k}(?!・コントロール|のスティープ化|のフラット化)"
-            elif raw_key == "キャッシュフロー":
-                new_k = f"(?<!フリー){escaped_k}"
-            elif raw_key == "キャリートレード":
-                new_k = f"(?<!円){escaped_k}"
-            elif raw_key == "スプレッド":
-                new_k = f"(?<!クレジット){escaped_k}"
-            elif raw_key == "バリュー":
-                new_k = f"(?<!レラティブ・|フェア){escaped_k}"
-            elif raw_key == "モーゲージ":
-                new_k = f"{escaped_k}(?!債)"
-            elif raw_key == "商い":
-                new_k = f"(?<!薄){escaped_k}"
-            else:
-                new_k = f"(?<![a-zA-Z]){escaped_k}(?![a-zA-Z])"
-        # 예외 처리: 中銀
-        elif raw_key == "中銀":
-            # '中央銀行' 앞에 수식어 포함 여부 확인
-            matches = regcheck.finditer(escaped_v, content)
-            exclude = False
-            for m in matches:
-                # 예: '欧州中央銀行' => m.start() - 2 >= 0, 앞 2글자 포함 확인
-                prefix = content[max(0, m.start() - 2): m.start()]
-                if prefix and not regcheck.match(r"[ \t\n\r]", prefix):
-                    exclude = True
-                    break
-            if exclude:
-                new_k = escaped_k  # full_key는 건너뛰고, raw_key만 검사
-                full_match = None
-            else:
-                full_match = regcheck.search(escaped_v, content)
+    for a, b in keyword_pairs:
+        if keyword_pair_exists(content, a, b):
+            result.append({a: a})
 
-            
-        raw_match = regcheck.search(new_k, content)
-        full_match = regcheck.search(escaped_v, content)
-
-        # 일반 조건: full_key가 먼저 등장하면 제외
-        if raw_key != "中銀":  # 중銀 예외 상황 제외
-            # full_key가 먼저 등장한 경우, 이 키는 제외하고 다음 키로
-            if full_match and raw_match:
-                if full_match.start() <= raw_match.start():
-                    continue
-            elif full_match and not raw_match:
-                continue
-
-        if raw_match:
-            result.append({raw_key: full_key})
-        
     return result
 
 # 0501 debug
@@ -3761,7 +3713,7 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
                 corrected_text_re = v  # 값(v)을 corrected_text_re에 저장 AI（人工知能）
                 reason_type = "用語の統一"  # 수정 이유
 
-                comment = f"{reason_type} {original_text} → "
+                comment = f"{reason_type} {original_text}"
 
             corrections.append({
                 "page": pageNumber,
