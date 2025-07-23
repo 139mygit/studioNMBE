@@ -5378,13 +5378,14 @@ def integrate_enhance():
         pageNumber = data.get('pageNumber',0)
 
         org_text = data.get("Org_Text", "")
+        __answer = ""
 
         if org_text == "銘柄名1～10":
                     content = _content
         else:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-            content, _answer = loop.run_until_complete(get_original(_content, org_text))
+            content, __answer = loop.run_until_complete(get_original(_content, org_text))
 
             if not content:
                 return jsonify({
@@ -5511,7 +5512,7 @@ def integrate_enhance():
 
             return jsonify({
                 "success": True,
-                "answer": _answer,
+                "answer": __answer,
                 "corrections": corrections  # 틀린 부분과 코멘트
             })
         else:
@@ -5549,7 +5550,7 @@ def ruru_ask_gpt():
         
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        input, _answer = loop.run_until_complete(get_original(_input, orgtext))
+        input, __answer = loop.run_until_complete(get_original(_input, orgtext))
         corrections = []
         pdf_base64 = data.get("pdf_bytes", "")
         if not input:
