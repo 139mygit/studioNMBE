@@ -5168,7 +5168,7 @@ async def get_original(input_data, org_text):
                 if score > src_score:
                     src_score = score
                     src_content = similar_content
-    return src_content
+    return src_content, answer
 
 LOCAL_LINK = "local_link"
 @app.route('/api/getaths', methods=['GET'])
@@ -5384,11 +5384,12 @@ def integrate_enhance():
         else:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-            content = loop.run_until_complete(get_original(_content, org_text))
+            content, _answer = loop.run_until_complete(get_original(_content, org_text))
 
             if not content:
                 return jsonify({
                     "success": True,
+                    "answer": _answer,
                     "corrections": []  # 틀린 부분과 코멘트
                 })
 
@@ -5524,6 +5525,7 @@ def integrate_enhance():
                     "reason_type":"整合性", # for debug 62
                     "locations": [],  # 뒤에서 실제 PDF 위치(좌표)를 저장할 필드
                     "intgr": True, # for debug 62
+                    "answer": _answer
                 }]  # 틀린 부분과 코멘트
             })
 
@@ -5548,7 +5550,7 @@ def ruru_ask_gpt():
         
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        input = loop.run_until_complete(get_original(_input, orgtext))
+        input, _answer = loop.run_until_complete(get_original(_input, orgtext))
         corrections = []
         pdf_base64 = data.get("pdf_bytes", "")
         if not input:
