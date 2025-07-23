@@ -7637,10 +7637,10 @@ def check_tenbrend(filename, fund_type):
                     if not row or str(row[0]).strip() not in [str(i) for i in range(1, 11)]:
                         continue
                     if not row[1]:
-                        pdf_stock = clean_text(row[2])
+                        pdf_stock = re.sub(r'^(NEW\s*|new\s*)|(\s*NEW|\s*new)$', '', clean_text(row[2]), flags=re.IGNORECASE)
                     else:
 
-                        pdf_stock = clean_text(row[1])
+                        pdf_stock = re.sub(r'^(NEW\s*|new\s*)|(\s*NEW|\s*new)$', '', clean_text(row[1]), flags=re.IGNORECASE)
                     if not row[2]:
                         pdf_desc = clean_text(row[3])
                     else:
@@ -7783,7 +7783,7 @@ def check_tenbrend(filename, fund_type):
                         continue
                     if not row or str(row[0]).strip() not in [str(i) for i in range(1, 11)]:
                         continue
-                    pdf_stock = clean_text(row[1])
+                    pdf_stock = re.sub(r'^(NEW\s*|new\s*)|(\s*NEW|\s*new)$', '', clean_text(row[1]), flags=re.IGNORECASE)
                     pdf_esg = clean_text(row[2])
                     pdf_desc = clean_text(row[3])
 
@@ -7946,7 +7946,7 @@ def handle_sheet_plus42(pdf_url, fcode, sheetname, fund_type, container, filenam
                 i += 1
                 continue
 
-            stock = clean_text(row1[1])
+            stock = re.sub(r'^(NEW\s*|new\s*)|(\s*NEW|\s*new)$', '', clean_text(row[1]), flags=re.IGNORECASE)
             if not stock or stock in seen_stocks:
                 i += 1  # ❗ 这里是跳1行而不是2行
                 continue
@@ -8161,7 +8161,8 @@ def handle_sheet_plus41(pdf_url, fcode, sheetname, fund_type, container, filenam
                     i += 1
                     continue
 
-                stock = clean_text(row1[1])
+                stock = re.sub(r'^(NEW\s*|new\s*)|(\s*NEW|\s*new)$', '', clean_text(row[1]), flags=re.IGNORECASE)
+                
                 if not stock or stock in seen_stocks:
                     i += 1  # ❗ 这里是跳1行而不是2行
                     continue
@@ -8378,7 +8379,7 @@ def handle_sheet_plus4(pdf_url, fcode, sheetname, fund_type, container, filename
         if fcode in ['140749']:
             for row in tables:
 
-                pdf_stock = clean_text(row[0])
+                pdf_stock = re.sub(r'^(NEW\s*|new\s*)|(\s*NEW|\s*new)$', '', clean_text(row[0]), flags=re.IGNORECASE)
 
                 pdf_desc = clean_text(row[1])
                 pdf_esg = re.sub(r"(\d{4})年(\d{1,2})月", lambda m: f"{m.group(1)}/{int(m.group(2))}/1", clean_text(row[2]))
@@ -8397,8 +8398,7 @@ def handle_sheet_plus4(pdf_url, fcode, sheetname, fund_type, container, filename
 
                     if not row or str(row[0]).strip() not in [str(i) for i in range(1, 11)]:
                         continue
-                    pdf_stock = clean_text(row[1])
-
+                    pdf_stock = re.sub(r'^(NEW\s*|new\s*)|(\s*NEW|\s*new)$', '', clean_text(row[1]), flags=re.IGNORECASE)
                     pdf_desc = clean_text(row[2])
                     pdf_esg = re.sub(r"(\d{4})年(\d{1,2})月", lambda m: f"{m.group(1)}/{int(m.group(2))}/1",
                                      clean_text(row[3]))
@@ -8584,8 +8584,7 @@ def handle_sheet_plus5(pdf_url, fcode, sheetname, fund_type, container, filename
         if fcode in ['140787', '180342-3']:
             for row in all_rows:
 
-                stock = clean_text(row[0])
-
+                stock = re.sub(r'^(NEW\s*|new\s*)|(\s*NEW|\s*new)$', '', clean_text(row[0]), flags=re.IGNORECASE)
                 keti = clean_text(row[1])
                 desc = clean_text(row[2])
                 esg = clean_text(row[3])
@@ -8605,6 +8604,7 @@ def handle_sheet_plus5(pdf_url, fcode, sheetname, fund_type, container, filename
                     continue
 
                 stock = clean_text(row1[1])
+                stock = re.sub(r'^(NEW\s*|new\s*)|(\s*NEW|\s*new)$', '', clean_text(row1[1]), flags=re.IGNORECASE)
                 if not stock or stock in seen_stocks:
                     i += 1  # ❗ 这里是跳1行而不是2行
                     continue
@@ -8844,7 +8844,8 @@ def handle_sheet_plus_si4(pdf_url, fcode, sheetname, fund_type, container, filen
 
                 if not row or str(row[0]).strip() not in [str(i) for i in range(1, 11)]:
                     continue
-                pdf_stock = clean_text(row[1])
+                
+                pdf_stock = re.sub(r'^(NEW\s*|new\s*)|(\s*NEW|\s*new)$', '', clean_text(row[1]), flags=re.IGNORECASE)
                 if not row[2]:
                     pdf_desc = clean_text(row[3]) if len(row) > 3 else ""
                 else:
@@ -9145,7 +9146,7 @@ def handle_sheet_plus_si5(pdf_url, fcode, sheetname, fund_type, container, filen
                 i += 1
                 continue
 
-            stock = clean_text(row1[1])
+            stock = re.sub(r'^(NEW\s*|new\s*)|(\s*NEW|\s*new)$', '', clean_text(row1[1]), flags=re.IGNORECASE)
             if not stock or stock in seen_stocks:
                 i += 1  # ❗ 这里是跳1行而不是2行
                 continue
