@@ -6702,8 +6702,12 @@ def save_corrections():
         def dict_key(d):
             return (d.get('check_point'), d.get('comment'), d.get('page'), d.get('original_text'))
 
-        merged_corrections = {dict_key(c): c for c in (corrections + existing_corrections)}
-        final_corrections = list(merged_corrections.values())
+        # merged_corrections = {dict_key(c): c for c in (corrections + existing_corrections)}
+        # final_corrections = list(merged_corrections.values())
+        if existing_corrections:
+            final_corrections = [c for c in corrections if dict_key(c) not in list(map(lambda x: dict_key(x), existing_corrections))]
+        else:
+            final_corrections = corrections
 
         # 새 데이터 생성
         item = {
