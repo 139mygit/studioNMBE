@@ -5109,7 +5109,7 @@ async def get_original(input_data, org_text):
     )
     answer = response['choices'][0]['message']['content'].strip().strip().replace("`", "").replace("json", "", 1)
 
-    src_score = 0
+    src_score = 0.5
     src_content = ""
     if answer:
         parsed_data = ast.literal_eval(answer)
