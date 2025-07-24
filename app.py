@@ -6668,8 +6668,8 @@ def save_corrections():
             existing_corrections = result.get("corrections", [])
 
         # 🔁 중복 제거 (dict list 기준, 'check_point' + 'comment' 기준 등으로)
-        def dict_key(d):
-            return (d.get('check_point'), d.get('comment'), d.get('page'), d.get('original_text'))
+        # def dict_key(d):
+        #     return (d.get('check_point'), d.get('comment'), d.get('page'), d.get('original_text'))
 
         # merged_corrections = {dict_key(c): c for c in (corrections + existing_corrections)}
         # final_corrections = list(merged_corrections.values())
@@ -6681,13 +6681,14 @@ def save_corrections():
 
 
         # 기존과 신규를 모두 합친 후, dict_key 기준 중복 제거
-        merged_corrections = existing_corrections + corrections
+        final_corrections  = existing_corrections + corrections
 
-        unique_dict = {}
-        for c in merged_corrections:
-            unique_dict[dict_key(c)] = c  # 중복일 경우 마지막 것으로 덮음
+        # 🔁 중복 제거
+        # unique_dict = {}
+        # for c in merged_corrections:
+        #     unique_dict[dict_key(c)] = c  # 중복일 경우 마지막 것으로 덮음
 
-        final_corrections = list(unique_dict.values())
+        # final_corrections = list(unique_dict.values())
 
         # 새 데이터 생성
         item = {
