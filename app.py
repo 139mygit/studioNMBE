@@ -5589,7 +5589,6 @@ def ruru_ask_gpt():
                 seed=SEED  # 재현 가능한 결과를 위해 seed 설정정
             )
             answer = response['choices'][0]['message']['content'].strip()
-        
             re_answer = remove_code_blocks(answer)
 
             # add the write logic
@@ -5607,27 +5606,14 @@ def ruru_ask_gpt():
                 except Exception as e:
                     return jsonify({"success": False, "error": str(e)}), 500
         
-            if corrections:
-                # 수정된 텍스트와 코멘트를 JSON으로 반환
-                return jsonify({
-                    "success": True,
-                    "corrections": corrections,  # 틀린 부분과 코멘트
-                    "input": input,  # 틀린 부분과 코멘트
-                })
-            else:
-                return jsonify({
-                "success": True,
-                "corrections": [{
-                    "page": pageNumber,  # 페이지 번호 (0부터 시작, 필요 시 수정)
-                    "original_text": clean_percent_prefix(input),
-                    "check_point": input,
-                    "comment": f"{input} → ",
-                    "reason_type":"整合性", # for debug 62
-                    "locations": [],  # 뒤에서 실제 PDF 위치(좌표)를 저장할 필드
-                    "intgr": True, # for debug 62
-                }]  # 틀린 부분과 코멘트
-            })
-
+            
+        # 수정된 텍스트와 코멘트를 JSON으로 반환
+        return jsonify({
+            "success": True,
+            "corrections": corrections,  # 틀린 부분과 코멘트
+            "input": input,  # 틀린 부분과 코멘트
+        })
+            
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
     
