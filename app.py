@@ -5606,13 +5606,12 @@ def ruru_ask_gpt():
                 except Exception as e:
                     return jsonify({"success": False, "error": str(e)}), 500
         
-            
-        # 수정된 텍스트와 코멘트를 JSON으로 반환
-        return jsonify({
-            "success": True,
-            "corrections": corrections,  # 틀린 부분과 코멘트
-            "input": input,  # 틀린 부분과 코멘트
-        })
+            # 수정된 텍스트와 코멘트를 JSON으로 반환
+            return jsonify({
+                "success": True,
+                "corrections": corrections,  # 틀린 부분과 코멘트
+                "input": input,  # 틀린 부분과 코멘트
+            })
             
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
