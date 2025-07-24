@@ -5589,25 +5589,25 @@ def ruru_ask_gpt():
                 seed=SEED  # 재현 가능한 결과를 위해 seed 설정정
             )
             answer = response['choices'][0]['message']['content'].strip()
-            if input:
-                re_answer = remove_code_blocks(answer)
+        
+            re_answer = remove_code_blocks(answer)
 
-                # add the write logic
-                # 틀린 부분 찾기
-                corrections = extract_corrections(re_answer,input,pageNumber)
+            # add the write logic
+            # 틀린 부분 찾기
+            corrections = extract_corrections(re_answer,input,pageNumber)
 
-                if pdf_base64:
-                    try:
-                        pdf_bytes = base64.b64decode(pdf_base64)
-                        # 위치 정보만 찾아 corrections에 저장
-                        find_locations_in_pdf(pdf_bytes, corrections)
-                        
-                    except ValueError as e:
-                        return jsonify({"success": False, "error": str(e)}), 400
-                    except Exception as e:
-                        return jsonify({"success": False, "error": str(e)}), 500
-            
-
+            if pdf_base64:
+                try:
+                    pdf_bytes = base64.b64decode(pdf_base64)
+                    # 위치 정보만 찾아 corrections에 저장
+                    find_locations_in_pdf(pdf_bytes, corrections)
+                    
+                except ValueError as e:
+                    return jsonify({"success": False, "error": str(e)}), 400
+                except Exception as e:
+                    return jsonify({"success": False, "error": str(e)}), 500
+        
+            if corrections:
                 # 수정된 텍스트와 코멘트를 JSON으로 반환
                 return jsonify({
                     "success": True,
