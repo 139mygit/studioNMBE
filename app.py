@@ -5558,7 +5558,7 @@ def ruru_ask_gpt():
 
                             5. If before includes the same meaning or exact phrase as after, even partially, treat it as correct and do not output anything.
                             6. If all values are semantically correct, return nothing (empty).
-                            7. Use {OrgType} and {TargetCondition }only as context for understanding — but your judgment should be based solely on {input} vs {result}.
+                            7. Use {OrgType} only as context for understanding — but your judgment should be based solely on {input} vs {result}.
 
                             Input:
                                 Input Text:
@@ -5566,9 +5566,6 @@ def ruru_ask_gpt():
 
                                 Original Type:
                                 {OrgType}
-
-                                Target Condition:
-                                {TargetCondition}
 
                                 Result:
                                 {result}
