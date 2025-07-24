@@ -5608,13 +5608,13 @@ def ruru_ask_gpt():
         
         if not corrections:
             corrections.append({
-                        "page": pageNumber,  # 페이지 번호 (0부터 시작, 필요 시 수정)
-                        "original_text": clean_percent_prefix(input)[-4:],
+                        "page": pageNumber,
+                        "original_text": input, #clean_percent_prefix(input)[-4:]
                         "check_point": input,
                         "comment": f"{input} → ", # +0.2% → 0.85% f"{reason} → {corrected}"
-                        "reason_type": "整合性",  # for debug 62
-                        "locations": [],  # 뒤에서 실제 PDF 위치(좌표)를 저장할 필드
-                        "intgr": True,  # for debug 66
+                        "reason_type": "整合性",
+                        "locations": [],
+                        "intgr": True,
                     })
                 
             try:
