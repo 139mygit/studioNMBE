@@ -5589,7 +5589,7 @@ def ruru_ask_gpt():
                 seed=SEED  # 재현 가능한 결과를 위해 seed 설정정
             )
             answer = response['choices'][0]['message']['content'].strip()
-            if answer:
+            if input:
                 re_answer = remove_code_blocks(answer)
 
                 # add the write logic
@@ -5619,7 +5619,7 @@ def ruru_ask_gpt():
                 "success": True,
                 "corrections": [{
                     "page": pageNumber,  # 페이지 번호 (0부터 시작, 필요 시 수정)
-                    "original_text": input,
+                    "original_text": clean_percent_prefix(input),
                     "check_point": input,
                     "comment": f"{input} → ",
                     "reason_type":"整合性", # for debug 62
