@@ -5607,18 +5607,26 @@ def ruru_ask_gpt():
                     return jsonify({"success": False, "error": str(e)}), 500
         
         if not corrections:
-            return jsonify({
-                "success": True,
-                "corrections": [{
-                    "page": pageNumber,  # 페이지 번호 (0부터 시작, 필요 시 수정)
-                    "original_text": clean_percent_prefix(input)[-10:],
-                    "check_point": input,
-                    "comment": f"{input} → ",
-                    "reason_type":"整合性", # for debug 62
-                    "locations": [],  # 뒤에서 실제 PDF 위치(좌표)를 저장할 필드
-                    "intgr": True, # for debug 62
-                }]  # 틀린 부분과 코멘트
-            })
+            corrections.append({
+                        "page": pageNumber,  # 페이지 번호 (0부터 시작, 필요 시 수정)
+                        "original_text": clean_percent_prefix(input)[-4:],
+                        "check_point": input,
+                        "comment": f"{input} → ", # +0.2% → 0.85% f"{reason} → {corrected}"
+                        "reason_type": "整合性",  # for debug 62
+                        "locations": [],  # 뒤에서 실제 PDF 위치(좌표)를 저장할 필드
+                        "intgr": True,  # for debug 66
+                    })
+                
+            try:
+                pdf_bytes = base64.b64decode(pdf_base64)
+                # 위치 정보만 찾아 corrections에 저장
+                find_locations_in_pdf(pdf_bytes, corrections)
+                
+            except ValueError as e:
+                return jsonify({"success": False, "error": str(e)}), 400
+            except Exception as e:
+                return jsonify({"success": False, "error": str(e)}), 500
+            
         # 수정된 텍스트와 코멘트를 JSON으로 반환
         return jsonify({
             "success": True,
