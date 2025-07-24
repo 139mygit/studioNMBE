@@ -5589,30 +5589,44 @@ def ruru_ask_gpt():
                 seed=SEED  # 재현 가능한 결과를 위해 seed 설정정
             )
             answer = response['choices'][0]['message']['content'].strip()
-            re_answer = remove_code_blocks(answer)
+            if answer:
+                re_answer = remove_code_blocks(answer)
 
-            # add the write logic
-            # 틀린 부분 찾기
-            corrections = extract_corrections(re_answer,input,pageNumber)
+                # add the write logic
+                # 틀린 부분 찾기
+                corrections = extract_corrections(re_answer,input,pageNumber)
 
-            if pdf_base64:
-                try:
-                    pdf_bytes = base64.b64decode(pdf_base64)
-                    # 위치 정보만 찾아 corrections에 저장
-                    find_locations_in_pdf(pdf_bytes, corrections)
-                    
-                except ValueError as e:
-                    return jsonify({"success": False, "error": str(e)}), 400
-                except Exception as e:
-                    return jsonify({"success": False, "error": str(e)}), 500
-        
+                if pdf_base64:
+                    try:
+                        pdf_bytes = base64.b64decode(pdf_base64)
+                        # 위치 정보만 찾아 corrections에 저장
+                        find_locations_in_pdf(pdf_bytes, corrections)
+                        
+                    except ValueError as e:
+                        return jsonify({"success": False, "error": str(e)}), 400
+                    except Exception as e:
+                        return jsonify({"success": False, "error": str(e)}), 500
+            
 
-        # 수정된 텍스트와 코멘트를 JSON으로 반환
-        return jsonify({
-            "success": True,
-            "corrections": corrections,  # 틀린 부분과 코멘트
-            "input": input,  # 틀린 부분과 코멘트
-        })
+                # 수정된 텍스트와 코멘트를 JSON으로 반환
+                return jsonify({
+                    "success": True,
+                    "corrections": corrections,  # 틀린 부분과 코멘트
+                    "input": input,  # 틀린 부분과 코멘트
+                })
+            else:
+                return jsonify({
+                "success": True,
+                "corrections": [{
+                    "page": pageNumber,  # 페이지 번호 (0부터 시작, 필요 시 수정)
+                    "original_text": input,
+                    "check_point": input,
+                    "comment": f"{input} → ",
+                    "reason_type":"整合性", # for debug 62
+                    "locations": [],  # 뒤에서 실제 PDF 위치(좌표)를 저장할 필드
+                    "intgr": True, # for debug 62
+                }]  # 틀린 부분과 코멘트
+            })
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -6667,28 +6681,8 @@ def save_corrections():
             result = existing_item[0].get("result", {})
             existing_corrections = result.get("corrections", [])
 
-        # 🔁 중복 제거 (dict list 기준, 'check_point' + 'comment' 기준 등으로)
-        # def dict_key(d):
-        #     return (d.get('check_point'), d.get('comment'), d.get('page'), d.get('original_text'))
-
-        # merged_corrections = {dict_key(c): c for c in (corrections + existing_corrections)}
-        # final_corrections = list(merged_corrections.values())
-        # 723 debug
-        # if existing_corrections:
-        #     final_corrections = [c for c in corrections if dict_key(c) not in list(map(lambda x: dict_key(x), existing_corrections))]
-        # else:
-        #     final_corrections = corrections
-
-
         # 기존과 신규를 모두 합친 후, dict_key 기준 중복 제거
         final_corrections  = existing_corrections + corrections
-
-        # 🔁 중복 제거
-        # unique_dict = {}
-        # for c in merged_corrections:
-        #     unique_dict[dict_key(c)] = c  # 중복일 경우 마지막 것으로 덮음
-
-        # final_corrections = list(unique_dict.values())
 
         # 새 데이터 생성
         item = {
