@@ -5584,6 +5584,8 @@ def ruru_ask_gpt():
             match = re.search(r"超過収益[^-+0-9]*([+-]?\d+(?:\.\d+)?)", input)
             if match:
                 value = match.group(1)
+            else:
+                value = input
             corrections.append({
                         "page": pageNumber,
                         "original_text": value, #clean_percent_prefix(input)[-4:]
@@ -7715,7 +7717,7 @@ def check_tenbrend(filename, fund_type):
                         "分類": "新規銘柄"
                     })
             insert_tenbrend_history(diff_rows)
-            update_excel_with_diff_rows(diff_rows, fund_type)
+            # update_excel_with_diff_rows(diff_rows, fund_type)
 
             return diff_rows or "全部一致，无需更新"
 
@@ -7859,7 +7861,7 @@ def check_tenbrend(filename, fund_type):
                     })
 
             insert_tenbrend_history(diff_rows)
-            update_excel_with_diff_rows4(diff_rows, fund_type)
+            # update_excel_with_diff_rows4(diff_rows, fund_type)
 
             return diff_rows or "全部一致，无需更新"
 
@@ -8039,7 +8041,7 @@ def handle_sheet_plus42(pdf_url, fcode, sheetname, fund_type, container, filenam
                 })
 
         insert_tenbrend_history42(diff_rows)
-        update_excel_with_diff_rows42(diff_rows, fund_type)
+        # update_excel_with_diff_rows42(diff_rows, fund_type)
 
         return diff_rows or "全部一致，无需更新"
 
@@ -8052,13 +8054,16 @@ def extract_excel_table(file_like,fcode):
         # 支持传入 BytesIO 或本地路径
         if fcode == "180371-2":
             sheet_name = "PIC_24_S"
+            df = pd.read_excel(file_like, sheet_name=sheet_name, header=1, usecols="A:D", dtype=str)
         elif fcode == "140764-5":
             sheet_name = "銘柄紹介"
+            df = pd.read_excel(file_like, sheet_name=sheet_name, header=1, usecols="A:D", dtype=str)
         elif fcode == "140793-6":
             sheet_name = "組入銘柄(債券・1)"
+            df = pd.read_excel(file_like, sheet_name=sheet_name, header=1, usecols="A:D", dtype=str)
         else:
             sheet_name = "銘柄解説"
-        df = pd.read_excel(file_like, sheet_name=sheet_name, header=1, usecols="A:D", dtype=str)
+            df = pd.read_excel(file_like, sheet_name=sheet_name, header=1, usecols="A:D", dtype=str)
     except Exception as e:
         print(f"❌ Excel 读取失败: {e}")
         return []
@@ -8102,7 +8107,7 @@ def extract_excel_table3(file_like,fcode):
             df = pd.read_excel(file_like, sheet_name=sheet_name, header=1, usecols="A:E", dtype=str)
         elif fcode == "140565-6":
             sheet_name = "銘柄解説入力ｼｰﾄ"
-            df = pd.read_excel(file_like, sheet_name=sheet_name, header=1, usecols="A:E", dtype=str)
+            df = pd.read_excel(file_like, sheet_name=sheet_name, header=1, usecols="A:D", dtype=str)
         else:
             sheet_name = "銘柄解説"
             df = pd.read_excel(file_like, sheet_name=sheet_name, header=1, usecols="A:E", dtype=str)
@@ -8142,7 +8147,6 @@ def handle_sheet_plus41(pdf_url, fcode, sheetname, fund_type, container, filenam
 
             # 转为 BytesIO 对象传给 extract_excel_table
             excel_file = io.BytesIO(response.content)
-            return excel_file
             tables = extract_excel_table(excel_file,fcode)
         else:
             pdf_response = requests.get(pdf_url)
@@ -8285,7 +8289,7 @@ def handle_sheet_plus41(pdf_url, fcode, sheetname, fund_type, container, filenam
                 })
 
         insert_tenbrend_history41(diff_rows)
-        update_excel_with_diff_rows41(diff_rows, fund_type)
+        # update_excel_with_diff_rows41(diff_rows, fund_type)
 
         return diff_rows or "全部一致，无需更新"
 
@@ -8533,7 +8537,7 @@ def handle_sheet_plus4(pdf_url, fcode, sheetname, fund_type, container, filename
                 })
 
         insert_tenbrend_history4(diff_rows)
-        update_excel_with_diff_rows_shang(diff_rows, fund_type)
+        # update_excel_with_diff_rows_shang(diff_rows, fund_type)
 
         return diff_rows or "全部一致，无需更新"
 
@@ -8733,7 +8737,7 @@ def handle_sheet_plus5(pdf_url, fcode, sheetname, fund_type, container, filename
                 })
 
         insert_tenbrend_history5(diff_rows)
-        update_excel_with_diff_rows5(diff_rows, fund_type)
+        # update_excel_with_diff_rows5(diff_rows, fund_type)
 
         return diff_rows or "全部一致，无需更新"
 
@@ -8963,7 +8967,7 @@ def handle_sheet_plus_si4(pdf_url, fcode, sheetname, fund_type, container, filen
                 })
 
         insert_tenbrend_history_si4(diff_rows)
-        update_excel_with_diff_si4(diff_rows, fund_type)
+        # update_excel_with_diff_si4(diff_rows, fund_type)
 
         return diff_rows or "全部一致，无需更新"
 
@@ -9271,12 +9275,13 @@ def handle_sheet_plus_si5(pdf_url, fcode, sheetname, fund_type, container, filen
                 })
 
         insert_tenbrend_history_si5(diff_rows)
-        update_excel_with_diff_si5(diff_rows, fund_type)
+        # update_excel_with_diff_si5(diff_rows, fund_type)
 
         return diff_rows or "全部一致，无需更新"
 
     except Exception as e:
         return f"❌ handle_sheet_plussi5 error: {str(e)}"
+
 
 
 
