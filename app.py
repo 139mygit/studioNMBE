@@ -7564,7 +7564,19 @@ def check_tenbrend(filename, fund_type):
             pdf_response = requests.get(pdf_url)
             if pdf_response.status_code != 200:
                 return "PDF下载失败，没有找到pdf"
-            if fcode in ["140193", "140386", "140675", "140565-6", "140655-6", "140695-6", "180291-2", "180295-8"]:
+            if fcode in ['140193', '140386','140565-6','180295-8']:
+                # 将 .pdf 替换为 .xlsx 作为 Excel 文件路径
+                excel_url = pdf_url.replace(".pdf", ".xlsx")
+
+                # 下载 Excel 文件内容
+                response = requests.get(excel_url)
+                if response.status_code != 200:
+                    return "Excel下载失败"
+
+                # 转为 BytesIO 对象传给 extract_excel_table3
+                excel_file = io.BytesIO(response.content)
+                tables = extract_excel_table3(excel_file,fcode)
+            elif fcode in ["140675", "140655-6", "140695-6", "180291-2"]:
                 tables = extract_pdf_table_special(io.BytesIO(pdf_response.content))
             else:
 
@@ -7582,51 +7594,52 @@ def check_tenbrend(filename, fund_type):
 
             seen_stocks = set()
             unique_rows = []
-            for table in tables:
-                for row in table:
-                    if len(row) < 3:
-                        continue
-                    if (row[1] and ('組入銘柄' in row[1] or '銘柄' in row[1])) and \
-                            ((row[2] and '銘柄解説' in row[2]) or (len(row) > 3 and row[3] and '銘柄解説' in row[3])):
-                        continue
-                    if not row or str(row[0]).strip() not in [str(i) for i in range(1, 11)]:
-                        continue
-                    if not row[1]:
-                        pdf_stock = re.sub(r'^(NEW\s*|new\s*)|(\s*NEW|\s*new)$', '', clean_text(row[2]), flags=re.IGNORECASE)
-                    else:
+            if fcode in ['140193', '140386','140565-6','180295-8']:
+                for row in tables:
+                    stock = clean_text(row[0])
+                    desc = clean_text(row[1])
+                    seen_stocks.add(stock)
+                    unique_rows.append([stock, desc])
 
-                        pdf_stock = re.sub(r'^(NEW\s*|new\s*)|(\s*NEW|\s*new)$', '', clean_text(row[1]), flags=re.IGNORECASE)
-                    if not row[2]:
-                        pdf_desc = clean_text(row[3])
-                    else:
-                        pdf_desc = clean_text(row[2])
-
-                    if pdf_stock and not pdf_desc:
-                        alt_desc = clean_text(row[3]) if len(row) > 3 else ""
-                        if alt_desc:
-                            pdf_desc = alt_desc
+                    if len(unique_rows) >= 10:
+                        break                
+            else:
+                for table in tables:
+                    for row in table:
+                        if len(row) < 3:
+                            continue
+                        if (row[1] and ('組入銘柄' in row[1] or '銘柄' in row[1])) and \
+                                ((row[2] and '銘柄解説' in row[2]) or (len(row) > 3 and row[3] and '銘柄解説' in row[3])):
+                            continue
+                        if not row or str(row[0]).strip() not in [str(i) for i in range(1, 11)]:
+                            continue
+                        if not row[1]:
+                            pdf_stock = re.sub(r'^(NEW\s*|new\s*)|(\s*NEW|\s*new)$', '', clean_text(row[2]), flags=re.IGNORECASE)
                         else:
+
+                            pdf_stock = re.sub(r'^(NEW\s*|new\s*)|(\s*NEW|\s*new)$', '', clean_text(row[1]), flags=re.IGNORECASE)
+                        if not row[2]:
+                            pdf_desc = clean_text(row[3])
+                        else:
+                            pdf_desc = clean_text(row[2])
+
+                        if pdf_stock and not pdf_desc:
+                            alt_desc = clean_text(row[3]) if len(row) > 3 else ""
+                            if alt_desc:
+                                pdf_desc = alt_desc
+                            else:
+                                continue
+
+                        if not pdf_stock or pdf_stock in seen_stocks:
                             continue
 
-                    if not pdf_stock or pdf_stock in seen_stocks:
-                        continue
-
-                    seen_stocks.add(pdf_stock)
-                    unique_rows.append([pdf_stock, pdf_desc])
+                        seen_stocks.add(pdf_stock)
+                        unique_rows.append([pdf_stock, pdf_desc])
+                        if len(unique_rows) >= 10:
+                            break
                     if len(unique_rows) >= 10:
                         break
-                if len(unique_rows) >= 10:
-                    break
-            # ✅ Excel 最后一行写入
-            for row in unique_rows:
-                ws.append(row)
 
-            output_stream = io.BytesIO()
-            wb.save(output_stream)
-            output_stream.seek(0)
-            container_client = get_storage_container()
-            blob_client = container_client.get_blob_client("10mingbing.xlsx")
-            blob_client.upload_blob(output_stream, overwrite=True)
             # ✅ 与 Cosmos DB 比对并插入必要记录
             diff_rows = []
             for stock, desc in unique_rows:
@@ -8031,11 +8044,20 @@ def handle_sheet_plus42(pdf_url, fcode, sheetname, fund_type, container, filenam
         return f"❌ handle_sheet_plus42 error: {str(e)}"
 
 
-def extract_excel_table(file_like):
+def extract_excel_table(file_like,fcode):
     try:
         # 支持传入 BytesIO 或本地路径
-        sheet_name = "銘柄解説"
-        df = pd.read_excel(file_like, sheet_name=sheet_name, header=1, usecols="A:C", dtype=str)
+        if fcode == "180371-2":
+            sheet_name = "PIC_24_S"
+        elif fcode == "180371-2":
+            sheet_name = "PIC_24_S"
+        elif fcode == "140764-5":
+            sheet_name = "銘柄紹介"
+        elif fcode == "140793-6":
+            sheet_name = "組入銘柄(債券・1)"
+        else:
+            sheet_name = "銘柄解説"
+        df = pd.read_excel(file_like, sheet_name=sheet_name, header=1, usecols="A:D", dtype=str)
     except Exception as e:
         print(f"❌ Excel 读取失败: {e}")
         return []
@@ -8052,13 +8074,60 @@ def extract_excel_table(file_like):
             esg = clean_text(df.iloc[i + 1, 2])
             if stock:
                 results.append([stock, desc, esg])
+                
+    if fcode == "140793-6":
+        sheet_name = "組入銘柄(債券・2)"
+        df = pd.read_excel(file_like, sheet_name=sheet_name, header=1, usecols="A:D", dtype=str)
+        df = df.reset_index(drop=True)
+        for i in range(len(df) - 1):
+            index_val = str(df.iloc[i, 0]).strip()
+
+            if index_val in [str(n) for n in range(1, 11)]:  # 只处理1~10
+                stock = clean_text(df.iloc[i, 1])
+                desc = clean_text(df.iloc[i, 2])
+                esg = clean_text(df.iloc[i + 1, 2])
+                if stock:
+                    results.append([stock, desc, esg])
+    return results
+
+def extract_excel_table3(file_like,fcode):
+    try:
+        # 支持传入 BytesIO 或本地路径
+        if fcode == "140193":
+            sheetname = "140193"
+        elif fcode == "140386":
+            sheetname = "140386 (3)"
+        elif fcode == "140565-6":
+            sheetname = "銘柄解説入力ｼｰﾄ"
+        else:
+            sheet_name = "銘柄解説"
+        df = pd.read_excel(file_like, sheet_name=sheet_name, header=1, usecols="A:E", dtype=str)
+    except Exception as e:
+        print(f"❌ Excel 读取失败: {e}")
+        return []
+
+    df = df.reset_index(drop=True)
+    results = []
+
+    for i in range(len(df) - 1):
+        index_val = str(df.iloc[i, 0]).strip()
+
+        if index_val in [str(n) for n in range(1, 11)]:  # 只处理1~10
+            stock = clean_text(df.iloc[i, 1])
+            if fcode == "140193":
+                desc = clean_text(df.iloc[i, 4])
+            elif fcode == "140565-6":
+                desc = clean_text(df.iloc[i, 3])
+            else:
+                desc = clean_text(df.iloc[i, 2])
+            if stock:
+                results.append([stock, desc])
 
     return results
 
-
 def handle_sheet_plus41(pdf_url, fcode, sheetname, fund_type, container, filename):
     try:
-        if fcode in ['140752', '140302-3']:
+        if fcode in ['140752', '140302-3','180371-2','180389-90','140764-5','140793-6']:
             # 将 .pdf 替换为 .xlsx 作为 Excel 文件路径
             excel_url = pdf_url.replace(".pdf", ".xlsx")
 
@@ -8069,7 +8138,7 @@ def handle_sheet_plus41(pdf_url, fcode, sheetname, fund_type, container, filenam
 
             # 转为 BytesIO 对象传给 extract_excel_table
             excel_file = io.BytesIO(response.content)
-            tables = extract_excel_table(excel_file)
+            tables = extract_excel_table(excel_file,fcode)
         else:
             pdf_response = requests.get(pdf_url)
             if pdf_response.status_code != 200:
@@ -8308,7 +8377,7 @@ def handle_sheet_plus4(pdf_url, fcode, sheetname, fund_type, container, filename
             if response.status_code != 200:
                 return "Excel下载失败"
 
-            # 转为 BytesIO 对象传给 extract_excel_table
+            # 转为 BytesIO 对象传给 extract_excel_table4
             excel_file = io.BytesIO(response.content)
             tables = extract_excel_table4(excel_file)
             
@@ -8511,7 +8580,7 @@ def handle_sheet_plus5(pdf_url, fcode, sheetname, fund_type, container, filename
             if response.status_code != 200:
                 return "Excel下载失败"
 
-            # 转为 BytesIO 对象传给 extract_excel_table
+            # 转为 BytesIO 对象传给 extract_excel_table5
             excel_file = io.BytesIO(response.content)
             tables = extract_excel_table5(excel_file)
         else:
