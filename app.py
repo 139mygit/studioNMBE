@@ -8049,8 +8049,6 @@ def extract_excel_table(file_like,fcode):
         # 支持传入 BytesIO 或本地路径
         if fcode == "180371-2":
             sheet_name = "PIC_24_S"
-        elif fcode == "180371-2":
-            sheet_name = "PIC_24_S"
         elif fcode == "140764-5":
             sheet_name = "銘柄紹介"
         elif fcode == "140793-6":
@@ -8094,11 +8092,11 @@ def extract_excel_table3(file_like,fcode):
     try:
         # 支持传入 BytesIO 或本地路径
         if fcode == "140193":
-            sheetname = "140193"
+            sheet_name = "140193"
         elif fcode == "140386":
-            sheetname = "140386 (3)"
+            sheet_name = "140386 (3)"
         elif fcode == "140565-6":
-            sheetname = "銘柄解説入力ｼｰﾄ"
+            sheet_name = "銘柄解説入力ｼｰﾄ"
         else:
             sheet_name = "銘柄解説"
         df = pd.read_excel(file_like, sheet_name=sheet_name, header=1, usecols="A:E", dtype=str)
@@ -8165,7 +8163,7 @@ def handle_sheet_plus41(pdf_url, fcode, sheetname, fund_type, container, filenam
         # 合并所有表格行为一个大列表
         all_rows = tables
 
-        if fcode in ['140752', '140302-3']:
+        if fcode in ['140752', '140302-3','180371-2','180389-90','140764-5','140793-6']:
             for row in all_rows:
                 stock = clean_text(row[0])
                 desc = clean_text(row[1])
