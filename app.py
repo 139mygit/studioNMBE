@@ -8093,13 +8093,16 @@ def extract_excel_table3(file_like,fcode):
         # 支持传入 BytesIO 或本地路径
         if fcode == "140193":
             sheet_name = "140193"
+            df = pd.read_excel(file_like, sheet_name=sheet_name, header=1, usecols="A:E", dtype=str)
         elif fcode == "140386":
             sheet_name = "140386 (3)"
+            df = pd.read_excel(file_like, sheet_name=sheet_name, header=1, usecols="A:E", dtype=str)
         elif fcode == "140565-6":
             sheet_name = "銘柄解説入力ｼｰﾄ"
+            df = pd.read_excel(file_like, sheet_name=sheet_name, header=1, usecols="A:E", dtype=str)
         else:
             sheet_name = "銘柄解説"
-        df = pd.read_excel(file_like, sheet_name=sheet_name, header=1, usecols="A:E", dtype=str)
+            df = pd.read_excel(file_like, sheet_name=sheet_name, header=1, usecols="A:E", dtype=str)
     except Exception as e:
         print(f"❌ Excel 读取失败: {e}")
         return []
@@ -8125,7 +8128,7 @@ def extract_excel_table3(file_like,fcode):
 
 def handle_sheet_plus41(pdf_url, fcode, sheetname, fund_type, container, filename):
     try:
-        if fcode in ['140752', '140302-3','180371-2','180389-90','140764-5','140793-6']:
+        if fcode in ['140752', '140302-3','180371-2','140389-90','140764-5','140793-6']:
             # 将 .pdf 替换为 .xlsx 作为 Excel 文件路径
             excel_url = pdf_url.replace(".pdf", ".xlsx")
 
@@ -8136,6 +8139,7 @@ def handle_sheet_plus41(pdf_url, fcode, sheetname, fund_type, container, filenam
 
             # 转为 BytesIO 对象传给 extract_excel_table
             excel_file = io.BytesIO(response.content)
+            return excel_file
             tables = extract_excel_table(excel_file,fcode)
         else:
             pdf_response = requests.get(pdf_url)
@@ -8163,7 +8167,7 @@ def handle_sheet_plus41(pdf_url, fcode, sheetname, fund_type, container, filenam
         # 合并所有表格行为一个大列表
         all_rows = tables
 
-        if fcode in ['140752', '140302-3','180371-2','180389-90','140764-5','140793-6']:
+        if fcode in ['140752', '140302-3','180371-2','140389-90','140764-5','140793-6']:
             for row in all_rows:
                 stock = clean_text(row[0])
                 desc = clean_text(row[1])
