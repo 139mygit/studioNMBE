@@ -5581,9 +5581,12 @@ def ruru_ask_gpt():
                     return jsonify({"success": False, "error": str(e)}), 500
         
         if not corrections:
+            match = re.search(r"超過収益[^-+0-9]*([+-]?\d+(?:\.\d+)?)", input)
+            if match:
+                value = match.group(1)
             corrections.append({
                         "page": pageNumber,
-                        "original_text": input, #clean_percent_prefix(input)[-4:]
+                        "original_text": value, #clean_percent_prefix(input)[-4:]
                         "check_point": input,
                         "comment": f"{input} → ", # +0.2% → 0.85% f"{reason} → {corrected}"
                         "reason_type": "整合性",
