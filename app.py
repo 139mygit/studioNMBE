@@ -4038,7 +4038,7 @@ def save_to_cosmos(file_name, response_data, link_url, fund_type, upload_type=''
     try:
         existing_item = list(container.query_items(
                 query="SELECT * FROM c WHERE c.id = @id",
-                parameters=[{"name": "@id", "value": file_name}],
+                parameters=[{"name": "@id", "value": file_id}],
                 enable_cross_partition_query=True
             ))
 
@@ -4768,7 +4768,7 @@ def auto_save_cosmos():
         # 기존 항목 존재 여부 확인
         existing_item = list(container.query_items(
             query="SELECT * FROM c WHERE c.id = @id",
-            parameters=[{"name": "@id", "value": file_name}],
+            parameters=[{"name": "@id", "value": file_id}],
             enable_cross_partition_query=True
         ))
 
@@ -6656,6 +6656,12 @@ def save_corrections():
         # URL 디코딩
         file_name = urllib.parse.unquote(file_name_decoding)
 
+        match = re.search(r'(\d{0,}(?:-\d+)?_M\d{4})', file_name)
+        if match:
+            file_id = match.group(1)
+        else:
+            file_id = file_name
+
         # 1. 필수 필드 검증
         if not file_name or not isinstance(corrections, list):
             return jsonify({"success": False, "error": "file_name과 corrections(list)가 필요합니다."}), 400
@@ -6668,7 +6674,7 @@ def save_corrections():
         # 기존 항목 존재 여부 확인
         existing_item = list(container.query_items(
             query="SELECT * FROM c WHERE c.id = @id",
-            parameters=[{"name": "@id", "value": file_name}],
+            parameters=[{"name": "@id", "value": file_id}],
             enable_cross_partition_query=True
         ))
 
