@@ -2285,11 +2285,11 @@ def handle_menu():
         logging.info(f"Connected to {container_name} container")
         
         # 쿼리 실행
-        query = "SELECT * FROM c WHERE CONTAINS(c.id, '.pdf') OR c.upload_type='参照ファイル'"
+        query = "SELECT * FROM c WHERE CONTAINS(c.fileName, '.pdf') OR c.upload_type='参照ファイル'"
         items = list(container.query_items(query=query, enable_cross_partition_query=True))
         
         # 결과 필터링
-        filtered_items = [item for item in items if item and item.get('id')]
+        filtered_items = [item for item in items if item and item.get('fileName')]
 
         # 페이지네이션 적용
         total = len(filtered_items)
@@ -2326,11 +2326,11 @@ def handle_menu_all():
         logging.info(f"Connected to {container_name} container")
         
         # 쿼리 실행
-        query = "SELECT * FROM c WHERE CONTAINS(c.id, '.pdf') OR c.upload_type='参照ファイル'"
+        query = "SELECT * FROM c WHERE CONTAINS(c.fileName, '.pdf') OR c.upload_type='参照ファイル'"
         items = list(container.query_items(query=query, enable_cross_partition_query=True))
         
         # 결과 필터링
-        filtered_items = [item for item in items if item and item.get('id')]
+        filtered_items = [item for item in items if item and item.get('fileName')]
         response = {
         "code": 200,
         "data": filtered_items
