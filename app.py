@@ -6689,7 +6689,7 @@ def save_corrections():
 
         # 새 데이터 생성
         item = {
-            'id': file_name,
+            'id': file_id,
             'fileName': file_name,
             'icon': icon,
             "result": {
