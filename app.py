@@ -4744,9 +4744,15 @@ def auto_save_cosmos():
         # Cosmos DB 컨테이너 클라이언트 가져오기)
         container = get_db_connection(container_name)
 
+        match = re.search(r'(\d{6}(?:-\d+)?_M\d{4})', file_name)
+        if match:
+            file_id = match.group(1)
+        else:
+            file_id = file_name
+
         # 저장할 아이템 생성
         item = {
-            'id': file_name,  # 파일명을 고유 ID로 사용
+            'id': file_id,  # 파일명을 고유 ID로 사용
             'fileName': file_name,
             'result': response_data,
             'link': link_url,
