@@ -4013,8 +4013,14 @@ def save_to_cosmos(file_name, response_data, link_url, fund_type, upload_type=''
     # Cosmos DB 연결
     container = public_container if fund_type == 'public' else private_container
 
+    match = re.search(r'(\d{0,}(?:-\d+)?_M\d{4})', file_name)
+    if match:
+        file_id = match.group(1)
+    else:
+        file_id = file_name
+
     item = {
-        'id': file_name,  # 고유 ID로 파일 이름 사용
+        'id': file_id,  # 고유 ID로 파일 이름 사용
         'fileName': file_name,
         'result': response_data,  # GPT 응답
         'link': link_url,  # 파일 다운로드 링크 저장
