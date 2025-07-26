@@ -2285,11 +2285,11 @@ def handle_menu():
         logging.info(f"Connected to {container_name} container")
         
         # 쿼리 실행
-        query = "SELECT * FROM c WHERE CONTAINS(c.fileName, '.pdf') OR c.upload_type='参照ファイル'"
+        query = "SELECT * FROM c WHERE CONTAINS(c.id, '.pdf') OR c.upload_type='参照ファイル'"
         items = list(container.query_items(query=query, enable_cross_partition_query=True))
         
         # 결과 필터링
-        filtered_items = [item for item in items if item and item.get('fileName')]
+        filtered_items = [item for item in items if item and item.get('id')]
 
         # 페이지네이션 적용
         total = len(filtered_items)
@@ -2326,11 +2326,11 @@ def handle_menu_all():
         logging.info(f"Connected to {container_name} container")
         
         # 쿼리 실행
-        query = "SELECT * FROM c WHERE CONTAINS(c.fileName, '.pdf') OR c.upload_type='参照ファイル'"
+        query = "SELECT * FROM c WHERE CONTAINS(c.id, '.pdf') OR c.upload_type='参照ファイル'"
         items = list(container.query_items(query=query, enable_cross_partition_query=True))
         
         # 결과 필터링
-        filtered_items = [item for item in items if item and item.get('fileName')]
+        filtered_items = [item for item in items if item and item.get('id')]
         response = {
         "code": 200,
         "data": filtered_items
@@ -4012,14 +4012,14 @@ def save_to_cosmos(file_name, response_data, link_url, fund_type, upload_type=''
     # Cosmos DB 연결
     container = public_container if fund_type == 'public' else private_container
 
-    match = re.search(r'(\d{0,}(?:-\d+)?_M\d{4})', file_name)
-    if match:
-        file_id = match.group(1)
-    else:
-        file_id = file_name
+    # match = re.search(r'(\d{0,}(?:-\d+)?_M\d{4})', file_name)
+    # if match:
+    #     file_id = match.group(1)
+    # else:
+    #     file_id = file_name
 
     item = {
-        'id': file_id,  # 고유 ID로 파일 이름 사용
+        'id': file_name,  # 고유 ID로 파일 이름 사용
         'fileName': file_name,
         'result': response_data,  # GPT 응답
         'link': link_url,  # 파일 다운로드 링크 저장
@@ -4037,7 +4037,7 @@ def save_to_cosmos(file_name, response_data, link_url, fund_type, upload_type=''
     try:
         existing_item = list(container.query_items(
                 query="SELECT * FROM c WHERE c.id = @id",
-                parameters=[{"name": "@id", "value": file_id}],
+                parameters=[{"name": "@id", "value": file_name}],
                 enable_cross_partition_query=True
             ))
 
@@ -4749,15 +4749,9 @@ def auto_save_cosmos():
         # Cosmos DB 컨테이너 클라이언트 가져오기)
         container = get_db_connection(container_name)
 
-        match = re.search(r'(\d{0,}(?:-\d+)?_M\d{4})', file_name)
-        if match:
-            file_id = match.group(1)
-        else:
-            file_id = file_name
-
         # 저장할 아이템 생성
         item = {
-            'id': file_id,  # 파일명을 고유 ID로 사용
+            'id': file_name,  # 파일명을 고유 ID로 사용
             'fileName': file_name,
             'result': response_data,
             'link': link_url,
@@ -4767,7 +4761,7 @@ def auto_save_cosmos():
         # 기존 항목 존재 여부 확인
         existing_item = list(container.query_items(
             query="SELECT * FROM c WHERE c.id = @id",
-            parameters=[{"name": "@id", "value": file_id}],
+            parameters=[{"name": "@id", "value": file_name}],
             enable_cross_partition_query=True
         ))
 
@@ -6655,11 +6649,11 @@ def save_corrections():
         # URL 디코딩
         file_name = urllib.parse.unquote(file_name_decoding)
 
-        match = re.search(r'(\d{0,}(?:-\d+)?_M\d{4})', file_name)
-        if match:
-            file_id = match.group(1)
-        else:
-            file_id = file_name
+        # match = re.search(r'(\d{0,}(?:-\d+)?_M\d{4})', file_name)
+        # if match:
+        #     file_id = match.group(1)
+        # else:
+        #     file_id = file_name
 
         # 1. 필수 필드 검증
         if not file_name or not isinstance(corrections, list):
@@ -6673,7 +6667,7 @@ def save_corrections():
         # 기존 항목 존재 여부 확인
         existing_item = list(container.query_items(
             query="SELECT * FROM c WHERE c.id = @id",
-            parameters=[{"name": "@id", "value": file_id}],
+            parameters=[{"name": "@id", "value": file_name}],
             enable_cross_partition_query=True
         ))
 
@@ -6688,7 +6682,7 @@ def save_corrections():
 
         # 새 데이터 생성
         item = {
-            'id': file_id,
+            'id': file_name,
             'fileName': file_name,
             'icon': icon,
             "result": {
