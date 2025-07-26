@@ -6145,7 +6145,6 @@ def get_prompt(corrected):
 
         {target_prompt}
 
-        **Please check each sentence **individually** for okurigana consistency.**
         """
         yield common_result
 
