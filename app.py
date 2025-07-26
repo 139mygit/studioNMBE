@@ -3018,7 +3018,6 @@ replace_rules = {
     'ロングポジション': 'ロングポジション（買い持ち）',
     'EDAツール': 'EDAツール（電子設計自動化ツール）', #623
     'TOPIX':'TOPIX（東証株価指数）', #63207
-    'ベンチマーク': 'ベンチマーク(分配金再投資)', #630
     '利回りは上昇': '利回りは上昇（価格は下落）',
     '利回りは低下': '利回りは低下（価格は上昇）',
     'シャリア': 'シャリーア',
@@ -3487,7 +3486,7 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
             "original_text": word[0],  # original_text,
             "comment": word[0],
             "reason_type": reason_type,
-            "check_point": word[0],  # 필요에 따라 입력
+            "check_point": word[1],  # 필요에 따라 입력
             "locations": [],  # 필요에 따라 입력
             "intgr": False,  # for debug 62
         })
@@ -3499,7 +3498,7 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
 
         for match in half_width_katakana_matches:
             corrected_text_re = half_and_full_process(match,half_to_full_dict)  # 반각 카타카나를 전각으로 변환
-            reason_type = "半角カタカナを全角カタカナに統一"  # 수정 이유
+            reason_type = "半角を全角統一"  # 수정 이유
             original_text = match  # 원본 텍스트
             target_text = corrected_text_re  # 전각으로 변환된 텍스트
             # 「％」表記の統一（半角→全角） -0.09% → -0.09％
@@ -3544,7 +3543,7 @@ def find_corrections_wording(input_text,pageNumber,tenbrend,fund_type):
 
         for match in full_width_matches:
             corrected_text_re = half_and_full_process(match,full_to_half_dict)  # 전각 숫자 및 알파벳을 반각으로 변환
-            reason_type = "全角数字・アルファベットを半角数字・アルファベットに統一"  # 수정 이유
+            reason_type = "全角を半角統一"  # 수정 이유
             original_text = match  # 원본 텍스트
             target_text = corrected_text_re  # 반각으로 변환된 텍스트
 
