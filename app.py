@@ -4201,6 +4201,72 @@ def get_log():
         print(f"❌ API错误: {str(e)}")
         return jsonify({"success": False, "error": str(e)}), 500
 
+@app.route('/api/task_log_count')
+def get_log_count():
+    try:
+        # 获取参数，默认空字符串
+        fund_type = request.args.get('fundType', "").strip()     
+        task_status = request.args.get('status', "").strip()     
+
+        log_controller = get_db_connection(LOG_RECORD_CONTAINER_NAME)
+
+        # 条件列表 + 参数列表（防注入核心）
+        where_conditions = []
+        params = []
+        param_index = 1  # 参数占位符序号，避免重复
+
+        # 1. 募集形态筛选：有值才加条件，无值则忽略
+        if fund_type:
+            where_conditions.append(f"c.Fund_Type = @p{param_index}")
+            params.append({"name": f"@p{param_index}", "value": fund_type})
+            param_index += 1
+
+        # 2. 状态筛选：支持单个值 / 逗号分隔的多个值（如: status=processing,waiting）
+        if task_status:
+            # 分割多个状态值，过滤空值
+            status_list = [s.strip() for s in task_status.split(",") if s.strip()]
+            if len(status_list) == 1:
+                # 单个值：等于匹配
+                where_conditions.append(f"c.Task_Status = @p{param_index}")
+                params.append({"name": f"@p{param_index}", "value": status_list[0]})
+                param_index += 1
+            elif len(status_list) > 1:
+                # 多个值：IN 匹配（实现「或」逻辑）
+                placeholders = []
+                for s in status_list:
+                    placeholders.append(f"@p{param_index}")
+                    params.append({"name": f"@p{param_index}", "value": s})
+                    param_index += 1
+                where_conditions.append(f"c.Task_Status IN ({','.join(placeholders)})")
+
+        # 3. 拼接完整SQL：有条件加WHERE，无条件查全部
+        where_clause = ""
+        if where_conditions:
+            where_clause = "WHERE " + " AND ".join(where_conditions)
+
+        query_sql = f"""
+        SELECT VALUE COUNT(1)
+        FROM c
+        {where_clause}
+        """
+
+        # 执行查询
+        result = list(log_controller.query_items(
+            query=query_sql,
+            parameters=params,  # 传入参数，彻底防注入
+            enable_cross_partition_query=True
+        ))
+        total = result[0] if result else 0
+
+        return jsonify({
+            "success": True,
+            "total": total
+        }), 200
+
+    except Exception as e:
+        print(f"❌ 统计接口错误: {str(e)}")  # 加日志方便排查
+        return jsonify({"success": False, "error": str(e)}), 500
+
 @app.route('/api/check_file', methods=['POST'])
 def check_file_statue():
     try:
